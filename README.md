@@ -19,6 +19,10 @@ Not in the rulebook text, so made up for this version: dish recipes and prices, 
 
 Goals scale with the number of players, as in the board game.
 
+## Putting meals aside
+
+Tap ✓ Ready twice on a ticket to put the meal aside: it shrinks into the Ready row above your tickets and can't be changed any more. It is checked at the end of the shift like every other meal, and from restaurant 6 it can be served early from the Ready row. A screen aid only; it changes no rule. In multi-shift games a meal that was not finished at the shift's end comes back as a normal ticket.
+
 ## Two-chef helpers (extra)
 
 The standard restaurants follow the rulebook. With exactly two players, the host can switch on these extras in the lobby under "Extras" (our own, not in the rulebook; off by default):
