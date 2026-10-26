@@ -81,6 +81,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .plist em { margin-left: 10px; font-style: normal; color: var(--ink-2); font-size: 16px; }
 .plist em.on { color: var(--ok); }
 .plist em.off { color: var(--bad); }
+h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 6px; }
 .plist .x { margin-left: auto; background: none; border: 0; font-size: 22px; padding: 4px 10px; }
 .setrow { display: flex; align-items: center; gap: 14px; margin: 10px 0; flex-wrap: wrap; }
 .setrow > span { width: 130px; font-weight: 600; }
@@ -887,7 +888,7 @@ safe-buffer/index.js:
   const fill = (keys, v) => keys.reduce((o, k) => (o[k] = v, o), {});
 
   function newGame(settings, players) {
-    const st = Object.assign({ scenario: 1, workerSec: 30, shiftSec: 270, strict: false, challenge: false }, settings || {});
+    const st = Object.assign({ scenario: 1, workerSec: 30, shiftSec: 270, strict: false, challenge: false, duo: false }, settings || {});
     st.scenario = SCEN[st.scenario] ? +st.scenario : 1;
     const cfg = SCEN[st.scenario];
     const L = layout(players.length);
@@ -913,7 +914,7 @@ safe-buffer/index.js:
       if (cfg.setbacks) {
         storage.A = { cheese: a, meat: b, bread: 0, salad: a, veg: b, pasta: 0 };
         storage.B = { cheese: 2, meat: 4, bread: 0, salad: 2, veg: 4, pasta: 0 };
-        storage.C = { cheese: 0, meat: 0, bread: 6, salad: 0, veg: 0, pasta: 6 }; // was 5 for three chefs only, fewer than for two
+        storage.C = { cheese: 0, meat: 0, bread: t(6, 5, 6), salad: 0, veg: 0, pasta: t(6, 5, 6) }; // rulebook: 6 / 5 / 6
       } else if (cfg.pantry) {
         storage.A = { cheese: a, meat: b, bread: 0, salad: a, veg: b, pasta: 0 }; storage.B = Object.assign({}, storage.A);
         storage.C = { cheese: 0, meat: 0, bread: t(3, 4, 5), salad: 0, veg: 0, pasta: t(3, 4, 5) };
@@ -998,11 +999,11 @@ safe-buffer/index.js:
       s.stats[x.id] = { actions: 0, byArea: {}, returned: 0, thrown: 0 };
     });
     if (cfg.temps) { s.workers.temp = Array(cfg.temps).fill(null); s.off.temp = Array(cfg.temps).fill(false); }
-    // Two-chef rules (our own, applied automatically with exactly 2 players):
+    // Two-chef helpers: an extra outside the rulebook, only when switched on in the lobby with exactly 2 chefs:
     //  1. a shared helper timer either chef can use (inspired by the original edition's neutral Helper),
     //  2. chefs may put ingredients and spices on, and cook, their partner's meals,
     //  3. a van trip allows two purchases.
-    s.duo = s.players.length === 2;
+    s.duo = !!st.duo && s.players.length === 2;
     if (s.duo) { s.workers.helper = [null]; s.off.helper = [false]; }
     markShiftStart(s);
     seatPatrons(s, 2, { setup: true });
@@ -1557,11 +1558,13 @@ safe-buffer/index.js:
     }
     if (cfg.awards) {
       const at = AWARD_AT[pc(s.players.length)];
-      if (s.awards.length && s.rep < at[s.awards.length - 1]) { rep.awardLost = s.awards.pop(); s.awardDeck.unshift(rep.awardLost); }
-      else if (s.awards.length < 3 && s.rep >= at[s.awards.length] && s.awardDeck.length) {
-        rep.award = s.awardDeck.shift();
-        s.awards.push(rep.award);
-        if (rep.award === 'garden') SPICES.forEach(i => { s.bag[i]++; });
+      // Every threshold passed wins an award; every threshold dropped below returns the latest one.
+      rep.awardsWon = []; rep.awardsLost = [];
+      while (s.awards.length && s.rep < at[s.awards.length - 1]) { const k = s.awards.pop(); s.awardDeck.unshift(k); rep.awardsLost.push(k); rep.awardLost = k; }
+      while (s.awards.length < 3 && s.rep >= at[s.awards.length] && s.awardDeck.length) {
+        const k = s.awardDeck.shift();
+        s.awards.push(k); rep.awardsWon.push(k); rep.award = k;
+        if (k === 'garden') SPICES.forEach(i => { s.bag[i]++; });
       }
     }
     if (cfg.salary) payroll(s, rep);
@@ -2183,7 +2186,7 @@ safe-buffer/index.js:
     const canRejoin = gsaved && Date.now() - gsaved.at < 12 * 3600e3;
     return `<main class="home">
       <h1 class="logo">Küchen<span>-</span>Chaos</h1>
-      <p class="sub">The real-time kitchen game for 1–4 chefs, one iPad each.</p>
+      <p class="sub">The real-time kitchen game for 2–4 chefs, one iPad each.</p>
       <section class="card homecard">
         <label class="fld">Your name<input id="nm" maxlength="14" value="${esc(me.name)}" placeholder="e.g. Juna" autocomplete="off"></label>
         <div class="fld">Your colour<div class="colors">${COLOR_NAMES.map(c => `<button class="cbtn ${me.color === c ? 'on' : ''}" style="--c:${COLORS[c]}" data-a="color" data-c="${c}" aria-label="${c}"></button>`).join('')}</div></div>
@@ -2203,7 +2206,7 @@ safe-buffer/index.js:
         </div>
       </section>
       <section class="card homecard solocard">
-        <div><h2>Play alone</h2><p>The solo campaign: cook your way through all 8 restaurants and the master chef missions, one after the other. Your progress is saved on this iPad.</p></div>
+        <div><h2>Play alone <small class="extra">extra, not in the rulebook</small></h2><p>The solo campaign: cook your way through all 8 restaurants and the master chef missions, one after the other, with our own one-chef goals. Your progress is saved on this iPad.</p></div>
         <button class="btn big" data-a="campaign">Solo campaign</button>
       </section>
       <button class="link" data-a="help">How to play</button>
@@ -2338,12 +2341,12 @@ safe-buffer/index.js:
         <div class="scens">${MISSIONS.map(scenBtn).join('')}</div>
         <p class="note sizenote">${boardNote(L.players.length)}</p>
         <p class="note goalnote">Goal: ${E.goalText(goal)}${cfg.shifts > 1 ? ` — over ${cfg.shifts} shifts` : ''}.</p>
-        ${L.players.length === 2 ? `<p class="note duonote">🤝 Two-chef rules are on: ${DUO_RULES}</p>` : ''}
         <h2>Settings</h2>
         <div class="setrow"><span>Sand timer</span>${DEV ? seg('workerSec', [3, 20, 25, 30, 35], ['3 s', '20 s', '25 s', '30 s', '35 s']) : seg('workerSec', [20, 25, 30, 35], ['20 s', '25 s', '30 s', '35 s'])}</div>
         <div class="setrow"><span>Shift length</span>${seg('shiftSec', shiftVals, shiftVals.map(shiftLbl))}</div>
         <div class="setrow"><span>Wrong moves</span>${seg('strict', [false, true], ['Allowed, checked at the end', 'Blocked'])}</div>
         ${scen >= 3 && !cfg.mission ? `<div class="setrow"><span>Goal</span>${seg('challenge', [false, true], ['Normal', 'Challenge'])}</div>` : ''}
+        ${L.players.length === 2 ? `<h2>Extras <small>not in the rulebook</small></h2><div class="setrow"><span>Two-chef helpers</span>${seg('duo', [false, true], ['Off — rulebook', 'On'])}</div>${S.duo ? `<p class="note duonote">🤝 ${DUO_RULES}</p>` : ''}` : ''}
         ${host ? `<button class="btn big" data-a="newgame" ${L.players.length ? '' : 'disabled'}>Set the tables</button>` : '<p class="note">The host starts the game.</p>'}
       </section>
       <div class="lobbylinks"><button class="link" data-a="help">How to play</button><button class="link" data-a="leave">Leave</button></div>
@@ -2672,7 +2675,7 @@ safe-buffer/index.js:
   }
   function repLine(r) {
     if (r.repEnd == null) return '';
-    return `<p class="money">⭐ Reputation ${r.repStart} + ${r.repGain} − ${r.repLoss} = <b>${r.repEnd}</b>${r.repStart + r.repGain - r.repLoss < 0 ? ' (it can\'t drop below 0)' : ''}${r.award ? ` · 🏆 new award: ${E.AWARDS[r.award].e} ${E.AWARDS[r.award].n} — ${E.AWARDS[r.award].d}` : ''}${r.awardLost ? ` · award lost: ${E.AWARDS[r.awardLost].e} ${E.AWARDS[r.awardLost].n}` : ''}</p>`;
+    return `<p class="money">⭐ Reputation ${r.repStart} + ${r.repGain} − ${r.repLoss} = <b>${r.repEnd}</b>${r.repStart + r.repGain - r.repLoss < 0 ? ' (it can\'t drop below 0)' : ''}${(r.awardsWon || (r.award ? [r.award] : [])).map(k => ` · 🏆 new award: ${E.AWARDS[k].e} ${E.AWARDS[k].n} — ${E.AWARDS[k].d}`).join('')}${(r.awardsLost || (r.awardLost ? [r.awardLost] : [])).map(k => ` · award lost: ${E.AWARDS[k].e} ${E.AWARDS[k].n}`).join('')}</p>`;
   }
   function strikeLine(g, r) {
     if (!r.strikes || !r.strikes.length) return '';
@@ -2687,7 +2690,7 @@ safe-buffer/index.js:
       if (o.ok) return `<li class="ok">✓ ${label}${o.early ? ' 🛎️' : ''}${money ? ` <b>+${d.c}🪙</b>` : ''}${repTxt(o)}</li>`;
       const why = `<small>${o.reasons.slice(0, 3).map(esc).join(' · ')}${o.reasons.length > 3 ? ' …' : ''}</small>`;
       const fate = o.fate === 'binned' && !over ? '🗑️ thrown away' : o.fate === 'waiting' && !over ? '⏳ still cooking' : '✗ not served';
-      return `<li class="bad">${label} — ${fate}${money && o.kind === 'reg' ? ' −1🪙' : ''}${repTxt(o)} ${why}</li>`;
+      return `<li class="bad">${label} — ${fate}${money && (o.kind === 'reg' || !rep) ? ' −1🪙' : ''}${repTxt(o)} ${why}</li>`; // free drink: everyone before restaurant 6, then friends and regulars only
     });
     return items.length ? `<ul class="glist">${items.join('')}</ul>` : '<p class="none">no guests this shift</p>';
   }
@@ -2727,7 +2730,7 @@ safe-buffer/index.js:
     return `<div class="sheet readysheet"><div class="card">
       <h2>${scenTitle(n)}</h2>
       <p>${extra}</p>
-      ${g.duo ? `<p>🤝 <b>Two-chef rules:</b> ${DUO_RULES}</p>` : ''}
+      ${g.duo ? `<p>🤝 <b>Two-chef helpers (extra, not in the rulebook):</b> ${DUO_RULES}</p>` : ''}
       <p><b>Goal:</b> ${E.goalText(g.goal, g.players.length === 1)}. ${cfg.shifts > 1 ? `${cfg.shifts} shifts of ${t}.` : `${t} on the clock.`} Each chef has ${cfg.timers === 1 ? 'one sand timer' : 'two sand timers'} of ${g.settings.workerSec} seconds.${g.settings.strict ? ' Wrong moves are blocked.' : ' Meals are checked when a shift ends.'}</p>
       ${host ? '<button class="btn big" data-a="startShift">Start the shift</button>' : `<p class="note">Waiting for ${esc(hostP ? hostP.name : 'the host')} to start the shift.</p>`}
       <button class="link" data-a="help">How to play</button>
@@ -2777,7 +2780,7 @@ safe-buffer/index.js:
         <li><b>🌿 Greenhouse</b> (from restaurant 2) puts spices on your plates — even on a meal that is already cooking.</li>
         <li><b>🧽 Sink</b> (from restaurant 3) washes up to 3 dirty plates.</li>
         <li><b>🚐 Van</b> (from restaurant 4, top bar) buys 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin.</li>
-        <li><b>🤝 Two chefs</b> play with extra rules: a shared helper sand timer (top bar) that either chef can use when their own timers are busy; you may put ingredients and spices on, and cook, your partner's meals — tap their row; and each van trip allows two purchases. The helper is paid first and is the last to go on strike.</li>
+        <li><b>🤝 Two-chef helpers</b> (an extra, not in the rulebook; switch it on in the lobby when two chefs play): a shared helper sand timer (top bar) that either chef can use when their own timers are busy; you may put ingredients and spices on, and cook, your partner's meals — tap their row; and each van trip allows two purchases. The helper is paid first and is the last to go on strike.</li>
         <li><b>🏢 Office</b> (from restaurant 7, top bar) pays a timer back from strike for 3 coins, and from restaurant 8 calls the locksmith, the technician, hires a temp or buys plates.</li>
       </ul>
       <p>Meals are checked when a shift ends: right plate (from restaurant 2, one size bigger is fine), exactly the right ingredients and spices, and the right cooking. ⭐ guests are demanding, 👑 VIP guests order two dishes and only pay if both are right.</p>
@@ -2956,7 +2959,7 @@ safe-buffer/index.js:
       case 'set': {
         if (!isHost()) return;
         const k = t.dataset.k; let v = t.dataset.v;
-        v = (k === 'strict' || k === 'challenge') ? v === 'true' : +v;
+        v = (k === 'strict' || k === 'challenge' || k === 'duo') ? v === 'true' : +v;
         wrap.lobby.settings[k] = v;
         if (k === 'scenario') wrap.lobby.settings.shiftSec = E.SCEN[v].normal;
         if (role === 'solo') { LS.set('kc-solo-settings', wrap.lobby.settings); render(); break; }

@@ -19,15 +19,15 @@ Not in the rulebook text, so made up for this version: dish recipes and prices, 
 
 Goals scale with the number of players, as in the board game.
 
-## Two-chef rules
+## Two-chef helpers (extra)
 
-With exactly two players these extra rules switch on automatically (our own, not in the rulebook):
+The standard restaurants follow the rulebook. With exactly two players, the host can switch on these extras in the lobby under "Extras" (our own, not in the rulebook; off by default):
 
 - A shared helper sand timer 🤝 (top bar) that either chef uses automatically when their own timers are busy, based on the neutral Helper timer of the original edition. It is paid first and goes on strike last.
 - Teamwork: you may put ingredients and spices on your partner's meals and cook them — tap their row at the bottom right. Plates and serving stay with the chef who took the order, and the meal counts for them. The score table shows how often each chef helped.
 - Each van trip allows two purchases (1 coin each).
 
-## Solo campaign
+## Solo campaign (extra)
 
 "Solo campaign" on the start screen plays alone on one iPad, without any connection to other iPads. Win a restaurant to open the next one; the master chef missions open after restaurant 8. After a lost round you can try again or continue anyway. Progress is saved on the iPad per player name. The rulebook has no one-player goals, so the solo goals are our own, scaled down from the two-player goals. If every sand timer is on strike, the game ends at once, because nobody could pay a timer back.
 
