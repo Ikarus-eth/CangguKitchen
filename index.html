@@ -79,6 +79,8 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .plist { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .plist li { display: flex; align-items: center; font-size: 22px; padding: 10px 14px; background: #fff; border: 2px solid var(--ink); border-radius: 12px; }
 .plist em { margin-left: 10px; font-style: normal; color: var(--ink-2); font-size: 16px; }
+.plist em.on { color: var(--ok); }
+.plist em.off { color: var(--bad); }
 .plist .x { margin-left: auto; background: none; border: 0; font-size: 22px; padding: 4px 10px; }
 .setrow { display: flex; align-items: center; gap: 14px; margin: 10px 0; flex-wrap: wrap; }
 .setrow > span { width: 130px; font-weight: 600; }
@@ -498,6 +500,110 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .board:is(.scen-4, .scen-5, .scen-6, .scen-7, .scen-8) .cupboard .pl.big.pl-L { width: 34px; height: 34px; }
 .board:is(.scen-4, .scen-5, .scen-6, .scen-7, .scen-8) .cupboard .pl.big.pl-XL { width: 39px; height: 39px; }
 
+/* ---------- team panel & activity feed ---------- */
+.kitchen { overflow: hidden; }
+.kitchen .mytks { flex: 1 1 auto; min-height: 120px; overflow-y: auto; align-content: start; padding-bottom: 6px; }
+.team { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.mate { background: #fff; border: 2px solid var(--ink); border-left: 8px solid var(--c); border-radius: 12px; padding: 6px 10px; cursor: pointer; }
+.mtop { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mtop b { font-size: 16px; font-weight: 600; flex: none; }
+.mtimers { display: flex; gap: 4px; flex: none; }
+.mtt { --p: 0; position: relative; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; background: conic-gradient(var(--c) calc(var(--p) * 360deg), color-mix(in srgb, var(--c) 18%, #fff) 0); }
+.mtt .mi { font-size: 14px; background: #fff; border-radius: 50%; width: 20px; height: 20px; display: grid; place-items: center; }
+.mtt .sec { position: absolute; bottom: -5px; right: -7px; font-style: normal; font-size: 10px; font-weight: 700; background: var(--ink); color: #fff; border-radius: 6px; padding: 0 3px; }
+.mtt .sec:empty { display: none; }
+.mtt.idle { background: #fff; border-style: dashed; color: var(--steel); }
+.mtt.strike { background: #5B6478; font-size: 14px; }
+.doing { font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+.chev { color: var(--ink-2); flex: none; }
+.msum { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.ts { display: inline-flex; align-items: center; gap: 3px; font-size: 18px; background: var(--paper); border: 1.5px solid var(--steel); border-radius: 8px; padding: 1px 6px; }
+.ts small { font-size: 12px; color: var(--ink-2); }
+.ts.srv { background: #E3F4EA; border-color: var(--ok); }
+.mate .otks { margin-top: 6px; }
+.feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: none; font-size: 13px; }
+.feed li { border-left: 4px solid var(--c); padding: 1px 0 1px 6px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed li:first-child { color: var(--ink); font-size: 14px; }
+.feed li:nth-child(n+3) { opacity: .65; }
+.btn.warn { background: var(--bad); color: #fff; font-size: 15px; }
+
+/* ---------- score tables ---------- */
+.scorecard { max-width: 860px !important; }
+.score { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 16px; }
+.score th { font-size: 13px; font-weight: 500; color: var(--ink-2); text-align: right; padding: 4px 6px; white-space: nowrap; }
+.score td { text-align: right; padding: 6px; border-top: 1px solid #E5E0D2; white-space: nowrap; }
+.score td.who, .score th:first-child { text-align: left; font-weight: 600; }
+.score .pos { color: var(--ok); font-weight: 600; }
+.score .neg, .neg { color: var(--bad); font-weight: 600; }
+.score .zero { color: #C4C9D2; }
+.score td.net { font-size: 18px; }
+.score tr.top td.who::after { content: ' 🏅'; }
+.sec-h { font-size: 18px; margin: 14px 0 0; }
+.shiftline .money { margin: 4px 0; }
+.gcols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 10px 0; }
+.gcol { background: #fff; border: 2px solid var(--ink); border-top: 6px solid var(--c); border-radius: 10px; padding: 8px 10px; }
+.gcol h3 { font-size: 17px; margin-bottom: 4px; display: flex; align-items: center; }
+.glist { list-style: none; padding: 0; margin: 0; font-size: 14px; display: grid; gap: 3px; }
+.glist li small { display: block; color: var(--ink-2); font-size: 12px; }
+.glist li.ok { color: var(--ink); }
+.glist li.bad { color: #7A2B2B; }
+.gshift { font-size: 12px; color: var(--ink-2); margin-top: 6px; text-transform: none; font-weight: 600; }
+@media (orientation: portrait), (max-width: 900px) {
+  .kitchen { overflow: visible; }
+  .kitchen .mytks { overflow: visible; }
+}
+
+/* team dock: compact rows under your own tickets */
+.teamdock { flex: none; display: flex; flex-direction: column; gap: 4px; border-top: 2px dashed rgba(29,42,68,.25); padding-top: 6px; }
+.team { gap: 4px; }
+.mate { display: flex; align-items: center; gap: 8px; padding: 3px 8px; min-height: 40px; border-width: 1.5px; border-left-width: 7px; }
+.mate b { font-size: 15px; font-weight: 600; flex: none; }
+.mate .msum { margin: 0; flex: none; gap: 3px; flex-wrap: nowrap; }
+.mate .ts { font-size: 17px; padding: 0 4px; }
+.mate .doing { font-size: 13px; }
+.feed { font-size: 12px; }
+.feed li:first-child { font-size: 13px; }
+.matecard { border-top: 8px solid var(--c) !important; }
+.matecard .mytks { margin: 10px 0; overflow: visible; }
+
+/* ---------- solo campaign ---------- */
+.solocard { display: flex; align-items: center; gap: 20px; margin-top: 16px; }
+.solocard h2 { margin-bottom: 4px; }
+.solocard p { margin: 0; color: var(--ink-2); }
+.solocard .btn { flex: none; }
+.cprog { height: 14px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; overflow: hidden; margin: 10px 0 4px; }
+.cprog div { height: 100%; background: var(--ok); }
+.cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.ccard { position: relative; text-align: left; background: #fff; border: 2.5px solid var(--ink); border-radius: 12px; padding: 10px 12px 10px 44px; display: flex; flex-direction: column; gap: 2px; min-height: 76px; box-shadow: var(--lift); }
+.ccard b { font-size: 16px; font-weight: 600; }
+.ccard small { font-size: 13px; color: var(--ink-2); line-height: 1.25; }
+.ccard .cst { position: absolute; left: 10px; top: 10px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 700; background: var(--tile); }
+.ccard.won .cst { background: var(--ok); color: #fff; }
+.ccard.on { background: var(--ink); color: #fff; }
+.ccard.on small { color: #DCE3EE; }
+.ccard.locked { opacity: .5; box-shadow: none; }
+.ccard:disabled { color: var(--ink); cursor: default; }
+@media (max-width: 640px) { .solocard { flex-direction: column; align-items: flex-start; } }
+.resumebtn { width: 100%; margin: 6px 0 14px; }
+
+/* two-chef rules */
+.duonote { background: #E9F3FF; border-radius: 10px; padding: 8px 12px; color: var(--ink); }
+.badge { font-size: 13px; font-weight: 600; background: var(--heat); color: #fff; border-radius: 8px; padding: 2px 8px; vertical-align: middle; }
+.forpartner { grid-column: 1 / -1; border: 2px dashed var(--heat); border-radius: 12px; padding: 6px; background: #FFF5E8; }
+.fpband { font-size: 14px; font-weight: 600; margin: 0 0 6px 4px; display: flex; align-items: center; gap: 8px; }
+.fpband .link { padding: 0; font-size: 13px; }
+.forpartner .ticket { max-width: 260px; }
+.helpwrap { display: flex; flex-direction: column; gap: 6px; }
+.helpwrap .btn { min-height: 42px; font-size: 15px; }
+.tempbar small { font-size: 11px; opacity: .85; margin-right: 2px; }
+@media (max-width: 1100px) {
+  .bar.crowded { gap: 6px; padding: 4px 8px; }
+  .bar.crowded .tempbar small, .bar.crowded .officebar small, .bar.crowded .brand { display: none; }
+  .bar.crowded .clock { min-width: 80px; font-size: 28px; padding: 0 8px; }
+  .bar.crowded .goalchip small { font-size: 12px; }
+  .bar.crowded .vanbtn span small { display: none; }
+}
+
 </style>
 </head>
 <body>
@@ -717,7 +823,28 @@ safe-buffer/index.js:
   }
 
   // Goals: a list of checks. coins/rep/meals are team totals; each = meals per chef.
+  // One chef (solo campaign): the rulebook only has 2–4 player goals, so these are scaled down from
+  // the 2-player ones (our own numbers).
+  function soloGoal(scen, challenge) {
+    switch (+scen) {
+      case 1: return { each: 2 };
+      case 2: return { meals: 3 };
+      case 3: return { coins: challenge ? 14 : 10 };
+      case 4: return { coins: challenge ? 20 : 14 };
+      case 5: return { coins: challenge ? 6 : 1, payroll: true };
+      case 6: return challenge ? { coins: 7, rep: 3, payroll: true } : { coins: 1, rep: 2, payroll: true };
+      case 7: return challenge ? { coins: 12, rep: 7, noStrike: true } : { coins: 4, rep: 5, noStrike: true };
+      case 8: case 12: return challenge && +scen === 8 ? { coins: 9, rep: 9, noStrike: true } : { coins: 5, rep: 5, noStrike: true };
+      case 9: return { equality: 2, noStrike: true };
+      case 10: return { meals: 8, noStrike: true };
+      case 11: return { mix: { reg: 2, ch: 1, vip: 1 }, coins: 7, noStrike: true };
+      case 13: return { coins: 10, rep: 9, noStrike: true };
+    }
+    return { each: 2 };
+  }
+
   function goalOf(scen, n, challenge) {
+    if (n === 1) return soloGoal(scen, challenge);
     const p = pc(n);
     const t = (a, b, c) => ({ 2: a, 3: b, 4: c })[p];
     switch (+scen) {
@@ -736,12 +863,13 @@ safe-buffer/index.js:
     }
     return { each: 2 };
   }
-  function goalText(g) {
+  function goalText(g, solo) {
     const out = [];
-    if (g.each) out.push(`every chef serves ${g.each} meals`);
-    if (g.meals) out.push(`serve ${g.meals} meals together`);
-    if (g.mix) out.push(`every chef serves ${g.mix.reg} ordinary, ${g.mix.ch} ⭐ and ${g.mix.vip} 👑 guests`);
-    if (g.equality) out.push(`every chef serves ${g.equality} guests early (🛎️) in every shift`);
+    const each = solo ? 'serve' : 'every chef serves';
+    if (g.each) out.push(`${each} ${g.each} meals`);
+    if (g.meals) out.push(`serve ${g.meals} meals${solo ? '' : ' together'}`);
+    if (g.mix) out.push(`${each} ${g.mix.reg} ordinary, ${g.mix.ch} ⭐ and ${g.mix.vip} 👑 guests`);
+    if (g.equality) out.push(`${each} ${g.equality} guests early (🛎️) in every shift`);
     if (g.payroll) out.push(g.coins > 1 ? `pay all salaries and end with ${g.coins} coins` : 'pay all salaries');
     else if (g.coins) out.push(`end with ${g.coins} coins`);
     if (g.rep) out.push(`reach ${g.rep} reputation`);
@@ -785,7 +913,7 @@ safe-buffer/index.js:
       if (cfg.setbacks) {
         storage.A = { cheese: a, meat: b, bread: 0, salad: a, veg: b, pasta: 0 };
         storage.B = { cheese: 2, meat: 4, bread: 0, salad: 2, veg: 4, pasta: 0 };
-        storage.C = { cheese: 0, meat: 0, bread: t(6, 5, 6), salad: 0, veg: 0, pasta: t(6, 5, 6) };
+        storage.C = { cheese: 0, meat: 0, bread: 6, salad: 0, veg: 0, pasta: 6 }; // was 5 for three chefs only, fewer than for two
       } else if (cfg.pantry) {
         storage.A = { cheese: a, meat: b, bread: 0, salad: a, veg: b, pasta: 0 }; storage.B = Object.assign({}, storage.A);
         storage.C = { cheese: 0, meat: 0, bread: t(3, 4, 5), salad: 0, veg: 0, pasta: t(3, 4, 5) };
@@ -844,6 +972,8 @@ safe-buffer/index.js:
       shifts: cfg.shifts,
       reports: [],
       shift0: null,
+      led: {},
+      feed: [],
       orders: [],
       workers: {},
       off: {},
@@ -868,6 +998,12 @@ safe-buffer/index.js:
       s.stats[x.id] = { actions: 0, byArea: {}, returned: 0, thrown: 0 };
     });
     if (cfg.temps) { s.workers.temp = Array(cfg.temps).fill(null); s.off.temp = Array(cfg.temps).fill(false); }
+    // Two-chef rules (our own, applied automatically with exactly 2 players):
+    //  1. a shared helper timer either chef can use (inspired by the original edition's neutral Helper),
+    //  2. chefs may put ingredients and spices on, and cook, their partner's meals,
+    //  3. a van trip allows two purchases.
+    s.duo = s.players.length === 2;
+    if (s.duo) { s.workers.helper = [null]; s.off.helper = [false]; }
     markShiftStart(s);
     seatPatrons(s, 2, { setup: true });
     return s;
@@ -875,6 +1011,24 @@ safe-buffer/index.js:
 
   function markShiftStart(s) {
     s.shift0 = { coins: s.coins, drinks: s.drinkCoins, shop: s.shopCoins, tips: s.tipCoins, office: s.officeCoins, rep: s.rep, early: {} };
+    // Per-chef ledger for this shift: who brought coins and reputation in, and who cost them.
+    s.led = {};
+    s.players.forEach(p => { s.led[p.id] = { seated: 0, drinks: 0, thrown: 0, tips: 0, early: 0, shop: 0, office: 0, binned: 0 }; });
+  }
+  const L = (s, pid) => s.led[pid] || (s.led[pid] = { seated: 0, drinks: 0, thrown: 0, tips: 0, early: 0, shop: 0, office: 0, binned: 0 });
+
+  // Recent moves, so every iPad can see what the others are doing. Consecutive taps of the same
+  // kind (ingredients, spices, washing) are merged into one line.
+  const FEED_MAX = 14;
+  function feed(s, now, pid, k, d) {
+    const last = s.feed[s.feed.length - 1];
+    if (last && last.pid === pid && last.k === k && (k === 'ing' || k === 'spice' || k === 'wash') && last.o === (d && d.o) && now - last.t < 20000) {
+      if (d.item) last.items.push(d.item);
+      last.t = now;
+      return;
+    }
+    s.feed.push(Object.assign({ t: now, pid, k }, d, d && d.item ? { items: [d.item] } : {}));
+    if (s.feed.length > FEED_MAX) s.feed.shift();
   }
 
   const has = (s, award) => s.awards.includes(award);
@@ -890,13 +1044,15 @@ safe-buffer/index.js:
     if (!opts.setup && !opts.noDrinks && cfgOf(s).money) {
       const c = n * (has(s, 'drinks') ? 2 : 1); // every new guest buys a drink
       s.coins += c; s.drinkCoins += c;
+      if (opts.by) L(s, opts.by).drinks += c;
     }
+    if (opts.by) L(s, opts.by).seated += n;
     return n;
   }
 
   // ---- timers ----
   const timerReady = (s, w, now) => !w || now >= w.start + workerMs(s);
-  const ownersFor = (s, pid) => (s.workers.temp ? [pid, 'temp'] : [pid]);
+  const ownersFor = (s, pid) => [pid].concat(s.workers.helper ? ['helper'] : [], s.workers.temp ? ['temp'] : []);
   function usable(s, owner, now) {
     return (s.workers[owner] || []).map((w, t) => ({ owner, t, w })).filter(x => !s.off[owner][x.t] && timerReady(s, x.w, now));
   }
@@ -997,6 +1153,15 @@ safe-buffer/index.js:
     st.byArea[area] = (st.byArea[area] || 0) + 1;
   }
 
+  // Two-chef rule: ingredients, spices and cooking may go to the partner's meals too.
+  function teamOrder(s, pid, id) {
+    const o = s.orders.find(x => x.id === id);
+    if (o && s.duo && o.pid !== pid && s.players.some(p => p.id === o.pid)) {
+      if (o.served) throw new Error('This meal is already served.');
+      return o;
+    }
+    return ownOrder(s, pid, id);
+  }
   function ownOrder(s, pid, id) {
     const o = s.orders.find(x => x.id === id);
     if (!o) throw new Error('That order is gone.');
@@ -1022,10 +1187,17 @@ safe-buffer/index.js:
     const cfg = cfgOf(s);
     const strict = !!s.settings.strict;
     if (!HOST_ONLY.includes(a.type) && !s.players.some(p => p.id === pid)) throw new Error('You are watching this round.');
+    const AREAS_OF = { storage: ['storA', 'storB', 'storC'], spice: ['green'], order: ['dining'], cook: ['stove'], wash: ['sink'], shop: ['van'], office: ['office'], reception: ['reception'] };
     const needOpen = (type, msg) => {
       if (!inPlay(s, now)) throw new Error('The shift is not running.');
       const op = s.open[pid];
-      if (!op || op.type !== type) throw new Error(msg);
+      if (!op || op.type !== type) {
+        // Rulebook (multitasking): placing your next timer ends the action before it, even while
+        // the first timer's sand is still running. Explain that instead of a generic message.
+        const still = ownersFor(s, pid).some(o => (s.workers[o] || []).some(w => w && w.by === pid && AREAS_OF[type].includes(w.area)));
+        if (still) throw new Error('That visit ended when you started your next action. Send a free timer there for a new visit.');
+        throw new Error(msg);
+      }
       return op;
     };
     switch (a.type) {
@@ -1059,7 +1231,8 @@ safe-buffer/index.js:
         const { owner, t, w } = pick;
         if (w) freeSpace(s, owner, t, w);
         const entry = { pid: owner, t, start: now, by: pid };
-        if (van) slots.push(entry); else slots[a.idx] = entry;
+        // freeSpace may have replaced the van list, so look the space up again
+        if (van) s.spaces.van.push(entry); else s.spaces[a.area][a.idx] = entry;
         s.workers[owner][t] = { area: a.area, idx: van ? -1 : a.idx, start: now, by: pid };
         stat(s, pid, a.area);
         // Starting a new action ends the one before it.
@@ -1067,8 +1240,9 @@ safe-buffer/index.js:
           if (cfg.throwOut) s.open[pid] = { type: 'reception' };
           else {
             const empty = s.seats.filter(x => !x.reserved && !x.dish).length;
-            const k = seatPatrons(s, has(s, 'seats') ? 3 : 2);
+            const k = seatPatrons(s, has(s, 'seats') ? 3 : 2, { by: pid });
             s.open[pid] = null;
+            if (k) feed(s, now, pid, 'seat', { n: k });
             if (!k) s.errs[pid] = { msg: empty ? 'No more guests are waiting outside.' : 'All tables are full.', t: now, info: true };
           }
         } else if (a.area === 'dining') s.open[pid] = { type: 'order' };
@@ -1076,7 +1250,7 @@ safe-buffer/index.js:
         else if (a.area === 'green') s.open[pid] = { type: 'spice' };
         else if (a.area === 'sink') s.open[pid] = { type: 'wash', left: has(s, 'sink') ? 5 : 3 };
         else if (a.area === 'office') s.open[pid] = { type: 'office' };
-        else if (van) s.open[pid] = { type: 'shop' };
+        else if (van) s.open[pid] = { type: 'shop', left: s.duo ? 2 : 1 };
         else s.open[pid] = { type: 'storage', room: ROOM_OF[a.area] };
         return;
       }
@@ -1084,8 +1258,9 @@ safe-buffer/index.js:
       case 'seat': {
         needOpen('reception', 'Put a timer at the reception first.');
         const empty = s.seats.filter(x => !x.reserved && !x.dish).length;
-        const k = seatPatrons(s, has(s, 'seats') ? 3 : 2);
+        const k = seatPatrons(s, has(s, 'seats') ? 3 : 2, { by: pid });
         s.open[pid] = null;
+        if (k) feed(s, now, pid, 'seat', { n: k });
         if (!k) s.errs[pid] = { msg: empty ? 'No more guests are waiting outside.' : 'All tables are full.', t: now, info: true };
         return;
       }
@@ -1097,6 +1272,8 @@ safe-buffer/index.js:
         if (seats.some(i => !s.seats[i] || !s.seats[i].dish)) throw new Error('Nobody sits there.');
         seats.forEach(i => { s.discard.push(s.seats[i].dish); s.seats[i].dish = null; });
         seatPatrons(s, seats.length, { noDrinks: true });
+        L(s, pid).thrown += seats.length;
+        feed(s, now, pid, 'throw', { n: seats.length });
         s.open[pid] = null;
         return;
       }
@@ -1109,6 +1286,7 @@ safe-buffer/index.js:
           const group = s.nextOrder;
           d.parts.forEach(part => s.orders.push({ id: s.nextOrder++, pid, dish: part, patron: seat.dish, group, plate: null, ing: {}, sp: {}, src: [], row: 0 }));
         } else s.orders.push({ id: s.nextOrder++, pid, dish: seat.dish, plate: null, ing: {}, sp: {}, src: [], row: 0 });
+        feed(s, now, pid, 'order', { dish: seat.dish });
         seat.dish = null;
         s.open[pid] = null;
         return;
@@ -1123,6 +1301,8 @@ safe-buffer/index.js:
         parts.forEach(x => { x.served = true; });
         const tip = has(s, 'tips') ? 2 : 1;
         s.coins += tip; s.tipCoins += tip;
+        L(s, pid).tips += tip; L(s, pid).early++;
+        feed(s, now, pid, 'serve', { dish: o.patron || o.dish, tip });
         s.shift0.early[pid] = (s.shift0.early[pid] || 0) + 1;
         s.open[pid] = null;
         return;
@@ -1138,46 +1318,56 @@ safe-buffer/index.js:
         }
         s.cupboard[a.size]--;
         o.plate = a.size;
+        feed(s, now, pid, 'plate', { dish: o.dish, size: a.size });
         return;
       }
       case 'takeIng': {
         const op = needOpen('storage', 'Put a timer in a storage room first.');
         const room = s.storage[op.room];
         if (!ING.includes(a.ing) || !(room[a.ing] > 0)) throw new Error('None left in this storage room.');
-        const o = ownOrder(s, pid, a.order);
+        const o = teamOrder(s, pid, a.order);
         if (!cfg.fix && o.row > 0) throw new Error('This meal is already cooking — no more ingredients.');
         if (strict && !needsIng(o, a.ing)) throw new Error(`${DISHES[o.dish].name} doesn't need more ${ING_INFO[a.ing].n.toLowerCase()}.`);
         room[a.ing]--;
         o.ing[a.ing] = (o.ing[a.ing] || 0) + 1;
         o.src.push({ ing: a.ing, room: op.room });
+        if (o.pid !== pid) L(s, pid).helped = (L(s, pid).helped || 0) + 1;
+        feed(s, now, pid, 'ing', { o: o.id, dish: o.dish, item: a.ing, for: o.pid !== pid ? o.pid : undefined });
         return;
       }
       case 'takeSpice': {
         needOpen('spice', 'Put a timer in the greenhouse first.');
         if (!SPICES.includes(a.spice) || !(s.bag[a.spice] > 0)) throw new Error('That spice has run out.');
-        const o = ownOrder(s, pid, a.order);
+        const o = teamOrder(s, pid, a.order);
         if (strict && !needsSp(o, a.spice)) throw new Error(`${DISHES[o.dish].name} doesn't need more ${SP_INFO[a.spice].n.toLowerCase()}.`);
         s.bag[a.spice]--;
         o.sp[a.spice] = (o.sp[a.spice] || 0) + 1;
+        if (o.pid !== pid) L(s, pid).helped = (L(s, pid).helped || 0) + 1;
+        feed(s, now, pid, 'spice', { o: o.id, dish: o.dish, item: a.spice, for: o.pid !== pid ? o.pid : undefined });
         return;
       }
       case 'buy': {
-        needOpen('shop', 'Put a timer at the van first.');
+        const op = needOpen('shop', 'Put a timer at the van first.');
         if (s.coins < 1) throw new Error('The office has no coins left.');
         if (a.kind === 'ing') {
           if (!ING.includes(a.ing)) throw new Error('Pick an ingredient.');
           let room = a.room;
           if (cfg.pantry && PANTRY_INGS.includes(a.ing)) room = 'C';
           if (!s.storage[room] || !roomIngs(s, room).includes(a.ing)) throw new Error(`${ING_INFO[a.ing].n} can't go in that storage room.`);
+          if (s.locked[room]) throw new Error('That storage room is locked.');
           s.storage[room][a.ing] += has(s, 'bulk') ? 7 : 5;
+          feed(s, now, pid, 'buy', { ing: a.ing, n: has(s, 'bulk') ? 7 : 5 });
         } else if (a.kind === 'cheap' || a.kind === 'pricey') {
           const allowed = a.kind === 'cheap' ? CHEAP : PRICEY, k = a.kind === 'cheap' ? 3 : 2;
           if (!Array.isArray(a.spices) || a.spices.length !== k || !a.spices.every(x => allowed.includes(x))) throw new Error(`Pick ${k} ${a.kind === 'cheap' ? 'cheap' : 'expensive'} spices.`);
           a.spices.forEach(x => { s.bag[x]++; });
+          feed(s, now, pid, 'buy', { spices: a.spices.slice() });
         } else throw new Error('Pick what to buy.');
         s.coins--;
         s.shopCoins++;
-        s.open[pid] = null;
+        L(s, pid).shop++;
+        op.left = (op.left || 1) - 1;
+        if (op.left <= 0 || s.coins < 1) s.open[pid] = null;
         return;
       }
       case 'latePay': {
@@ -1187,6 +1377,8 @@ safe-buffer/index.js:
         if (!s.off[owner] || !s.off[owner][t]) throw new Error('That sand timer is not on strike.');
         if (s.coins < LATE_PAY) throw new Error(`A late payment costs ${LATE_PAY} coins.`);
         s.coins -= LATE_PAY; s.officeCoins += LATE_PAY;
+        L(s, pid).office += LATE_PAY;
+        feed(s, now, pid, 'late', { owner, t });
         s.off[owner][t] = false;
         s.open[pid] = null;
         return;
@@ -1197,6 +1389,8 @@ safe-buffer/index.js:
         const card = OFFICE[a.card];
         if (s.coins < card.cost) throw new Error(`That costs ${card.cost} coins.`);
         s.coins -= card.cost; s.officeCoins += card.cost;
+        L(s, pid).office += card.cost;
+        feed(s, now, pid, 'office', { card: a.card });
         if (a.card === 'locksmith') s.locked = {};
         else if (a.card === 'technician') s.broken = null;
         else if (a.card === 'temp') { s.workers.temp.push(null); s.off.temp.push(false); }
@@ -1228,11 +1422,13 @@ safe-buffer/index.js:
         if (o.plate) s.dirty[o.plate]++;
         o.plate = null; o.ing = {}; o.sp = {}; o.src = []; o.row = 0;
         s.stats[pid].thrown++;
+        L(s, pid).binned++;
+        feed(s, now, pid, 'bin', { dish: o.dish });
         return;
       }
       case 'cook': {
         needOpen('cook', 'Put a timer on the stove first.');
-        const o = ownOrder(s, pid, a.order);
+        const o = teamOrder(s, pid, a.order);
         const d = DISHES[o.dish];
         if (strict) {
           if (!plateOk(s, o)) throw new Error('Get the right plate before cooking.');
@@ -1240,6 +1436,8 @@ safe-buffer/index.js:
           if (o.row >= d.cook) throw new Error(d.cook === 0 ? `${d.name} is served raw — no cooking.` : `${d.name} is done — don't overcook it.`);
         } else if (o.row >= MAX_ROW) throw new Error('It can\'t cook any longer.');
         o.row++;
+        feed(s, now, pid, 'cook', { dish: o.dish, row: o.row, cook: d.cook, for: o.pid !== pid ? o.pid : undefined });
+        if (o.pid !== pid) L(s, pid).helped = (L(s, pid).helped || 0) + 1;
         s.open[pid] = null;
         return;
       }
@@ -1248,6 +1446,7 @@ safe-buffer/index.js:
         if (!PLATES.includes(a.size) || !(s.dirty[a.size] > 0)) throw new Error('No dirty plates of that size.');
         s.dirty[a.size]--;
         s.cupboard[a.size]++;
+        feed(s, now, pid, 'wash', { o: 0, item: a.size });
         op.left--;
         if (op.left <= 0 || !PLATES.some(x => s.dirty[x] > 0)) s.open[pid] = null;
         return;
@@ -1300,7 +1499,8 @@ safe-buffer/index.js:
     if (!cfg.strike) { rep.bankrupt = true; rep.short = due - s.coins; rep.salary = s.coins; s.coins = 0; return; }
     const payable = Math.floor(s.coins / SALARY);
     // Who strikes first: temps, then the chefs' second timers, then their first timers.
-    const order = active.slice().sort((a, b) => (a.owner === 'temp' ? -1 : 0) - (b.owner === 'temp' ? -1 : 0) || b.t - a.t);
+    const rank = x => x.owner === 'temp' ? 0 : x.owner === 'helper' ? 3 : x.t === 1 ? 1 : 2;
+    const order = active.slice().sort((a, b) => rank(a) - rank(b));
     const unpaid = order.slice(0, active.length - payable);
     unpaid.forEach(x => { s.off[x.owner][x.t] = true; });
     rep.salary = payable * SALARY;
@@ -1318,22 +1518,31 @@ safe-buffer/index.js:
       orders: [], strikes: [], bankrupt: false, award: null, awardLost: null,
     };
     const G = guests(s);
+    const chefs = {};
+    s.players.forEach(p => {
+      chefs[p.id] = Object.assign({ served: 0, meals: 0, freeDrinks: 0, repGain: 0, repLoss: 0, waiting: 0, mistakes: 0 }, L(s, p.id));
+    });
+    const C = pid => chefs[pid] || (chefs[pid] = { served: 0, meals: 0, freeDrinks: 0, repGain: 0, repLoss: 0, waiting: 0, mistakes: 0, seated: 0, drinks: 0, thrown: 0, tips: 0, early: 0, shop: 0, office: 0, binned: 0 });
     // Served meals pay first.
     G.filter(g => g.ok).forEach(g => {
-      if (cfg.money) { s.coins += DISHES[g.patron].c; rep.meals += DISHES[g.patron].c; }
-      if (cfg.rep) rep.repGain += g.kind === 'vip' ? 2 : g.kind === 'ch' ? 1 : 0;
+      const c = C(g.pid);
+      c.served++;
+      if (cfg.money) { s.coins += DISHES[g.patron].c; rep.meals += DISHES[g.patron].c; c.meals += DISHES[g.patron].c; }
+      if (cfg.rep) { const r = g.kind === 'vip' ? 2 : g.kind === 'ch' ? 1 : 0; rep.repGain += r; c.repGain += r; }
       rep.orders.push({ pid: g.pid, dish: g.patron, kind: g.kind, ok: true, reasons: [], fate: 'served', early: g.early });
       if (!last) g.parts.forEach(o => { if (o.plate) s.dirty[o.plate]++; });
     });
     // Then everyone still waiting: friends and regulars get a free drink, demanding guests cost reputation.
     const keep = [];
     G.filter(g => !g.ok).forEach(g => {
-      if (g.kind === 'reg' || !cfg.rep) { if (cfg.money && s.coins > 0) { s.coins--; rep.freeDrinks++; } }
+      const c = C(g.pid);
+      if (g.kind === 'reg' || !cfg.rep) { if (cfg.money && s.coins > 0) { s.coins--; rep.freeDrinks++; c.freeDrinks++; } }
       if (cfg.rep) {
-        rep.repLoss += g.kind === 'vip' ? 2 : g.kind === 'ch' ? 1 : 0;
-        if (g.early) rep.repLoss += 1; // served early with a mistake: an annoyed guest
+        const r = (g.kind === 'vip' ? 2 : g.kind === 'ch' ? 1 : 0) + (g.early ? 1 : 0); // served early with a mistake: an annoyed guest
+        rep.repLoss += r; c.repLoss += r;
       }
       const mistake = !last && g.parts.some(o => isMistake(s, o));
+      if (g.parts.some(o => isMistake(s, o))) c.mistakes++; else c.waiting++;
       rep.orders.push({ pid: g.pid, dish: g.patron, kind: g.kind, ok: false, reasons: g.reasons, fate: last ? 'unserved' : mistake ? 'binned' : 'waiting', early: g.early });
       g.parts.forEach(o => {
         o.served = false;
@@ -1356,14 +1565,18 @@ safe-buffer/index.js:
       }
     }
     if (cfg.salary) payroll(s, rep);
+    // Nobody left who can work (and so nobody who could pay a timer back): the restaurant closes.
+    if (cfg.strike && Object.keys(s.off).every(k => s.off[k].every(Boolean))) rep.allStrike = true;
     if (cfg.mission === 1) {
       rep.equality = s.players.map(p => ({ pid: p.id, early: rep.orders.filter(o => o.pid === p.id && o.ok && o.early).length }));
       rep.equalityFailed = rep.equality.some(x => x.early < s.goal.equality);
     }
     rep.end = s.coins;
+    Object.values(chefs).forEach(c => { c.net = c.meals + c.drinks + c.tips - c.shop - c.office - c.freeDrinks; c.rep = c.repGain - c.repLoss; });
+    rep.chefs = chefs;
     s.reports.push(rep);
     s.open = {};
-    if (last || rep.bankrupt || rep.equalityFailed) finish(s, now);
+    if (last || rep.bankrupt || rep.equalityFailed || rep.allStrike) finish(s, now);
     else s.phase = 'between';
   }
 
@@ -1374,14 +1587,15 @@ safe-buffer/index.js:
     const all = R.flatMap(r => r.orders.map(o => Object.assign({ shift: r.shift }, o)));
     const okList = all.filter(o => o.ok);
     const out = [];
+    const Each = s.players.length === 1 ? 'Serve' : 'Every chef serves';
     const perServed = s.players.map(p => okList.filter(o => o.pid === p.id).length);
-    if (g.each) out.push({ label: `Every chef serves ${g.each} meals`, ok: perServed.every(x => x >= g.each), have: perServed.join(' / '), need: g.each });
+    if (g.each) out.push({ label: `${Each} ${g.each} meals`, ok: perServed.every(x => x >= g.each), have: perServed.join(' / '), need: g.each });
     if (g.meals) out.push({ label: `${g.meals} meals served`, ok: okList.length >= g.meals, have: okList.length, need: g.meals });
     if (g.mix) {
       const okEach = s.players.every(p => ['reg', 'ch', 'vip'].every(k => okList.filter(o => o.pid === p.id && o.kind === k).length >= g.mix[k]));
-      out.push({ label: `Every chef serves ${g.mix.reg} ordinary, ${g.mix.ch} ⭐ and ${g.mix.vip} 👑 guests`, ok: okEach, have: s.players.map(p => ['reg', 'ch', 'vip'].map(k => okList.filter(o => o.pid === p.id && o.kind === k).length).join('·')).join(' / '), need: `${g.mix.reg}·${g.mix.ch}·${g.mix.vip}` });
+      out.push({ label: `${Each} ${g.mix.reg} ordinary, ${g.mix.ch} ⭐ and ${g.mix.vip} 👑 guests`, ok: okEach, have: s.players.map(p => ['reg', 'ch', 'vip'].map(k => okList.filter(o => o.pid === p.id && o.kind === k).length).join('·')).join(' / '), need: `${g.mix.reg}·${g.mix.ch}·${g.mix.vip}` });
     }
-    if (g.equality) out.push({ label: `Every chef serves ${g.equality} guests early in every shift`, ok: !R.some(r => r.equalityFailed) && R.length === s.shifts, have: `${R.filter(r => !r.equalityFailed).length} shifts`, need: `${s.shifts} shifts` });
+    if (g.equality) out.push({ label: `${Each} ${g.equality} guests early in every shift`, ok: !R.some(r => r.equalityFailed) && R.length === s.shifts, have: `${R.filter(r => !r.equalityFailed).length} shifts`, need: `${s.shifts} shifts` });
     if (g.payroll) out.push({ label: 'All salaries paid', ok: !R.some(r => r.bankrupt), have: R.some(r => r.bankrupt) ? 'no' : 'yes', need: 'yes' });
     if (g.coins) out.push({ label: `${g.coins} coin${g.coins === 1 ? '' : 's'} in the office`, ok: s.coins >= g.coins, have: s.coins, need: g.coins });
     if (g.rep) out.push({ label: `${g.rep} reputation`, ok: s.rep >= g.rep, have: s.rep, need: g.rep });
@@ -1407,6 +1621,7 @@ safe-buffer/index.js:
       checks,
       win: checks.every(c => c.ok),
       bankrupt: s.reports.some(r => r.bankrupt),
+      allStrike: s.reports.some(r => r.allStrike),
       equalityFailed: s.reports.some(r => r.equalityFailed),
       served: per.reduce((a, x) => a + x.served, 0),
       coins: s.coins,
@@ -1432,6 +1647,9 @@ safe-buffer/index.js:
 // Sync between iPads over a public MQTT relay (no account, no setup).
 // The host iPad owns the game state and publishes it as a retained message, so an iPad that
 // reloads or wakes up gets the current game immediately. Other iPads send their taps as actions.
+// Every iPad talks to all relays at once: the host publishes on each one it reaches and guests
+// listen on all of them, so the iPads always share at least one working relay. A relay that
+// drops out reconnects on its own while the others carry the game.
 (function (root) {
   'use strict';
   const BROKERS = [
@@ -1441,83 +1659,88 @@ safe-buffer/index.js:
   ];
   const PREFIX = 'kuechenchaos1';
 
+  // ?broker=url1,url2 replaces the list (for testing).
   function brokers() {
     const q = new URLSearchParams(location.search).get('broker');
-    return q ? [q] : BROKERS;
+    return q ? q.split(',').filter(Boolean) : BROKERS;
   }
   function rid() { return Math.random().toString(36).slice(2, 10); }
 
-  function connectOne(url, timeout, onStatus) {
-    return new Promise((resolve, reject) => {
-      let settled = false;
-      const c = root.mqtt.connect(url, {
+  // One connection per relay. setup(c) runs on every (re)connect.
+  function links(onStatus, setup, onMessage) {
+    const all = brokers().map(url => ({ url, c: null, up: false }));
+    const report = () => onStatus && onStatus(all.some(l => l.up) ? 'online' : 'reconnecting');
+    function open(l) {
+      const c = root.mqtt.connect(l.url, {
         clientId: 'kc_' + rid(),
-        connectTimeout: timeout,
-        reconnectPeriod: 1500,
-        keepalive: 20,
+        connectTimeout: 8000,
+        reconnectPeriod: 2000,
+        keepalive: 15,
         clean: true,
+        resubscribe: false,
       });
-      const timer = setTimeout(() => { if (!settled) { settled = true; c.end(true); reject(new Error('timeout')); } }, timeout);
-      c.on('connect', () => {
-        onStatus && onStatus('online');
-        if (!settled) { settled = true; clearTimeout(timer); resolve(c); }
-      });
-      c.on('offline', () => onStatus && onStatus('offline'));
-      c.on('reconnect', () => onStatus && onStatus('reconnecting'));
+      l.c = c;
+      c.on('connect', () => { if (l.c !== c) return; l.up = true; report(); setup(c, l); });
+      c.on('close', () => { if (l.c !== c) return; l.up = false; report(); });
+      c.on('offline', () => { if (l.c !== c) return; l.up = false; report(); });
       c.on('error', () => {});
+      c.on('message', (topic, buf) => { if (l.c === c) onMessage(topic, buf, l); });
+    }
+    all.forEach(open);
+    return {
+      all,
+      up: () => all.filter(l => l.up),
+      // After the iPad slept, its sockets may look open but be dead: start every relay afresh.
+      refresh() { all.forEach(l => { const old = l.c; l.up = false; l.c = null; try { old.end(true); } catch (e) { /* gone */ } open(l); }); report(); },
+      close() { all.forEach(l => { const old = l.c; l.c = null; l.up = false; try { old.end(true); } catch (e) { /* gone */ } }); },
+    };
+  }
+
+  function host(room, onAction, onStatus) {
+    const tS = `${PREFIX}/${room}/s`, tA = `${PREFIX}/${room}/a`;
+    let last = null;
+    const L = links(onStatus, c => {
+      c.subscribe(tA, { qos: 1 });
+      if (last !== null) c.publish(tS, last, { qos: 0, retain: true });
+    }, (topic, buf) => {
+      if (topic !== tA) return;
+      try { onAction(JSON.parse(buf.toString())); } catch (e) { /* ignore junk */ }
     });
+    return {
+      publish(obj) { last = JSON.stringify(obj); L.up().forEach(l => l.c.publish(tS, last, { qos: 0, retain: true })); },
+      clear() { last = ''; L.up().forEach(l => l.c.publish(tS, '', { qos: 0, retain: true })); },
+      online: () => L.up().length > 0,
+      refresh: L.refresh,
+      close: L.close,
+    };
   }
 
-  async function host(room, onAction, onStatus) {
-    let lastErr;
-    for (const url of brokers()) {
-      try {
-        const c = await connectOne(url, 6000, onStatus);
-        const tS = `${PREFIX}/${room}/s`, tA = `${PREFIX}/${room}/a`;
-        c.subscribe(tA, { qos: 1 });
-        c.on('message', (topic, buf) => {
-          if (topic !== tA) return;
-          try { onAction(JSON.parse(buf.toString())); } catch (e) { /* ignore junk */ }
-        });
-        return {
-          url,
-          publish(obj) { c.publish(tS, JSON.stringify(obj), { qos: 0, retain: true }); },
-          clear() { c.publish(tS, '', { qos: 0, retain: true }); },
-          close() { c.end(true); },
-        };
-      } catch (e) { lastErr = e; }
-    }
-    throw lastErr || new Error('No connection');
-  }
-
-  // Tries each relay until it finds the host's game for this room code.
-  async function join(room, onState, onStatus) {
-    for (const url of brokers()) {
-      let c;
-      try { c = await connectOne(url, 6000, onStatus); } catch (e) { continue; }
-      const tS = `${PREFIX}/${room}/s`, tA = `${PREFIX}/${room}/a`;
-      const found = await new Promise(resolve => {
-        const t = setTimeout(() => resolve(false), 4000);
-        c.on('message', (topic, buf) => {
-          if (topic !== tS || !buf.length) return;
-          let obj; try { obj = JSON.parse(buf.toString()); } catch (e) { return; }
-          clearTimeout(t);
-          resolve(true);
-          onState(obj);
-        });
-        c.subscribe(tS, { qos: 0 });
-      });
-      if (found) {
-        return {
-          url,
-          send(a) { c.publish(tA, JSON.stringify(a), { qos: 1 }); },
-          onReconnect(fn) { c.on('connect', fn); },
-          close() { c.end(true); },
-        };
-      }
-      c.end(true);
-    }
-    throw new Error('not found');
+  // Listens on every relay for the host's game with this room code. onState gets every state
+  // message from any relay; the caller sorts out repeats and stale copies.
+  function join(room, onState, onStatus) {
+    const tS = `${PREFIX}/${room}/s`, tA = `${PREFIX}/${room}/a`;
+    const onConnect = [];
+    const L = links(onStatus, c => {
+      c.subscribe(tS, { qos: 0 });
+      onConnect.forEach(fn => fn());
+    }, (topic, buf, l) => {
+      if (topic !== tS || !buf.length) return;
+      let obj; try { obj = JSON.parse(buf.toString()); } catch (e) { return; }
+      onState(obj, l.url);
+    });
+    return {
+      // Sent on every relay that is up (the host drops repeats by action id); if none is up,
+      // mqtt.js keeps the message and sends it once a relay is back.
+      send(a) {
+        const s = JSON.stringify(a);
+        const up = L.up();
+        (up.length ? up : L.all.filter(l => l.c)).forEach(l => l.c.publish(tA, s, { qos: 1 }));
+      },
+      onReconnect(fn) { onConnect.push(fn); },
+      online: () => L.up().length > 0,
+      refresh: L.refresh,
+      close: L.close,
+    };
   }
 
   root.Net = { host, join };
@@ -1555,10 +1778,12 @@ safe-buffer/index.js:
   let netStatus = '';
   let seenErr = 0;
   let sound = LS.get('kc-sound', true);
-  const ui = { screen: 'home', sel: null, armed: null, menu: false, help: false, joining: false, results: true, shop: { ing: null, cheap: [], pricey: [] }, throwSel: [] };
+  const ui = { screen: 'home', sel: null, armed: null, menu: false, help: false, joining: false, results: true, shop: { ing: null, cheap: [], pricey: [] }, throwSel: [], mate: null, soloResume: null };
 
   const app = document.getElementById('app');
-  const hostNow = () => (role === 'host' ? Date.now() : Date.now() + offset);
+  const hostNow = () => (role !== 'guest' ? Date.now() : Date.now() + offset);
+  // The solo campaign runs the whole game on this iPad, like a host without a relay.
+  const isHost = () => role === 'host' || role === 'solo';
   const game = () => (wrap && wrap.game) || null;
   const playerOf = (g, id) => (g ? g.players : wrap.lobby.players).find(p => p.id === id);
   const fmt = ms => { const t = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
@@ -1612,10 +1837,11 @@ safe-buffer/index.js:
   // ---------- host ----------
   function newRoomCode() { return WORDS[Math.floor(Math.random() * WORDS.length)] + String(Math.floor(10 + Math.random() * 90)); }
 
-  function saveHost() { LS.set('kc-host', { room, wrap, savedAt: Date.now(), pid: me.pid }); }
+  function saveHost() { LS.set(role === 'solo' ? 'kc-solo' : 'kc-host', { room, wrap, savedAt: Date.now(), pid: me.pid }); }
 
   async function hostStart(resume) {
-    role = 'host';
+    if (net) { try { net.close(); } catch (e) { /* gone */ } net = null; }
+    role = 'host'; ui.joining = false;
     if (resume) {
       room = resume.room; wrap = resume.wrap;
       if (wrap.game && wrap.game.v !== 3) wrap.game = null; // saved by an older version of the game
@@ -1625,29 +1851,35 @@ safe-buffer/index.js:
       wrap = { room, rev: 1, lobby: { players: [{ id: me.pid, name: me.name, color: me.color }], settings: { scenario: 1, workerSec: 30, shiftSec: 270, strict: false, challenge: false } }, game: null };
     }
     ui.screen = 'game';
+    hostSession = rid();
+    LS.del('kc-guest'); // this iPad hosts now; don't rejoin an older game after a reload
     saveHost();
     render();
     keepAwake();
-    try {
-      net = await E_NET.host(room, onRemoteAct, st => { netStatus = st; renderStatus(); });
-      publish();
-    } catch (e) {
-      netStatus = 'offline';
-      toast('No connection to the game relay. Check the Wi-Fi and reload.', 'err');
-      renderStatus();
-    }
+    netStatus = 'reconnecting';
+    net = E_NET.host(room, onRemoteAct, st => { const was = netStatus; netStatus = st; renderStatus(); if (st === 'online' && was !== 'online') publish(); });
+    const mine = net;
+    setTimeout(() => { if (net === mine && !net.online()) toast('No connection to the game relay yet. Check the Wi-Fi; it keeps trying.', 'err'); }, 10000);
   }
 
-  function publish() { if (net && role === 'host') net.publish(Object.assign({}, wrap, { now: Date.now() })); }
+  // hs marks this hosting session, so guests can tell the live game from an old copy a relay kept.
+  let hostSession = null;
+  const acks = [];          // ids of the latest guest actions the host has handled
+  const seen = {};          // pid -> last time the host heard from that iPad
+  function publish() { if (net && role === 'host') net.publish(Object.assign({}, wrap, { now: Date.now(), hs: hostSession, acks: acks.slice(-60), seen: Object.assign({}, seen, { [me.pid]: Date.now() }) })); }
   function changed() { wrap.rev++; saveHost(); publish(); render(); }
 
-  const seenAids = [];
+  const seenAids = new Set(), seenOrder = [];
   function onRemoteAct(a) {
-    if (!a || !a.type || !wrap) return;
+    if (!a || !a.type || !wrap || role !== 'host') return;
+    if (a.pid) seen[a.pid] = Date.now();
+    if (a.type === 'ping') return;
     if (E.HOST_ONLY.includes(a.type)) return;
-    if (a.aid) { // the relay may deliver a message twice; never apply an action twice
-      if (seenAids.includes(a.aid)) return;
-      seenAids.push(a.aid); if (seenAids.length > 300) seenAids.shift();
+    if (a.aid) { // every relay delivers a copy; never apply an action twice
+      if (seenAids.has(a.aid)) return;
+      seenAids.add(a.aid); seenOrder.push(a.aid);
+      if (seenOrder.length > 2000) seenAids.delete(seenOrder.shift());
+      acks.push(a.aid); if (acks.length > 60) acks.shift();
     }
     const g = game();
     if (a.type === 'join') {
@@ -1677,12 +1909,12 @@ safe-buffer/index.js:
   }
 
   function hostTick() {
-    if (role !== 'host' || !wrap) return;
+    if (!isHost() || !wrap) return;
     const g = game();
     if (g) {
       const before = g.phase;
       if (E.tick(g, Date.now())) {
-        if (g.phase === 'results' && before !== 'results') saveLog(g);
+        if (g.phase === 'results' && before !== 'results') { saveLog(g); if (role === 'solo') campaignResult(g); }
         if (g.phase !== before) onPhaseChange(before, g.phase);
         changed();
       }
@@ -1690,60 +1922,105 @@ safe-buffer/index.js:
   }
   setInterval(hostTick, 250);
   setInterval(() => { if (role === 'host') publish(); }, 2000);
+  setInterval(() => { if (role === 'host' && wrap && !wrap.game && !ui.menu && !ui.help) render(); }, 3000); // lobby: who is connected
 
   // ---------- guest ----------
-  async function guestJoin(code) {
-    code = code.trim().toUpperCase().replace(/\s+/g, '');
+  // Keeps listening until the host's game turns up (a reload or a relay hiccup on the host can take
+  // a few seconds), with a Cancel button on the waiting screen.
+  function guestJoin(code) {
+    code = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
     if (!code) { toast('Type the code shown on the host iPad.', 'err'); return; }
-    role = 'guest'; room = code; ui.joining = true; ui.screen = 'game';
+    if (net) { try { net.close(); } catch (e) { /* gone */ } }
+    role = 'guest'; room = code; ui.joining = true; ui.joinSince = Date.now(); ui.screen = 'game';
+    wrap = null; authWrap = null; pending = []; offsets = []; lastMsgAt = 0; curHs = null;
+    netStatus = 'reconnecting';
     render();
-    try {
-      net = await E_NET.join(room, onState, st => { netStatus = st; renderStatus(); });
-      ui.joining = false;
-      LS.set('kc-guest', { room, at: Date.now() });
-      sendJoin();
-      net.onReconnect(sendJoin);
-      keepAwake();
-      render();
-    } catch (e) {
-      role = null; room = null; ui.joining = false; ui.screen = 'home';
-      LS.del('kc-guest');
-      render();
-      toast(`No game called ${code} found. Check the code on the host iPad.`, 'err');
-    }
+    const mine = E_NET.join(room, (w, url) => { if (net === mine) onState(w, url); }, st => { if (net !== mine) return; netStatus = st; renderStatus(); });
+    net = mine;
+    net.onReconnect(() => { if (net === mine && authWrap) sendJoin(); });
+    keepAwake();
+    // Point out a likely typo, but keep looking.
+    setTimeout(() => { if (net === mine && ui.joining) render(); }, 12500);
   }
-  function sendJoin() { if (net) net.send({ type: 'join', pid: me.pid, name: me.name, color: me.color }); }
+  function sendJoin() { if (net) net.send({ type: 'join', pid: me.pid, name: me.name, color: me.color, aid: rid() + rid() }); }
+  function cancelJoin() {
+    if (net) { try { net.close(); } catch (e) { /* gone */ } }
+    net = null; role = null; room = null; wrap = null; authWrap = null; pending = []; ui.joining = false; ui.screen = 'home';
+    LS.del('kc-guest');
+    render();
+  }
 
-  let authWrap = null;      // last state from the host (wrap may hold an optimistic copy on top)
-  let optimisticAt = 0;
+  let authWrap = null;      // last state from the host (wrap may show my unconfirmed moves on top)
+  let curHs = null;         // hosting session the guest follows
+  let pending = [];         // my moves the host hasn't confirmed yet: { a, at }
+  let guestSavedAt = 0;
   function onState(w) {
-    if (!w || w.room !== room) return;
+    if (!w || w.room !== room || role !== 'guest') return;
+    const prev = authWrap;
+    // Every relay delivers its own copy, and a relay may still hold the game of an older session.
+    // Follow the newest session; within it, never step back to an older revision.
+    if (prev && w.hs !== curHs && !(w.now > prev.now)) return;
+    if (prev && w.hs === curHs && w.rev < prev.rev) return;
+    if (!prev || w.hs !== curHs) offsets = [];
+    curHs = w.hs;
     lastMsgAt = Date.now();
     offsets.push(w.now - Date.now());
     if (offsets.length > 15) offsets.shift();
     offset = Math.max.apply(null, offsets);
-    const prev = authWrap;
-    if (prev && prev.rev === w.rev) return; // heartbeat, nothing new
+    if (Date.now() - guestSavedAt > 30000) { guestSavedAt = Date.now(); LS.set('kc-guest', { room, at: Date.now() }); }
+    if (prev && prev.hs === w.hs && prev.rev === w.rev) { // heartbeat, nothing new
+      authWrap = w;
+      if (!w.game && !pending.length) { wrap = w; render(); } // lobby: who is online
+      return;
+    }
     authWrap = w;
     const shown = wrap;
-    wrap = w;
-    optimisticAt = 0;
-    const pg = shown && shown.game, g = w.game;
+    rebuild();
+    if (ui.joining) {
+      ui.joining = false;
+      LS.set('kc-guest', { room, at: Date.now() }); guestSavedAt = Date.now();
+      sendJoin();
+    }
+    const pg = shown && shown.game, g = wrap.game;
     if (g && pg && pg.phase !== g.phase) onPhaseChange(pg.phase, g.phase);
     render();
   }
-  // An action that never reached the host would leave the screen out of step: fall back after 3 s.
+  // What this iPad shows: the host's state plus my own moves the host hasn't confirmed yet, so a
+  // move doesn't flicker away when another chef's update arrives first.
+  function rebuild() {
+    if (!authWrap) return;
+    const done = authWrap.acks || [];
+    pending = pending.filter(p => Date.now() - p.at < 5000 && !done.includes(p.a.aid));
+    const ag = authWrap.game;
+    if (!pending.length || !ag) { wrap = authWrap; return; }
+    const copy = JSON.parse(JSON.stringify(ag));
+    const now = hostNow();
+    pending.forEach(p => { E.apply(copy, p.a, Math.max(now, p.t)); });
+    copy.errs = ag.errs;
+    wrap = Object.assign({}, authWrap, { game: copy });
+  }
+  // A move the host never confirmed drops off after 5 s; a silent host gets a fresh connection.
   setInterval(() => {
-    if (role === 'guest' && optimisticAt && Date.now() - optimisticAt > 3000 && authWrap) {
-      wrap = authWrap; optimisticAt = 0; render();
+    if (role !== 'guest' || !net) return;
+    if (pending.length && pending.some(p => Date.now() - p.at >= 5000)) { rebuild(); render(); }
+    if (!ui.joining && document.visibilityState === 'visible' && Date.now() - lastMsgAt > 9000 && Date.now() - lastRefresh > 15000) {
+      lastRefresh = Date.now(); net.refresh();
     }
+    if (authWrap && Date.now() - lastPing > 5000) { lastPing = Date.now(); net.send({ type: 'ping', pid: me.pid }); }
   }, 1000);
+  let lastRefresh = 0, lastPing = 0;
+
+  // Coming back from a locked screen or another app: the sockets are often dead without knowing it.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !net || role === 'solo') return;
+    if (Date.now() - lastRefresh > 3000) { lastRefresh = Date.now(); offsets = []; net.refresh(); }
+  });
 
   // ---------- actions ----------
   function act(a) {
     a.pid = me.pid;
     const g = game();
-    if (role === 'host') {
+    if (isHost()) {
       if (!g) return;
       const err = E.apply(g, a, Date.now());
       if (err) { toast(err, 'err'); return false; }
@@ -1756,11 +2033,12 @@ safe-buffer/index.js:
       // Apply the move on this iPad straight away so the tap feels instant; the host's
       // answer replaces this copy a moment later.
       const copy = JSON.parse(JSON.stringify(g));
-      const err = E.apply(copy, a, hostNow());
+      const t = hostNow();
+      const err = E.apply(copy, a, t);
       if (err) { toast(err, 'err'); return false; }
       copy.errs = g.errs;
       wrap = Object.assign({}, wrap, { game: copy });
-      optimisticAt = optimisticAt || Date.now();
+      pending.push({ a, at: Date.now(), t });
       render();
     }
     net.send(a);
@@ -1817,9 +2095,10 @@ safe-buffer/index.js:
   }).join('');
   const coin = n => `<span class="coin" title="pays ${n} coins">🪙${n}</span>`;
 
-  const OWNER_TEMP = { name: 'Temp', color: 'temp' };
+  const OWNER_TEMP = { name: 'Temp', color: 'temp' }, OWNER_HELPER = { name: 'Helper', color: 'temp' };
+  const SHARED = ['helper', 'temp'];
   const colorOf = c => COLORS[c] || '#F4F4F4';
-  const whoOf = (g, owner) => owner === 'temp' ? OWNER_TEMP : (playerOf(g, owner) || { name: '?', color: 'red' });
+  const whoOf = (g, owner) => owner === 'temp' ? OWNER_TEMP : owner === 'helper' ? OWNER_HELPER : (playerOf(g, owner) || { name: '?', color: 'red' });
 
   function spot(g, area, idx) {
     const occ = g.spaces[area][idx];
@@ -1828,9 +2107,9 @@ safe-buffer/index.js:
     if (g.broken && g.broken.area === area && g.broken.idx === idx) return `<span class="spot broken" title="Broken — call the technician">🔧</span>`;
     if (!occ) return `<button class="spot" data-a="place" data-area="${area}" data-idx="${idx}" aria-label="${label}: free"><span>${icons[area]}</span></button>`;
     const p = whoOf(g, occ.pid);
-    const mine = occ.pid === me.pid || (occ.pid === 'temp' && occ.by === me.pid);
-    const ini = occ.pid === 'temp' ? 'T' : p.name.slice(0, 1).toUpperCase();
-    return `<button class="spot taken ${mine ? 'mine' : ''} ${occ.pid === 'temp' ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-a="place" data-area="${area}" data-idx="${idx}" data-wstart="${occ.start}" aria-label="${label}: ${esc(p.name)}"><span class="ini">${esc(ini)}</span><em class="sec"></em></button>`;
+    const mine = occ.pid === me.pid || (SHARED.includes(occ.pid) && occ.by === me.pid);
+    const ini = occ.pid === 'temp' ? 'T' : occ.pid === 'helper' ? 'H' : p.name.slice(0, 1).toUpperCase();
+    return `<button class="spot taken ${mine ? 'mine' : ''} ${SHARED.includes(occ.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-a="place" data-area="${area}" data-idx="${idx}" data-wstart="${occ.start}" aria-label="${label}: ${esc(p.name)}"><span class="ini">${esc(ini)}</span><em class="sec"></em></button>`;
   }
 
   function miniTicket(g, dishId) {
@@ -1845,6 +2124,15 @@ safe-buffer/index.js:
   }
 
   function myOpen(g) { return g.open[me.pid] || null; }
+  // Serving early is a gamble: an unfinished meal costs reputation, so ask twice.
+  function serveBtn(g, o) {
+    const parts = o.group ? g.orders.filter(x => x.group === o.group) : [o];
+    const ready = parts.every(x => !E.checkOrder(g, x).length);
+    const armed = ui.armedServe && ui.armedServe.order === o.id && Date.now() - ui.armedServe.t < 4000;
+    const tip = E.has(g, 'tips') ? 2 : 1;
+    if (ready) return `<button class="btn ghost cookbtn" data-a="serve" data-order="${o.id}" data-ready="1">🛎️ Serve now (+${tip} tip)</button>`;
+    return `<button class="btn ghost cookbtn ${armed ? 'warn' : ''}" data-a="serve" data-order="${o.id}">${armed ? 'Not finished — tap again to serve anyway' : `🛎️ Serve now (+${tip} tip)`}</button>`;
+  }
   const orderDone = (g, o) => E.plateOk(g, o) && E.ingComplete(o) && E.SPICES.every(i => ((o.sp || {})[i] || 0) === (E.DISHES[o.dish].sp[i] || 0));
 
   function ticket(g, o, mine) {
@@ -1883,7 +2171,7 @@ safe-buffer/index.js:
       <div class="tk-plate">${o.plate ? plateBadge(o.plate, 'big') : `<span class="noplate">${mine ? 'Take a plate from the cupboard' : 'no plate'}</span>`}<span class="chips">${chips}</span></div>
       <div class="tk-cook"><span class="cells">${cells.join('')}</span><span class="ct">${cookTxt}</span>${bin}</div>
       ${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">Cook one step</button>` : ''}
-      ${canServe ? `<button class="btn ghost cookbtn" data-a="serve" data-order="${o.id}">🛎️ Serve now (+${E.has(g, 'tips') ? 2 : 1} tip)</button>` : ''}
+      ${canServe ? serveBtn(g, o) : ''}
     </div>`;
   }
 
@@ -1895,7 +2183,7 @@ safe-buffer/index.js:
     const canRejoin = gsaved && Date.now() - gsaved.at < 12 * 3600e3;
     return `<main class="home">
       <h1 class="logo">Küchen<span>-</span>Chaos</h1>
-      <p class="sub">The real-time kitchen game for 2–4 chefs, one iPad each.</p>
+      <p class="sub">The real-time kitchen game for 1–4 chefs, one iPad each.</p>
       <section class="card homecard">
         <label class="fld">Your name<input id="nm" maxlength="14" value="${esc(me.name)}" placeholder="e.g. Juna" autocomplete="off"></label>
         <div class="fld">Your colour<div class="colors">${COLOR_NAMES.map(c => `<button class="cbtn ${me.color === c ? 'on' : ''}" style="--c:${COLORS[c]}" data-a="color" data-c="${c}" aria-label="${c}"></button>`).join('')}</div></div>
@@ -1914,7 +2202,81 @@ safe-buffer/index.js:
           </div>
         </div>
       </section>
+      <section class="card homecard solocard">
+        <div><h2>Play alone</h2><p>The solo campaign: cook your way through all 8 restaurants and the master chef missions, one after the other. Your progress is saved on this iPad.</p></div>
+        <button class="btn big" data-a="campaign">Solo campaign</button>
+      </section>
       <button class="link" data-a="help">How to play</button>
+    </main>`;
+  }
+
+  // ---------- solo campaign ----------
+  const CAMP_KEY = () => 'kc-campaign-' + me.pid;
+  const camp = () => LS.get(CAMP_KEY(), { unlocked: 1, done: {} });
+  function campaignResult(g) {
+    const c = camp(), n = g.settings.scenario, R = g.results;
+    const d = c.done[n] || { plays: 0, won: false, challenge: false };
+    d.plays++;
+    if (R.win) { d.won = true; if (g.settings.challenge) d.challenge = true; }
+    d.best = Math.max(d.best || 0, R.coins || R.served || 0);
+    c.done[n] = d;
+    if (R.win) c.unlocked = Math.max(c.unlocked, n + 1);
+    LS.set(CAMP_KEY(), c);
+  }
+  function openCampaign() {
+    role = 'solo'; room = 'SOLO';
+    const st = LS.get('kc-solo-settings', { scenario: 1, workerSec: 30, shiftSec: 270, strict: false, challenge: false });
+    const saved = LS.get('kc-solo', null);
+    if (saved && saved.pid === me.pid && saved.wrap && saved.wrap.game && saved.wrap.game.v === 3 && saved.wrap.game.phase !== 'results' && Date.now() - saved.savedAt < 6 * 3600e3) {
+      ui.soloResume = saved.wrap;
+    } else ui.soloResume = null;
+    wrap = { room, rev: 1, lobby: { players: [{ id: me.pid, name: me.name, color: me.color }], settings: st }, game: null };
+    ui.screen = 'game';
+    render();
+  }
+  function startSolo(n) {
+    const S = wrap.lobby.settings;
+    if (S.scenario !== n) { S.scenario = n; S.shiftSec = E.SCEN[n].normal; S.challenge = false; }
+    LS.set('kc-solo-settings', S);
+    wrap.lobby.players = [{ id: me.pid, name: me.name, color: me.color }];
+    wrap.game = E.newGame(S, wrap.lobby.players);
+    ui.results = true; ui.sel = null;
+    changed();
+    keepAwake();
+  }
+  function renderCampaign() {
+    const c = camp(), S = wrap.lobby.settings, n = S.scenario || 1;
+    const all = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+    const open = k => k <= 8 ? k <= c.unlocked : c.unlocked > 8;
+    const wonCount = [1, 2, 3, 4, 5, 6, 7, 8].filter(k => c.done[k] && c.done[k].won).length;
+    const card = k => {
+      const d = c.done[k] || {};
+      const st = !open(k) ? '🔒' : d.challenge ? '⭐' : d.won ? '✓' : d.plays ? `${d.plays}×` : '▶';
+      return `<button class="ccard ${n === k ? 'on' : ''} ${open(k) ? '' : 'locked'} ${d.won ? 'won' : ''}" ${open(k) ? `data-a="pickSolo" data-n="${k}"` : 'disabled'}>
+        <span class="cst">${st}</span><b>${scenTitle(k)}</b><small>${open(k) ? esc(E.goalText(E.goalOf(k, 1, false), true)) : k > 8 ? 'Opens after restaurant 8' : `Win restaurant ${k - 1} to open`}</small></button>`;
+    };
+    const seg = (key, vals, labels) => `<div class="seg">${vals.map((v, i) => `<button class="${S[key] === v ? 'on' : ''}" data-a="set" data-k="${key}" data-v="${v}">${labels[i]}</button>`).join('')}</div>`;
+    const normal = E.SCEN[n].normal;
+    const canChallenge = n >= 3 && n <= 8 && c.done[n] && c.done[n].won;
+    return `<main class="lobby campaign">
+      <h1 class="logo small">Küchen<span>-</span>Chaos</h1>
+      <section class="card">
+        <h2>${esc(me.name || 'Chef')}'s solo campaign</h2>
+        <div class="cprog"><div style="width:${wonCount / 8 * 100}%"></div></div>
+        <p class="note">${wonCount} of 8 restaurants won${c.unlocked > 8 ? ' — the master chef missions are open' : ''}. Win a restaurant to open the next one.</p>
+        ${ui.soloResume ? '<button class="btn big resumebtn" data-a="soloResume">Continue the game you started</button>' : ''}
+        <div class="cgrid">${all.filter(k => k <= 8).map(card).join('')}</div>
+        <h2>Master chef missions</h2>
+        <div class="cgrid">${all.filter(k => k > 8).map(card).join('')}</div>
+        <h2>${scenTitle(n)}</h2>
+        <p class="note goalnote">Goal: ${E.goalText(E.goalOf(n, 1, S.challenge && canChallenge), true)}${E.SCEN[n].shifts > 1 ? ` — over ${E.SCEN[n].shifts} shifts` : ''}.</p>
+        <div class="setrow"><span>Sand timer</span>${DEV ? seg('workerSec', [3, 20, 25, 30, 35], ['3 s', '20 s', '25 s', '30 s', '35 s']) : seg('workerSec', [20, 25, 30, 35], ['20 s', '25 s', '30 s', '35 s'])}</div>
+        <div class="setrow"><span>Shift length</span>${seg('shiftSec', (DEV ? [40] : []).concat([normal, 300]), (DEV ? ['0:40'] : []).concat([fmt(normal * 1000) + ' normal', '5:00 family']))}</div>
+        <div class="setrow"><span>Wrong moves</span>${seg('strict', [false, true], ['Allowed, checked at the end', 'Blocked'])}</div>
+        ${canChallenge ? `<div class="setrow"><span>Goal</span>${seg('challenge', [false, true], ['Normal', 'Challenge ⭐'])}</div>` : ''}
+        <button class="btn big" data-a="playSolo">Play ${scenTitle(n)}</button>
+      </section>
+      <div class="lobbylinks"><button class="link" data-a="help">How to play</button><button class="link" data-a="leave">Back to the start</button></div>
     </main>`;
   }
 
@@ -1934,7 +2296,20 @@ safe-buffer/index.js:
     13: 'Lots of coins and lots of reputation.',
   };
   const RESTAURANTS = [1, 2, 3, 4, 5, 6, 7, 8], MISSIONS = [9, 10, 11, 12, 13];
+  const DUO_RULES = 'a shared helper sand timer 🤝 for whoever has no free timer, you may put ingredients and spices on and cook your partner\'s meals, and each van trip allows two purchases.';
   const scenTitle = n => n <= 8 ? `${n}. ${E.SCEN[n].name}` : E.SCEN[n].name;
+
+  // Presence: guests ping the host every 5 s; the host passes the times on in every state.
+  function chefOnline(pid) {
+    if (pid === me.pid) return true;
+    const t = role === 'host' ? seen[pid] : wrap && wrap.seen && wrap.seen[pid] != null ? wrap.seen[pid] - offset : null;
+    return t != null && Date.now() - t < 15000;
+  }
+  function boardNote(n) {
+    if (n < 1) return '';
+    const Lo = E.layout(n);
+    return `Kitchen for ${n} chef${n > 1 ? 's' : ''}: ${6 - Lo.reserved} tables, ${Lo.dining} order spaces in the dining room, ${Lo.stove} stove spaces.`;
+  }
 
   function renderLobby() {
     const L = wrap.lobby, host = role === 'host', S = L.settings;
@@ -1954,14 +2329,16 @@ safe-buffer/index.js:
         <p class="sub">On the other iPads, open this page, tap Join and type</p>
         <div class="roomcode">${esc(wrap.room)}</div>
         <h2>Chefs (${L.players.length} of 4)</h2>
-        <ul class="plist">${L.players.map(p => `<li>${dot(p.color)}<span>${esc(p.name || 'Chef')}</span>${p.id === me.pid ? '<em>you</em>' : ''}${host && p.id !== me.pid ? `<button class="x" data-a="kick" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">✕</button>` : ''}</li>`).join('')}</ul>
+        <ul class="plist">${L.players.map(p => `<li>${dot(p.color)}<span>${esc(p.name || 'Chef')}</span>${p.id === me.pid ? '<em>you</em>' : chefOnline(p.id) ? '<em class="on">● connected</em>' : '<em class="off">not connected</em>'}${host && p.id !== me.pid ? `<button class="x" data-a="kick" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">✕</button>` : ''}</li>`).join('')}</ul>
         ${!L.players.some(p => p.id === me.pid) && !host ? '<p class="note">Joining…</p>' : ''}
         <h2>Restaurant</h2>
         <div class="scens">${RESTAURANTS.map(scenBtn).join('')}</div>
         <h2>Master chef missions</h2>
         <p class="note">Played with all the rules of restaurant 8, four shifts of 4 minutes.</p>
         <div class="scens">${MISSIONS.map(scenBtn).join('')}</div>
+        <p class="note sizenote">${boardNote(L.players.length)}</p>
         <p class="note goalnote">Goal: ${E.goalText(goal)}${cfg.shifts > 1 ? ` — over ${cfg.shifts} shifts` : ''}.</p>
+        ${L.players.length === 2 ? `<p class="note duonote">🤝 Two-chef rules are on: ${DUO_RULES}</p>` : ''}
         <h2>Settings</h2>
         <div class="setrow"><span>Sand timer</span>${DEV ? seg('workerSec', [3, 20, 25, 30, 35], ['3 s', '20 s', '25 s', '30 s', '35 s']) : seg('workerSec', [20, 25, 30, 35], ['20 s', '25 s', '30 s', '35 s'])}</div>
         <div class="setrow"><span>Shift length</span>${seg('shiftSec', shiftVals, shiftVals.map(shiftLbl))}</div>
@@ -1998,12 +2375,17 @@ safe-buffer/index.js:
     const now = hostNow();
     const myOrders = g.orders.filter(o => o.pid === me.pid);
     const liveOrders = myOrders.filter(o => !o.served);
-    if (ui.sel && !liveOrders.some(o => o.id === ui.sel)) ui.sel = null;
+    // Two-chef rule: the target may also be one of the partner's meals (chosen from their row).
+    const partnerSel = g.duo && op && (op.type === 'storage' || op.type === 'spice') ? g.orders.find(o => o.id === ui.sel && o.pid !== me.pid && !o.served) : null;
+    if (ui.sel && !partnerSel && !liveOrders.some(o => o.id === ui.sel)) ui.sel = null;
     if (!ui.sel && liveOrders.length) ui.sel = (liveOrders.find(o => !orderDone(g, o)) || liveOrders[liveOrders.length - 1]).id;
-    const selO = liveOrders.find(o => o.id === ui.sel);
+    const selO = partnerSel || liveOrders.find(o => o.id === ui.sel);
+    const forWhom = o => o.pid === me.pid ? 'your' : `${esc((playerOf(g, o.pid) || {}).name)}'s`;
+    const helpHint = g.duo && liveOrders.length + g.orders.filter(o => o.pid !== me.pid).length > 0 ? ' Tap your partner\'s row to help with their meals.' : '';
     const plateGlow = selO && !selO.plate;
     const recOpen = op && op.type === 'reception';
     if (!recOpen) ui.throwSel = [];
+    ui.throwSel = ui.throwSel.filter(i => g.seats[i] && g.seats[i].dish);
 
     const seats = g.seats.map((s, i) => {
       if (s.reserved) return `<div class="seat reserved"><span>Reserved</span></div>`;
@@ -2035,20 +2417,14 @@ safe-buffer/index.js:
 
     const ring = x => {
       const p = whoOf(g, x.pid);
-      return `<span class="vt ${x.pid === 'temp' ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-wstart="${x.start}"><span class="ini">${esc(x.pid === 'temp' ? 'T' : p.name.slice(0, 1).toUpperCase())}</span><em class="sec"></em></span>`;
+      return `<span class="vt ${SHARED.includes(x.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-wstart="${x.start}"><span class="ini">${esc(x.pid === 'temp' ? 'T' : x.pid === 'helper' ? 'H' : p.name.slice(0, 1).toUpperCase())}</span><em class="sec"></em></span>`;
     };
     // The van and the office have no room on the board, so they live in the top bar where every chef can reach them.
     const van = cfg.shop ? `<div class="vanbar ${op && op.type === 'shop' ? 'active' : ''}"><button class="vanbtn" data-a="place" data-area="van" data-idx="0" ${g.coins < 1 ? 'disabled' : ''} aria-label="Van: go shopping for 1 coin">🚐 <span>Shop<small>1 🪙</small></span></button><div class="vts">${g.spaces.van.map(ring).join('')}</div></div>` : '';
     const office = cfg.office ? `<div class="vanbar officebar ${op && op.type === 'office' ? 'active' : ''}" title="Office">${spot(g, 'office', 0)}<small>Office</small></div>` : '';
-    const temps = g.workers.temp ? `<div class="tempbar" title="Temps — any chef can use them when their own timers are busy">🤍 ${g.workers.temp.map((w, t) => g.off.temp[t] ? '<span class="vt tempw strike">⛔</span>' : w ? ring({ pid: 'temp', start: w.start }) : '<span class="vt tempw"><span class="ini">T</span></span>').join('')}</div>` : '';
-
-    const others = g.players.filter(p => p.id !== me.pid).map(p => {
-      const os = g.orders.filter(o => o.pid === p.id);
-      const where = (g.workers[p.id] || []).filter(Boolean).map(w => E.AREA_NAME[w.area].toLowerCase());
-      const st = (g.off[p.id] || []).filter(Boolean).length;
-      return `<div class="other" style="--c:${COLORS[p.color]}"><div class="oname">${dot(p.color)}${esc(p.name)}${st ? ` <span class="ostrike">⛔ ${st} on strike</span>` : ''} <small>${where.length ? where.join(' · ') : 'not started'}</small></div>
-        <div class="otks">${os.length ? os.map(o => ticket(g, o, false)).join('') : '<span class="none">No orders yet</span>'}</div></div>`;
-    }).join('');
+    const sharedRing = owner => g.workers[owner].map((w, t) => g.off[owner][t] ? '<span class="vt tempw strike">⛔</span>' : w ? ring({ pid: owner, start: w.start }) : `<span class="vt tempw"><span class="ini">${owner === 'helper' ? 'H' : 'T'}</span></span>`).join('');
+    const temps = (g.workers.helper ? `<div class="tempbar" title="Helper — two-chef rule: either chef can use it when their own timers are busy">🤝<small>Helper</small> ${sharedRing('helper')}</div>` : '')
+      + (g.workers.temp ? `<div class="tempbar" title="Temps — any chef can use them when their own timers are busy">🤍<small>Temp</small> ${sharedRing('temp')}</div>` : '');
 
     let prompt = '', promptBtn = '';
     const ready = meP && E.workerReady(g, me.pid, now);
@@ -2066,13 +2442,13 @@ safe-buffer/index.js:
       prompt = ui.throwSel.length ? `🚪 Throw out ${ui.throwSel.length} guest${ui.throwSel.length > 1 ? 's' : ''}? The new guests won't buy drinks.` : '🚪 Seat new guests — or tap 1 or 2 waiting guests to throw them out.';
       promptBtn = ui.throwSel.length ? '<button class="btn" data-a="throwOut">Throw out</button><button class="btn ghost" data-a="throwClear">Cancel</button>' : '<button class="btn" data-a="seatGuests">Seat guests</button>';
     }
-    else if (op && op.type === 'storage') { prompt = selO ? `📦 Tap ingredients for your ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to fill that one.' : ''}` : '📦 Take an order first. Ingredients only go on your own plates.'; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
-    else if (op && op.type === 'spice') { prompt = selO ? `🌿 Tap spices for your ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to season that one.' : ''}` : '🌿 Take an order first. Spices only go on your own plates.'; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
-    else if (op && op.type === 'shop') { prompt = '🚐 Choose what to buy for 1 coin.'; promptBtn = '<button class="btn ghost" data-a="done">Buy nothing</button>'; }
+    else if (op && op.type === 'storage') { prompt = selO ? `📦 Tap ingredients for ${forWhom(selO)} ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to fill that one.' : ''}${helpHint}` : `📦 Take an order first. Ingredients only go on ${g.duo ? 'your team\'s' : 'your own'} plates.${helpHint}`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
+    else if (op && op.type === 'spice') { prompt = selO ? `🌿 Tap spices for ${forWhom(selO)} ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to season that one.' : ''}${helpHint}` : `🌿 Take an order first. Spices only go on ${g.duo ? 'your team\'s' : 'your own'} plates.${helpHint}`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
+    else if (op && op.type === 'shop') { prompt = op.left > 1 ? '🚐 Choose what to buy — two purchases this trip, 1 coin each.' : '🚐 Choose what to buy for 1 coin.'; promptBtn = '<button class="btn ghost" data-a="done">Done shopping</button>'; }
     else if (op && op.type === 'office') { prompt = '🏢 Choose what to do in the office.'; promptBtn = '<button class="btn ghost" data-a="done">Nothing</button>'; }
     else if (g.phase === 'between') prompt = 'Shift break. Plan the next shift together.';
     else if (op && op.type === 'wash') { prompt = `🧽 Tap dirty plates in the sink to wash them (${op.left} more).`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
-    else if (op && op.type === 'cook') { prompt = liveOrders.length ? '🔥 Tap “Cook one step” on a meal.' : '🔥 You have nothing to cook yet.'; promptBtn = '<button class="btn ghost" data-a="done">Skip</button>'; }
+    else if (op && op.type === 'cook') { prompt = liveOrders.length ? `🔥 Tap “Cook one step” on a meal.${g.duo ? ' You can also cook for your partner from their row.' : ''}` : g.duo ? '🔥 Tap your partner\'s row to cook one of their meals.' : '🔥 You have nothing to cook yet.'; promptBtn = '<button class="btn ghost" data-a="done">Skip</button>'; }
     else if (g.phase === 'grace') prompt = 'Time is up! Waiting for the others to finish.';
     else if (now < g.shiftStart) prompt = 'Get ready…';
     else if (!nTimers && !g.workers.temp) prompt = 'All your sand timers are on strike — a late payment in the office brings one back.';
@@ -2120,10 +2496,11 @@ safe-buffer/index.js:
         </div>
         <aside class="kitchen">
           ${status}
-          <div class="mytks">${myOrders.length ? myOrders.map(o => ticket(g, o, true)).join('') : (meP ? '<p class="empty-k">Your order tickets land here. Start at the dining room 📝, or seat more guests at the reception 🚪.</p>' : '')}</div>
-          ${others ? `<div class="others">${others}</div>` : ''}
+          <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${ticket(g, partnerSel, false)}</div>` : ''}${myOrders.length ? myOrders.map(o => ticket(g, o, true)).join('') : (meP ? '<p class="empty-k">Your order tickets land here. Start at the dining room 📝, or seat more guests at the reception 🚪.</p>' : '')}</div>
+          <div class="teamdock">${teamPanel(g, now)}${feedPanel(g)}</div>
         </aside>
       </div>
+      ${ui.mate && g.players.some(p => p.id === ui.mate) ? renderMate(g, ui.mate) : ''}
       ${g.phase === 'ready' ? renderReady(g) : ''}
       ${g.phase === 'between' ? renderBetween(g) : ''}
       ${op && op.type === 'shop' && (g.phase === 'play' || g.phase === 'grace') ? renderShop(g) : ''}
@@ -2151,15 +2528,15 @@ safe-buffer/index.js:
     };
     const spBtn = (kind, i) => `<button class="sbtn" data-a="shopSp" data-kind="${kind}" data-spice="${i}">${E.SP_INFO[i].e}<small>${E.SP_INFO[i].n}</small></button>`;
     return `<div class="sheet shopsheet"><div class="card shop">
-      <h2>🚐 Shopping</h2>
-      <p class="note">Each trip costs 1 coin from the office (now ${g.coins}). Pick one of the three.</p>
+      <h2>🚐 Shopping${myOpen(g) && myOpen(g).left > 1 ? ' <small class="badge">2 purchases this trip</small>' : g.duo ? ' <small class="badge">last purchase</small>' : ''}</h2>
+      <p class="note">Each purchase costs 1 coin from the office (now ${g.coins}). Pick one of the three.</p>
       <h3>${n} of one ingredient</h3>
       <div class="shoprow">${E.ING.map(ingBtn).join('')}</div>${rooms}
       <h3>3 cheap spices, any mix</h3>
       <div class="shoprow">${E.CHEAP.map(i => spBtn('cheap', i)).join('')}</div>${tray('cheap', 3)}
       <h3>2 expensive spices, any mix</h3>
       <div class="shoprow">${E.PRICEY.map(i => spBtn('pricey', i)).join('')}</div>${tray('pricey', 2)}
-      <button class="btn ghost" data-a="done">Buy nothing</button>
+      <button class="btn ghost" data-a="done">${g.duo && myOpen(g) && myOpen(g).left < 2 ? 'Done shopping' : 'Buy nothing'}</button>
     </div></div>`;
   }
 
@@ -2182,44 +2559,157 @@ safe-buffer/index.js:
     </div></div>`;
   }
 
-  function moneyLine(r) {
-    const parts = [`start ${r.start}`, `+ drinks ${r.drinks}`];
-    if (r.tips) parts.push(`+ tips ${r.tips}`);
-    if (r.shopping) parts.push(`− shopping ${r.shopping}`);
-    if (r.office) parts.push(`− office ${r.office}`);
-    parts.push(`+ meals ${r.meals}`, `− free drinks ${r.freeDrinks}`);
-    if (r.salary || r.bankrupt || r.salaryDue) parts.push(`− salaries ${r.salary}`);
-    return `${parts.join(' ')} = <b>${r.end} coins</b>`;
+  // ---------- team panel: what the other chefs are doing right now ----------
+  const AREA_ICON = { reception: '🚪', dining: '📝', storA: '📦', storB: '📦', storC: '📦', stove: '🔥', green: '🌿', sink: '🧽', van: '🚐', office: '🏢' };
+  const ROOM_NO = { A: 1, B: 2, C: 3 };
+  function doingText(g, pid, now) {
+    const op = g.open[pid];
+    if (op) {
+      return {
+        order: 'is in the dining room', reception: 'is at the reception', storage: `is fetching ingredients in storage ${ROOM_NO[op.room]}`,
+        spice: 'is picking spices', cook: 'is at the stove', wash: 'is washing plates', shop: 'is shopping at the van', office: 'is in the office',
+      }[op.type] || '';
+    }
+    if (g.phase !== 'play' || now < g.shiftStart) return '';
+    return E.workerReady(g, pid, now) ? 'has a free timer' : 'is waiting for the sand';
+  }
+  // Just the dish — whether it's right is for the chef to check, same as on your own tickets.
+  function ticketSummary(g, o) {
+    const d = E.DISHES[o.dish];
+    return `<span class="ts ${o.served ? 'srv' : ''}" title="${esc(d.name)}">${d.e}${o.served ? '🛎️' : ''}</span>`;
+  }
+  function teamPanel(g, now) {
+    const mates = g.players.filter(p => p.id !== me.pid);
+    if (!mates.length) return '';
+    return `<div class="team">${mates.map(p => {
+      const ws = g.workers[p.id] || [], off = g.off[p.id] || [];
+      const timers = ws.map((w, t) => off[t] ? '<span class="mtt strike" title="On strike">⛔</span>'
+        : w ? `<span class="mtt" style="--c:${COLORS[p.color]}" data-wstart="${w.start}" title="${E.AREA_NAME[w.area]}"><span class="mi">${AREA_ICON[w.area]}</span><em class="sec"></em></span>`
+        : '<span class="mtt idle" title="Free">·</span>').join('');
+      const os = g.orders.filter(o => o.pid === p.id);
+      return `<div class="mate" style="--c:${COLORS[p.color]}" data-a="mate" data-id="${p.id}" role="button" aria-label="Show ${esc(p.name)}'s orders">
+        <b>${esc(p.name)}</b><span class="mtimers">${timers}</span><span class="doing">${doingText(g, p.id, now)}</span><span class="msum">${os.map(o => ticketSummary(g, o)).join('')}</span>
+      </div>`;
+    }).join('')}</div>`;
+  }
+  function helpBtn(g, o) {
+    const op = myOpen(g);
+    if (!g.duo || !op || o.served) return '';
+    if (op.type === 'storage') return `<button class="btn" data-a="helpSel" data-order="${o.id}">📦 Put ingredients on this</button>`;
+    if (op.type === 'spice') return `<button class="btn" data-a="helpSel" data-order="${o.id}">🌿 Put spices on this</button>`;
+    if (op.type === 'cook') return `<button class="btn" data-a="helpCook" data-order="${o.id}">🔥 Cook one step</button>`;
+    return '';
+  }
+  function renderMate(g, pid) {
+    const p = playerOf(g, pid);
+    const os = g.orders.filter(o => o.pid === pid);
+    return `<div class="sheet" data-a="closeMate"><div class="card matecard" data-stop="1" style="--c:${COLORS[p.color]}">
+      <h2>${dot(p.color)}${esc(p.name)}'s orders</h2>
+      <div class="mytks">${os.length ? os.map(o => `<div class="helpwrap">${ticket(g, o, false)}${helpBtn(g, o)}</div>`).join('') : '<p class="none">No orders yet.</p>'}</div>
+      ${g.duo ? '<p class="note">Two-chef rule: you may put ingredients and spices on these meals and cook them. Plates and serving stay with their chef.</p>' : ''}
+      <button class="btn" data-a="closeMate">Close</button>
+    </div></div>`;
+  }
+
+  function feedLine(g, f) {
+    const p = whoOf(g, f.pid);
+    const dn = k => k && E.DISHES[k] ? `${E.DISHES[k].e} ${E.DISHES[k].name}` : '';
+    const money = E.cfgOf(g).money;
+    const forTxt = () => f.for ? `${esc(whoOf(g, f.for).name)}'s ` : '';
+    const txt = {
+      seat: () => `seated ${f.n} guest${f.n > 1 ? 's' : ''}${money ? ` (+${f.n * (E.has(g, 'drinks') ? 2 : 1)} 🪙 drinks)` : ''}`,
+      throw: () => `threw out ${f.n} guest${f.n > 1 ? 's' : ''}`,
+      order: () => `took the order: ${dn(f.dish)}`,
+      serve: () => `served ${dn(f.dish)} early (+${f.tip} 🪙 tip)`,
+      plate: () => `took a ${E.PLATE_NAME[f.size].toLowerCase()} plate for ${dn(f.dish)}`,
+      ing: () => `put ${(f.items || []).map(i => E.ING_INFO[i].e).join('')} on ${forTxt()}${dn(f.dish)}`,
+      spice: () => `seasoned ${forTxt()}${dn(f.dish)} with ${(f.items || []).map(i => E.SP_INFO[i].e).join('')}`,
+      cook: () => `cooked ${forTxt()}${dn(f.dish)} (${f.row} of ${f.cook})`,
+      wash: () => `washed ${(f.items || []).length} plate${(f.items || []).length > 1 ? 's' : ''}`,
+      buy: () => f.ing ? `bought ${f.n} ${E.ING_INFO[f.ing].e} (−1 🪙)` : `bought ${(f.spices || []).map(i => E.SP_INFO[i].e).join('')} (−1 🪙)`,
+      late: () => `paid ${esc(whoOf(g, f.owner).name)}'s timer back from strike (−${E.LATE_PAY} 🪙)`,
+      office: () => `${E.OFFICE[f.card].e} ${E.OFFICE[f.card].n.toLowerCase()} (−${E.OFFICE[f.card].cost} 🪙)`,
+      bin: () => `binned ${dn(f.dish)}`,
+    }[f.k];
+    return txt ? `<li style="--c:${colorOf(p.color)}"><b>${esc(p.name)}</b> ${txt()}</li>` : '';
+  }
+  function feedPanel(g) {
+    if (!g.feed || !g.feed.length || g.phase === 'ready' || g.players.length < 2) return '';
+    return `<ul class="feed">${g.feed.slice(-2).reverse().map(f => feedLine(g, f)).join('')}</ul>`;
+  }
+
+  // ---------- score tables: who brought what in and who cost what ----------
+  function sumChefs(g, reports) {
+    const out = {};
+    g.players.forEach(p => { out[p.id] = { served: 0, meals: 0, drinks: 0, tips: 0, shop: 0, office: 0, freeDrinks: 0, net: 0, repGain: 0, repLoss: 0, rep: 0, waiting: 0, mistakes: 0, binned: 0, thrown: 0, early: 0, seated: 0, helped: 0 }; });
+    reports.forEach((r, i) => Object.keys(r.chefs || {}).forEach(pid => {
+      const c = r.chefs[pid], o = out[pid];
+      if (!o) return;
+      Object.keys(o).forEach(k => { if (k !== 'waiting' && k !== 'mistakes') o[k] += c[k] || 0; });
+      if (i === reports.length - 1) { o.waiting = c.waiting || 0; o.mistakes = c.mistakes || 0; }
+    }));
+    return out;
+  }
+  const num = (v, sign) => v ? `<span class="${sign < 0 ? 'neg' : 'pos'}">${sign < 0 ? '−' : '+'}${v}</span>` : '<span class="zero">·</span>';
+  function chefTable(g, chefs, last) {
+    const cfg = E.cfgOf(g);
+    const rows = g.players.map(p => ({ p, c: chefs[p.id] }));
+    const name = p => `<td class="who">${dot(p.color)}${esc(p.name)}</td>`;
+    if (!cfg.money) {
+      return `<table class="score"><thead><tr><th></th><th>Served ✓</th><th>${last ? 'Not served' : 'Still cooking'}</th><th>Mistakes</th>${g.duo ? '<th title="Ingredients, spices and cooking steps for the partner">🤝 Helped</th>' : ''}</tr></thead><tbody>
+        ${rows.map(({ p, c }) => `<tr>${name(p)}<td><b>${c.served}</b></td><td>${c.waiting || '·'}</td><td>${(c.mistakes + c.binned) || '·'}</td>${g.duo ? `<td>${c.helped || '·'}</td>` : ''}</tr>`).join('')}
+      </tbody></table>`;
+    }
+    const spent = c => c.shop + c.office;
+    const best = Math.max.apply(null, rows.map(r => r.c.net));
+    return `<table class="score"><thead><tr><th></th><th>Served</th><th title="Price of served meals">🍽️ Meals</th><th title="Drinks of guests they seated">🥤 Drinks</th>${cfg.service ? '<th title="Tips for serving early">🛎️ Tips</th>' : ''}${cfg.shop || cfg.office ? '<th title="Van and office">🛒 Spent</th>' : ''}<th title="Free drinks for guests they didn't serve">😕 Free drinks</th><th>= Coins</th>${cfg.rep ? '<th>⭐</th>' : ''}${g.duo ? '<th title="Ingredients, spices and cooking steps for the partner">🤝 Helped</th>' : ''}</tr></thead><tbody>
+      ${rows.map(({ p, c }) => `<tr class="${c.net === best && best > 0 ? 'top' : ''}">${name(p)}<td><b>${c.served}</b>${c.mistakes || c.binned ? `<small class="neg"> ${c.mistakes + c.binned}✗</small>` : ''}</td><td>${num(c.meals, 1)}</td><td>${num(c.drinks, 1)}</td>${cfg.service ? `<td>${num(c.tips, 1)}</td>` : ''}${cfg.shop || cfg.office ? `<td>${num(spent(c), -1)}</td>` : ''}<td>${num(c.freeDrinks, -1)}</td><td class="net ${c.net < 0 ? 'neg' : ''}"><b>${c.net > 0 ? '+' : c.net < 0 ? '−' : ''}${Math.abs(c.net)}</b></td>${cfg.rep ? `<td>${c.repGain ? `<span class="pos">+${c.repGain}</span>` : ''}${c.repLoss ? ` <span class="neg">−${c.repLoss}</span>` : ''}${!c.repGain && !c.repLoss ? '<span class="zero">·</span>' : ''}</td>` : ''}${g.duo ? `<td>${c.helped || '<span class="zero">·</span>'}</td>` : ''}</tr>`).join('')}
+    </tbody></table>`;
+  }
+  function teamMoney(g, r) {
+    const chefs = Object.values(r.chefs || {}).reduce((a, c) => a + c.net, 0);
+    return `<p class="money">🏢 Office: start <b>${r.start}</b> ${chefs >= 0 ? '+' : '−'} chefs <b>${Math.abs(chefs)}</b>${r.salaryDue ? ` − salaries <b>${r.salary}</b>${r.salary < r.salaryDue ? ` <span class="neg">(${r.salaryDue - r.salary} not paid)</span>` : ''}` : ''} = <b>${r.end} coins</b></p>`;
   }
   function repLine(r) {
     if (r.repEnd == null) return '';
-    return `<p class="money">Reputation ${r.repStart} + ${r.repGain} − ${r.repLoss} = <b>${r.repEnd} ⭐</b>${r.award ? ` · new award: ${E.AWARDS[r.award].e} ${E.AWARDS[r.award].n} (${E.AWARDS[r.award].d})` : ''}${r.awardLost ? ` · award lost: ${E.AWARDS[r.awardLost].e} ${E.AWARDS[r.awardLost].n}` : ''}</p>`;
+    return `<p class="money">⭐ Reputation ${r.repStart} + ${r.repGain} − ${r.repLoss} = <b>${r.repEnd}</b>${r.repStart + r.repGain - r.repLoss < 0 ? ' (it can\'t drop below 0)' : ''}${r.award ? ` · 🏆 new award: ${E.AWARDS[r.award].e} ${E.AWARDS[r.award].n} — ${E.AWARDS[r.award].d}` : ''}${r.awardLost ? ` · award lost: ${E.AWARDS[r.awardLost].e} ${E.AWARDS[r.awardLost].n}` : ''}</p>`;
   }
   function strikeLine(g, r) {
     if (!r.strikes || !r.strikes.length) return '';
-    return `<p class="money bad">⛔ Not enough money for all salaries: ${r.strikes.map(x => `${esc(whoOf(g, x.owner).name)}${x.owner === 'temp' ? '' : `'s timer ${x.t + 1}`}`).join(', ')} went on strike. A late payment in the office (${E.LATE_PAY} 🪙) brings a timer back.</p>`;
+    return `<p class="money bad">⛔ Not enough coins for all salaries: ${r.strikes.map(x => `${esc(whoOf(g, x.owner).name)}${x.owner === 'temp' ? '' : `'s timer ${x.t + 1}`}`).join(', ')} went on strike. A late payment in the office (${E.LATE_PAY} 🪙) brings a timer back.</p>`;
+  }
+  function guestList(g, r, pid, over) {
+    const money = E.cfgOf(g).money, rep = E.cfgOf(g).rep;
+    const repTxt = o => rep && o.kind !== 'reg' ? ` ${o.ok ? '+' : '−'}${(o.kind === 'vip' ? 2 : 1) + (!o.ok && o.early ? 1 : 0)}⭐` : (rep && !o.ok && o.early ? ' −1⭐' : '');
+    const items = r.orders.filter(o => o.pid === pid).map(o => {
+      const d = E.DISHES[o.dish];
+      const label = `${o.kind === 'vip' ? '👑' : d.e} ${d.name}`;
+      if (o.ok) return `<li class="ok">✓ ${label}${o.early ? ' 🛎️' : ''}${money ? ` <b>+${d.c}🪙</b>` : ''}${repTxt(o)}</li>`;
+      const why = `<small>${o.reasons.slice(0, 3).map(esc).join(' · ')}${o.reasons.length > 3 ? ' …' : ''}</small>`;
+      const fate = o.fate === 'binned' && !over ? '🗑️ thrown away' : o.fate === 'waiting' && !over ? '⏳ still cooking' : '✗ not served';
+      return `<li class="bad">${label} — ${fate}${money && o.kind === 'reg' ? ' −1🪙' : ''}${repTxt(o)} ${why}</li>`;
+    });
+    return items.length ? `<ul class="glist">${items.join('')}</ul>` : '<p class="none">no guests this shift</p>';
   }
 
   function renderBetween(g) {
-    const host = role === 'host';
+    const host = isHost();
     const r = g.reports[g.reports.length - 1];
-    const name = o => `${E.DISHES[o.dish].e === '👑' ? '👑' : E.DISHES[o.dish].e} ${E.DISHES[o.dish].name} (${esc((playerOf(g, o.pid) || {}).name || '')})`;
-    const list = fate => r.orders.filter(o => o.fate === fate).map(name).join(', ');
-    const served = list('served'), waiting = list('waiting'), binned = list('binned');
     const hostP = wrap.lobby.players[0];
-    const eq = r.equality ? `<p class="money">Served early this shift: ${r.equality.map(x => `${esc((playerOf(g, x.pid) || {}).name)} ${x.early}`).join(', ')} (each needs ${g.goal.equality}).</p>` : '';
-    return `<div class="sheet readysheet"><div class="card">
+    const eq = r.equality ? `<p class="money">🛎️ Served early this shift: ${r.equality.map(x => `${esc((playerOf(g, x.pid) || {}).name)} ${x.early}`).join(', ')} (each needs ${g.goal.equality}).</p>` : '';
+    return `<div class="sheet"><div class="card scorecard">
       <h2>End of shift ${r.shift} of ${g.shifts}</h2>
-      ${E.cfgOf(g).money ? `<p class="money">${moneyLine(r)}</p>` : ''}
+      ${chefTable(g, r.chefs, false)}
+      ${E.cfgOf(g).money ? teamMoney(g, r) : ''}
       ${repLine(r)}${strikeLine(g, r)}${eq}
-      <p>${served ? `Served: ${served}.` : 'No meals were served.'}${waiting ? ` Still waiting: ${waiting} — keep cooking these.` : ''}${binned ? ` Thrown away because of a mistake: ${binned} — these guests still want a fresh meal.` : ''}</p>
-      <p class="note">Plates of served meals went to the sink. Guests at the tables stay for the next shift.</p>
+      <div class="gcols">${g.players.map(p => `<div class="gcol" style="--c:${COLORS[p.color]}"><h3>${dot(p.color)}${esc(p.name)}</h3>${guestList(g, r, p.id)}</div>`).join('')}</div>
+      <p class="note">Served plates went to the sink. Guests still waiting stay with their chef; thrown-away meals start again from scratch.</p>
       ${host ? `<button class="btn big" data-a="nextShift">Start shift ${r.shift + 1}</button>` : `<p class="note">Waiting for ${esc(hostP ? hostP.name : 'the host')} to start the next shift.</p>`}
     </div></div>`;
   }
 
   function renderReady(g) {
-    const host = role === 'host';
+    const host = isHost();
     const hostP = wrap.lobby.players[0];
     const n = g.settings.scenario, t = fmt(g.settings.shiftSec * 1000);
     const cfg = E.cfgOf(g);
@@ -2237,38 +2727,39 @@ safe-buffer/index.js:
     return `<div class="sheet readysheet"><div class="card">
       <h2>${scenTitle(n)}</h2>
       <p>${extra}</p>
-      <p><b>Goal:</b> ${E.goalText(g.goal)}. ${cfg.shifts > 1 ? `${cfg.shifts} shifts of ${t}.` : `${t} on the clock.`} Each chef has ${cfg.timers === 1 ? 'one sand timer' : 'two sand timers'} of ${g.settings.workerSec} seconds.${g.settings.strict ? ' Wrong moves are blocked.' : ' Meals are checked when a shift ends.'}</p>
+      ${g.duo ? `<p>🤝 <b>Two-chef rules:</b> ${DUO_RULES}</p>` : ''}
+      <p><b>Goal:</b> ${E.goalText(g.goal, g.players.length === 1)}. ${cfg.shifts > 1 ? `${cfg.shifts} shifts of ${t}.` : `${t} on the clock.`} Each chef has ${cfg.timers === 1 ? 'one sand timer' : 'two sand timers'} of ${g.settings.workerSec} seconds.${g.settings.strict ? ' Wrong moves are blocked.' : ' Meals are checked when a shift ends.'}</p>
       ${host ? '<button class="btn big" data-a="startShift">Start the shift</button>' : `<p class="note">Waiting for ${esc(hostP ? hostP.name : 'the host')} to start the shift.</p>`}
       <button class="link" data-a="help">How to play</button>
     </div></div>`;
   }
 
   function renderResults(g) {
-    const R = g.results, host = role === 'host';
+    const R = g.results, host = isHost();
     const log = host ? LS.get('kc-log', []) : [];
     const wins = log.filter(x => (x.scenario || 1) === (R.scenario || 1) && x.win && x.goalAt != null);
     const best = wins.length ? Math.min.apply(null, wins.map(x => x.goalAt)) : null;
     const head = R.win ? 'You did it — every goal reached!'
       : R.bankrupt ? 'The office couldn\'t pay the salaries — the restaurant had to close.'
+      : R.allStrike ? 'Every sand timer went on strike — the restaurant had to close.'
       : R.equalityFailed ? 'Not every chef served enough guests early in that shift.'
       : 'Not every goal reached this time.';
-    const M = R.money;
-    const checks = (R.checks || []).map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><span class="mark">${c.ok ? '✓' : '✗'}</span>${esc(c.label)} <small>(${esc(String(c.have))})</small></li>`).join('');
-    const money = M ? M.map(r => `<p class="money">${M.length > 1 ? `Shift ${r.shift}: ` : ''}${moneyLine(r)}${r.bankrupt ? ` — ${r.short} coins short for the salaries` : ''}</p>`).join('') : '';
-    const per = p => g.goal.each ? `${p.served} of ${g.goal.each}` : `${p.served} served`;
-    const kindTag = o => o.kind === 'vip' ? '👑 ' : o.kind === 'ch' ? '⭐ ' : '';
-    return `<div class="sheet"><div class="card results ${R.win ? 'won' : 'lost'}">
+    const checks = (R.checks || []).map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><span class="mark">${c.ok ? '✓' : '✗'}</span>${esc(c.label)} <small>(you: ${esc(String(c.have))})</small></li>`).join('');
+    const reps = g.reports || [];
+    const multi = reps.length > 1;
+    return `<div class="sheet"><div class="card results scorecard ${R.win ? 'won' : 'lost'}">
       <h2>${head}</h2>
-      <p class="sub">${R.served} guest${R.served === 1 ? '' : 's'} served correctly${R.goalAt != null ? ` · goal reached at ${fmt(R.goalAt)}` : ''}${best != null ? ` · best ever ${fmt(best)}` : ''}</p>
       <ul class="checks">${checks}</ul>
-      ${money}
-      <div class="rgrid">${R.per.map(p => `<div class="rcol" style="--c:${COLORS[p.color]}">
-        <h3>${dot(p.color)}${esc(p.name)} <span>${per(p)}</span></h3>
-        ${p.orders.length ? p.orders.map(o => `<div class="rrow ${o.ok ? 'ok' : 'bad'}"><span class="re">${E.DISHES[o.dish].e}</span><div><b>${kindTag(o)}${E.DISHES[o.dish].name}</b>${o.ok ? `<small>served${o.early ? ' early 🛎️' : ''}${M ? ` · +${E.DISHES[o.dish].c} coins` : ''}${M && M.length > 1 ? ` · shift ${o.shift}` : ''}</small>` : `<small>${o.reasons.map(esc).join(' · ')}</small>`}</div><span class="mark">${o.ok ? '✓' : '✗'}</span></div>`).join('') : '<p class="none">No orders taken</p>'}
-        <p class="acts">${p.stats ? p.stats.actions : 0} actions${p.stats && p.stats.thrown ? ` · ${p.stats.thrown} binned` : ''}</p>
-      </div>`).join('')}</div>
+      <h3 class="sec-h">${multi ? `All ${reps.length} shifts` : 'Who did what'}</h3>
+      ${chefTable(g, sumChefs(g, reps), true)}
+      ${R.money ? reps.map(r => `<div class="shiftline">${multi ? `<b>Shift ${r.shift}</b> ` : ''}${teamMoney(g, r)}${repLine(r)}${strikeLine(g, r)}</div>`).join('') : ''}
+      <p class="sub">${R.served} guest${R.served === 1 ? '' : 's'} served correctly${R.goalAt != null ? ` · goal reached at ${fmt(R.goalAt)}` : ''}${best != null ? ` · best ever ${fmt(best)}` : ''}</p>
+      <div class="gcols">${g.players.map(p => `<div class="gcol" style="--c:${COLORS[p.color]}"><h3>${dot(p.color)}${esc(p.name)}</h3>${reps.some(r => r.orders.some(o => o.pid === p.id)) ? reps.map((r, i) => r.orders.some(o => o.pid === p.id) ? `${multi ? `<div class="gshift">Shift ${r.shift}</div>` : ''}${guestList(g, r, p.id, i === reps.length - 1)}` : '').join('') : '<p class="none">no guests</p>'}</div>`).join('')}</div>
       <div class="rbtns">
-        ${host ? '<button class="btn big" data-a="again">Play again</button><button class="btn ghost" data-a="lobby">Change restaurant or chefs</button><button class="btn ghost" data-a="log">Download game log</button>' : '<p class="note">The host can start the next round.</p>'}
+        ${role === 'solo' ? (R.win
+          ? `${R.scenario < 13 ? '<button class="btn big" data-a="nextSolo">Next restaurant ▶</button>' : ''}<button class="btn ghost" data-a="again">Play again</button><button class="btn ghost" data-a="lobby">Campaign</button>`
+          : `<button class="btn big" data-a="again">Try again</button>${R.scenario < 13 ? '<button class="btn ghost" data-a="skipSolo">Continue anyway ▶</button>' : ''}<button class="btn ghost" data-a="lobby">Campaign</button>`)
+          : host ? '<button class="btn big" data-a="again">Play again</button><button class="btn ghost" data-a="lobby">Change restaurant or chefs</button><button class="btn ghost" data-a="log">Download game log</button>' : '<p class="note">The host can start the next round.</p>'}
         <button class="link" data-a="hideResults">Look at the board</button>
       </div>
     </div></div>`;
@@ -2286,6 +2777,7 @@ safe-buffer/index.js:
         <li><b>🌿 Greenhouse</b> (from restaurant 2) puts spices on your plates — even on a meal that is already cooking.</li>
         <li><b>🧽 Sink</b> (from restaurant 3) washes up to 3 dirty plates.</li>
         <li><b>🚐 Van</b> (from restaurant 4, top bar) buys 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin.</li>
+        <li><b>🤝 Two chefs</b> play with extra rules: a shared helper sand timer (top bar) that either chef can use when their own timers are busy; you may put ingredients and spices on, and cook, your partner's meals — tap their row; and each van trip allows two purchases. The helper is paid first and is the last to go on strike.</li>
         <li><b>🏢 Office</b> (from restaurant 7, top bar) pays a timer back from strike for 3 coins, and from restaurant 8 calls the locksmith, the technician, hires a temp or buys plates.</li>
       </ul>
       <p>Meals are checked when a shift ends: right plate (from restaurant 2, one size bigger is fine), exactly the right ingredients and spices, and the right cooking. ⭐ guests are demanding, 👑 VIP guests order two dishes and only pay if both are right.</p>
@@ -2295,15 +2787,15 @@ safe-buffer/index.js:
   }
 
   function renderMenu() {
-    const host = role === 'host', g = game();
+    const host = isHost(), g = game();
     return `<div class="sheet" data-a="closeMenu"><div class="card menu" data-stop="1">
       <h2>Menu</h2>
       <button class="btn ghost" data-a="sound">Sound: ${sound ? 'on' : 'off'}</button>
       <button class="btn ghost" data-a="help">How to play</button>
       ${host && g && g.phase === 'play' ? '<button class="btn ghost" data-a="endNow">End the shift now</button>' : ''}
-      ${host && g ? '<button class="btn ghost" data-a="lobby">Back to the lobby</button>' : ''}
+      ${host && g ? `<button class="btn ghost" data-a="lobby">${role === 'solo' ? 'Back to the campaign' : 'Back to the lobby'}</button>` : ''}
       ${host ? '<button class="btn ghost" data-a="log">Download game log</button>' : ''}
-      <button class="btn ghost" data-a="leave">Leave this game</button>
+      ${role === 'solo' ? '' : '<button class="btn ghost" data-a="leave">Leave this game</button>'}
       <button class="btn" data-a="closeMenu">Close</button>
     </div></div>`;
   }
@@ -2320,8 +2812,8 @@ safe-buffer/index.js:
     if (touching) { pendingRender = true; return; }
     let html;
     if (ui.screen === 'home' || !role) html = renderHome();
-    else if (ui.joining || !wrap) html = `<main class="home"><h1 class="logo small">Küchen<span>-</span>Chaos</h1><p class="sub">Looking for ${esc(room || '')}…</p></main>`;
-    else if (!wrap.game) html = renderLobby();
+    else if (ui.joining || !wrap) html = `<main class="home"><h1 class="logo small">Küchen<span>-</span>Chaos</h1><p class="sub">Looking for ${esc(room || '')}…</p>${Date.now() - (ui.joinSince || 0) > 12000 ? `<p class="note">Still looking. Check that the code matches the host iPad and that the host iPad is awake.</p>` : ''}<button class="btn ghost" data-a="cancelJoin">Cancel</button></main>`;
+    else if (!wrap.game) html = role === 'solo' ? renderCampaign() : renderLobby();
     else html = renderGame(wrap.game);
     if (ui.help) html += renderHelp();
     if (ui.menu) html += renderMenu();
@@ -2379,7 +2871,7 @@ safe-buffer/index.js:
       if (!once && meP && g.phase === 'play') {
         const nReady = (g.workers[me.pid] || []).filter(w => w && E.timerReady(g, w, now)).length;
         const started = now >= g.shiftStart;
-        const key = nReady + '|' + started;
+        const key = nReady + '|' + started + '|' + E.workerReady(g, me.pid, now);
         if (lastReady !== null && lastReady !== key) {
           if (nReady > +lastReady.split('|')[0]) SFX.ready();
           lastReady = key;
@@ -2414,7 +2906,7 @@ safe-buffer/index.js:
     const t = e.target.closest('[data-a]');
     if (!t) return;
     // clicks inside a card shouldn't close its sheet
-    if ((t.dataset.a === 'closeHelp' || t.dataset.a === 'closeMenu') && t.classList.contains('sheet') && e.target.closest('[data-stop]')) return;
+    if ((t.dataset.a === 'closeHelp' || t.dataset.a === 'closeMenu' || t.dataset.a === 'closeMate') && t.classList.contains('sheet') && e.target.closest('[data-stop]')) return;
     unlockAudio();
     const a = t.dataset.a;
     const g = game();
@@ -2424,38 +2916,67 @@ safe-buffer/index.js:
         if (!me.name) { toast('Type your name first.', 'err'); document.getElementById('nm').focus(); return; }
         hostStart(null); break;
       case 'resume': hostStart(LS.get('kc-host', null)); break;
+      case 'campaign':
+        if (!me.name) { toast('Type your name first.', 'err'); document.getElementById('nm').focus(); return; }
+        openCampaign(); break;
+      case 'pickSolo': {
+        const n = +t.dataset.n, S = wrap.lobby.settings;
+        if (S.scenario !== n) { S.scenario = n; S.shiftSec = E.SCEN[n].normal; S.challenge = false; LS.set('kc-solo-settings', S); }
+        render(); break;
+      }
+      case 'playSolo': startSolo(wrap.lobby.settings.scenario || 1); break;
+      case 'soloResume': wrap = ui.soloResume; ui.soloResume = null; render(); keepAwake(); break;
+      case 'nextSolo': {
+        const n = (game() && game().settings.scenario) || 1;
+        if (n < 13) startSolo(n + 1);
+        break;
+      }
+      case 'skipSolo': {
+        const c = camp(), n = game().settings.scenario;
+        c.unlocked = Math.max(c.unlocked, n + 1); LS.set(CAMP_KEY(), c);
+        if (n < 13) startSolo(n + 1);
+        break;
+      }
       case 'join':
         if (!me.name) { toast('Type your name first.', 'err'); document.getElementById('nm').focus(); return; }
         guestJoin(document.getElementById('code').value); break;
+      case 'cancelJoin': cancelJoin(); break;
       case 'help': ui.help = true; ui.menu = false; render(); break;
       case 'closeHelp': ui.help = false; render(); break;
       case 'menu': ui.menu = true; render(); break;
       case 'closeMenu': ui.menu = false; render(); break;
       case 'sound': sound = !sound; LS.set('kc-sound', sound); render(); break;
       case 'leave':
+        if (role === 'solo') { role = null; wrap = null; room = null; ui.menu = false; ui.screen = 'home'; render(); break; }
         if (role === 'host' && !confirm('Close the restaurant? The other iPads will lose this game.')) return;
-        if (role === 'guest' && net) { if (!g) net.send({ type: 'leave', pid: me.pid }); net.close(); LS.del('kc-guest'); }
-        if (role === 'host' && net) { net.clear(); net.close(); LS.del('kc-host'); }
-        role = null; net = null; wrap = null; authWrap = null; optimisticAt = 0; room = null; offsets = []; ui.menu = false; ui.screen = 'home'; render(); break;
+        // Give the last message a moment to leave before the connections close.
+        if (role === 'guest' && net) { const n = net; if (!g) n.send({ type: 'leave', pid: me.pid, aid: rid() + rid() }); setTimeout(() => n.close(), 1500); LS.del('kc-guest'); }
+        if (role === 'host' && net) { const n = net; n.clear(); setTimeout(() => n.close(), 1500); LS.del('kc-host'); }
+        role = null; net = null; wrap = null; authWrap = null; pending = []; ui.joining = false; room = null; offsets = []; ui.menu = false; ui.screen = 'home'; render(); break;
       case 'set': {
-        if (role !== 'host') return;
+        if (!isHost()) return;
         const k = t.dataset.k; let v = t.dataset.v;
         v = (k === 'strict' || k === 'challenge') ? v === 'true' : +v;
         wrap.lobby.settings[k] = v;
         if (k === 'scenario') wrap.lobby.settings.shiftSec = E.SCEN[v].normal;
+        if (role === 'solo') { LS.set('kc-solo-settings', wrap.lobby.settings); render(); break; }
         changed(); break;
       }
       case 'kick': wrap.lobby.players = wrap.lobby.players.filter(p => p.id !== t.dataset.id); changed(); break;
       case 'newgame': case 'again':
-        if (role !== 'host') return;
+        if (!isHost()) return;
+        if (a === 'newgame' && role === 'host') {
+          const away = wrap.lobby.players.filter(p => !chefOnline(p.id)).map(p => p.name || 'Chef');
+          if (away.length && !confirm(`${away.join(' and ')} ${away.length > 1 ? 'are' : 'is'} not connected. Set the tables anyway? They can still come back with the code.`)) return;
+        }
         wrap.game = E.newGame(wrap.lobby.settings, wrap.lobby.players);
         ui.results = true; ui.sel = null; changed(); break;
       case 'lobby':
-        if (role !== 'host') return;
+        if (!isHost()) return;
         if (g && (g.phase === 'play' || g.phase === 'grace') && !confirm('Stop this shift and go back to the lobby?')) return;
         wrap.game = null; ui.menu = false; changed(); break;
-      case 'startShift': if (role === 'host' && g) { E.apply(g, { type: 'start' }, Date.now()); changed(); keepAwake(); } break;
-      case 'nextShift': if (role === 'host' && g) { const err = E.apply(g, { type: 'nextShift' }, Date.now()); if (err) toast(err, 'err'); changed(); keepAwake(); } break;
+      case 'startShift': if (isHost() && g) { E.apply(g, { type: 'start' }, Date.now()); changed(); keepAwake(); } break;
+      case 'nextShift': if (isHost() && g) { const err = E.apply(g, { type: 'nextShift' }, Date.now()); if (err) toast(err, 'err'); changed(); keepAwake(); } break;
       case 'shopIng': ui.shop.ing = t.dataset.ing; render(); break;
       case 'pickThrow': {
         const i = +t.dataset.seat;
@@ -2465,10 +2986,23 @@ safe-buffer/index.js:
       case 'throwClear': ui.throwSel = []; render(); break;
       case 'throwOut': if (g && act({ type: 'throwOut', seats: ui.throwSel.slice() })) { toast('🚪 Thrown out — new guests sit down'); ui.throwSel = []; } break;
       case 'seatGuests': if (g) act({ type: 'seat' }); break;
-      case 'serve': e.stopPropagation(); if (g && act({ type: 'serve', order: +t.dataset.order })) toast('🛎️ Served — the tip is in the office'); return;
+      case 'serve': {
+        e.stopPropagation();
+        const order = +t.dataset.order;
+        const armed = ui.armedServe && ui.armedServe.order === order && Date.now() - ui.armedServe.t < 4000;
+        if (!t.dataset.ready && !armed) { ui.armedServe = { order, t: Date.now() }; render(); setTimeout(render, 4100); return; }
+        ui.armedServe = null;
+        if (g && act({ type: 'serve', order })) toast('🛎️ Served — the tip is in the office');
+        return;
+      }
+      case 'mate': ui.mate = t.dataset.id; render(); break;
+      case 'helpSel': ui.sel = +t.dataset.order; ui.mate = null; render(); break;
+      case 'helpCook': if (g && act({ type: 'cook', order: +t.dataset.order })) { ui.mate = null; toast('🔥 Cooked for your partner'); render(); } break;
+      case 'selMine': ui.sel = null; render(); break;
+      case 'closeMate': ui.mate = null; render(); break;
       case 'latePay': if (g && act({ type: 'latePay', owner: t.dataset.owner, t: +t.dataset.t })) toast('⏳ The timer is back at work'); break;
       case 'officeCard': if (g && act({ type: 'officeCard', card: t.dataset.card })) toast(`${E.OFFICE[t.dataset.card].e} ${E.OFFICE[t.dataset.card].n} — done`); break;
-      case 'buyIng': if (g && ui.shop.ing && act({ type: 'buy', kind: 'ing', ing: ui.shop.ing, room: t.dataset.room })) toast(`🚐 Bought 5 ${E.ING_INFO[ui.shop.ing].e}`); break;
+      case 'buyIng': if (g && ui.shop.ing && act({ type: 'buy', kind: 'ing', ing: ui.shop.ing, room: t.dataset.room })) { toast(`🚐 Bought ${E.has(g, 'bulk') ? 7 : 5} ${E.ING_INFO[ui.shop.ing].e}`); ui.shop = { ing: null, cheap: [], pricey: [] }; render(); } break;
       case 'shopSp': {
         const k = t.dataset.kind, n = k === 'cheap' ? 3 : 2;
         if (ui.shop[k].length < n) ui.shop[k].push(t.dataset.spice);
@@ -2477,10 +3011,10 @@ safe-buffer/index.js:
       case 'shopClear': ui.shop[t.dataset.kind] = []; render(); break;
       case 'buySp': {
         const k = t.dataset.kind, picks = ui.shop[k].slice();
-        if (g && act({ type: 'buy', kind: k, spices: picks })) toast(`🚐 Bought ${picks.map(x => E.SP_INFO[x].e).join('')}`);
+        if (g && act({ type: 'buy', kind: k, spices: picks })) { toast(`🚐 Bought ${picks.map(x => E.SP_INFO[x].e).join('')}`); ui.shop = { ing: null, cheap: [], pricey: [] }; render(); }
         break;
       }
-      case 'endNow': if (role === 'host' && g && confirm('End the shift now and check the meals?')) { E.apply(g, { type: 'endNow' }, Date.now()); ui.menu = false; changed(); } break;
+      case 'endNow': if (isHost() && g && confirm('End the shift now and check the meals?')) { E.apply(g, { type: 'endNow' }, Date.now()); ui.menu = false; changed(); } break;
       case 'log': downloadLog(); break;
       case 'hideResults': ui.results = false; render(); break;
       case 'showResults': ui.results = true; render(); break;
@@ -2503,7 +3037,7 @@ safe-buffer/index.js:
       case 'takeIng': {
         if (!g) return;
         const op = myOpen(g);
-        if (!op || op.type !== 'storage') { toast('Put your timer in a storage room first.', 'err'); return; }
+        if (!op || op.type !== 'storage') { act({ type: 'takeIng', order: ui.sel || 0, ing: t.dataset.ing }); return; } // the engine explains why
         if (op.room !== t.dataset.room) { toast(`Your timer is in storage room ${op.room === 'A' ? 1 : 2}.`, 'err'); return; }
         if (!ui.sel) { toast('Take an order first — ingredients only go on your own plates.', 'err'); return; }
         act({ type: 'takeIng', order: ui.sel, ing: t.dataset.ing });
@@ -2513,7 +3047,7 @@ safe-buffer/index.js:
       case 'takeSpice': {
         if (!g) return;
         const op = myOpen(g);
-        if (!op || op.type !== 'spice') { toast('Put a timer in the greenhouse first.', 'err'); return; }
+        if (!op || op.type !== 'spice') { act({ type: 'takeSpice', order: ui.sel || 0, spice: t.dataset.spice }); return; }
         if (!ui.sel) { toast('Take an order first — spices only go on your own plates.', 'err'); return; }
         act({ type: 'takeSpice', order: ui.sel, spice: t.dataset.spice });
         break;
@@ -2558,9 +3092,15 @@ safe-buffer/index.js:
   if (qRoom) LS.set('kc-guest', { room: qRoom.toUpperCase(), at: Date.now() });
 
   const E_NET = window.Net;
+  if (DEV) window.__kc = { get wrap() { return wrap; }, get auth() { return authWrap; }, get role() { return role; }, get net() { return net; }, get pending() { return pending; }, me };
   render();
-  const back = LS.get('kc-guest', null);
-  if (!qRoom && back && me.name && Date.now() - back.at < 3 * 3600e3 && !LS.get('kc-host', null)) guestJoin(back.room);
+  // After a reload (Safari drops pages it hasn't shown for a while), go straight back into the game
+  // this iPad was in most recently: hosting it or playing in it.
+  const back = LS.get('kc-guest', null), hsave = LS.get('kc-host', null);
+  const hostOk = !qRoom && hsave && hsave.pid === me.pid && hsave.wrap && Date.now() - hsave.savedAt < 3 * 3600e3;
+  const guestOk = !qRoom && back && me.name && Date.now() - back.at < 3 * 3600e3;
+  if (hostOk && (!guestOk || hsave.savedAt >= back.at)) hostStart(hsave);
+  else if (guestOk) guestJoin(back.room);
 })();
 
 </script>
