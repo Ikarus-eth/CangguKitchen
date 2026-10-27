@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, ">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1D2A44">
-<title>Küchen-Chaos</title>
+<title>Canggu Kitchen · Ink & Linen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 <style>
 :root {
@@ -618,6 +618,8 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 }
 
 </style>
+<link rel="stylesheet" href="design.css">
+<link rel="stylesheet" href="reference.css">
 </head>
 <body>
 <div id="app"></div>
@@ -886,7 +888,7 @@ safe-buffer/index.js:
     if (g.payroll) out.push(g.coins > 1 ? `pay all salaries and end with ${g.coins} coins` : 'pay all salaries');
     else if (g.coins) out.push(`end with ${g.coins} coins`);
     if (g.rep) out.push(`reach ${g.rep} reputation`);
-    if (g.noStrike) out.push('no sand timer on strike at the end');
+    if (g.noStrike) out.push('no chef on strike at the end');
     return out.join(', ');
   }
 
@@ -1469,7 +1471,7 @@ safe-buffer/index.js:
         return;
       }
       case 'wash': {
-        const op = needOpen('wash', 'Put a timer at the sink first.');
+        const op = needOpen('wash', 'Send a chef to the wash station first.');
         if (!PLATES.includes(a.size) || !(s.dirty[a.size] > 0)) throw new Error('No dirty plates of that size.');
         s.dirty[a.size]--;
         s.cupboard[a.size]++;
@@ -1781,7 +1783,7 @@ safe-buffer/index.js:
   'use strict';
   const E = window.Engine;
   const DEV = new URLSearchParams(location.search).has('dev');
-  const COLORS = { red: '#E5484D', yellow: '#E9A800', blue: '#3B7BF0', green: '#1F9D63' };
+  const COLORS = { red: '#a94b3e', yellow: '#c18c25', blue: '#3d7090', green: '#517752' };
   const COLOR_NAMES = Object.keys(COLORS);
   const WORDS = ['MANGO', 'PIZZA', 'TACO', 'NOODLE', 'WAFFLE', 'BAGEL', 'MUFFIN', 'SALSA', 'PANCAKE', 'COOKIE',
     'LEMON', 'PEPPER', 'CARROT', 'TOAST', 'DUMPLING', 'SATE', 'PAPAYA', 'BANANA', 'CREPE', 'PRETZEL'];
@@ -2107,20 +2109,33 @@ safe-buffer/index.js:
     document.body.appendChild(a); a.click(); a.remove();
   }
 
+  // Source rectangles preserve the artist's proportions; all quantities remain live text.
+  const ART = {
+    cheese:[30,88,220,215],meat:[268,80,245,220],bread:[530,84,240,220],salad:[780,78,240,230],veg:[1020,74,252,230],pasta:[1272,75,250,225],
+    salt:[74,328,164,174],pepper:[321,328,170,174],herbs:[563,327,171,177],curry:[804,326,174,177],chili:[1042,326,173,177],plate:[1279,313,233,225],
+    blue:[51,544,165,195],yellow:[283,530,164,209],red:[520,538,174,203],green:[739,538,170,204],temp:[968,546,151,197],guestA:[1134,581,153,155],guestB:[1375,584,145,158],
+    noodles:[12,752,254,248],soup:[266,752,254,247],skewers:[512,751,259,250],greens:[768,754,250,244],toast:[1014,754,259,245],pan:[1282,748,248,244]
+  };
+  function asset(key, extra='') { const [x,y,w,h]=ART[key]||ART.plate;return `<span aria-hidden="true" class="asset art-${key} ${extra}" style="background-size:${1536/w*100}% ${1024/h*100}%;background-position:${x/(1536-w)*100}% ${y/(1024-h)*100}%"></span>`; }
+  function chef(color) { return asset(color, 'chef'); }
+  function dishArt(d) { const n=d.name.toLowerCase();const k=/soup|curry|stew|dhal|risotto/.test(n)?'soup':/salad|bowl/.test(n)?'greens':/sandwich|toast|burger|bread|bagel|croissant|pizza|quiche|hot dog|burrito|wrap/.test(n)?'toast':/sate|steak|meat|kebab|chicken|schnitzel|ribs|pork|fish|lamb/.test(n)?'skewers':d.ing.pasta?'noodles':d.ing.meat?'skewers':d.ing.salad?'greens':d.ing.bread||d.ing.cheese?'toast':'soup';return `<span class="dish-art">${asset(k)}</span>`; }
+  function nextNeed(g,o) { const d=E.DISHES[o.dish];if(!E.plateOk(g,o))return `Get plate ${d.plate}`;const i=E.ING.find(k=>(o.ing[k]||0)<(d.ing[k]||0));if(i)return `Get ${E.ING_INFO[i].n.toLowerCase()}`;const sp=E.SPICES.find(k=>(o.sp[k]||0)<(d.sp[k]||0));if(sp)return `Add ${E.SP_INFO[sp].n.toLowerCase()}`;if(o.row<d.cook)return 'Visit stove';if(o.row>d.cook)return 'Overcooked';return E.checkOrder(g,o).length?'Check portions':'Ready to serve'; }
+  function checklist(d,o) { return `<div class="recipe-list"><small>INGREDIENT · HAVE / NEED</small>${[...E.ING.filter(i=>d.ing[i]||(o.ing||{})[i]),...E.SPICES.filter(i=>d.sp[i]||(o.sp||{})[i])].map(i=>{const spice=E.SPICES.includes(i), need=(spice?d.sp:d.ing)[i]||0, have=((spice?o.sp:o.ing)||{})[i]||0, info=(spice?E.SP_INFO:E.ING_INFO)[i];return `<div class="recipe-line ${have===need?'complete':have>need?'excess':'missing'}">${asset(i)}<span>${info.n}</span><b>${have} / ${need}</b><i>${have===need?'✓':have>need?'!':'○'}</i></div>`}).join('')}</div>`; }
+
   // ---------- small render helpers ----------
-  const plateBadge = (size, extra) => `<span class="pl pl-${size} ${extra || ''}" title="${E.PLATE_NAME[size]} plate">${size}</span>`;
+  const plateBadge = (size, extra) => `<span class="pl pl-${size} ${extra || ''}" title="${E.PLATE_NAME[size]} plate">${asset('plate')}<b>${size}</b></span>`;
   const pot = n => `<span class="pot" title="Cook ${n}×">🍳<b>${n}</b></span>`;
-  const ingRow = ingObj => E.ING.filter(i => ingObj[i]).map(i => E.ING_INFO[i].e.repeat(ingObj[i])).join('');
+  const ingRow = ingObj => E.ING.filter(i => ingObj[i]).map(i => asset(i)+`<small>×${ingObj[i]}</small>`).join('');
   // Needed ingredients one by one; the ones already on the plate are ticked off.
   const needIcons = (d, o) => E.ING.filter(i => d.ing[i]).map(i => {
     const have = o.ing[i] || 0;
-    return Array.from({ length: d.ing[i] }, (_, k) => `<span class="ni ${k < have ? 'got' : ''}">${E.ING_INFO[i].e}</span>`).join('');
+    return Array.from({ length: d.ing[i] }, (_, k) => `<span class="ni ${k < have ? 'got' : ''}">${asset(i)}</span>`).join('');
   }).join('');
   const dot = color => `<i class="dot" style="background:${COLORS[color]}"></i>`;
 
   const spIcons = (d, o) => E.SPICES.filter(i => d.sp[i]).map(i => {
     const have = o ? ((o.sp || {})[i] || 0) : 0;
-    return Array.from({ length: d.sp[i] }, (_, k) => `<span class="ni sp ${o && k < have ? 'got' : ''}">${E.SP_INFO[i].e}</span>`).join('');
+    return Array.from({ length: d.sp[i] }, (_, k) => `<span class="ni sp ${o && k < have ? 'got' : ''}">${asset(i)}</span>`).join('');
   }).join('');
   const coin = n => `<span class="coin" title="pays ${n} coins">🪙${n}</span>`;
 
@@ -2134,11 +2149,11 @@ safe-buffer/index.js:
     const icons = { reception: '🚪', dining: '📝', storA: '📦', storB: '📦', storC: '📦', stove: '🔥', green: '🌿', sink: '🧽', office: '🏢' };
     const label = `${E.AREA_NAME[area]}`;
     if (g.broken && g.broken.area === area && g.broken.idx === idx) return `<span class="spot broken" title="Broken — call the technician">🔧</span>`;
-    if (!occ) return `<button class="spot" data-a="place" data-area="${area}" data-idx="${idx}" aria-label="${label}: free"><span>${icons[area]}</span></button>`;
+    if (!occ) return `<button class="spot" data-a="place" data-area="${area}" data-idx="${idx}" aria-label="${label}: station ${idx+1}, free"><span class="slot-number">${idx+1}</span></button>`;
     const p = whoOf(g, occ.pid);
     const mine = occ.pid === me.pid || (SHARED.includes(occ.pid) && occ.by === me.pid);
     const ini = occ.pid === 'temp' ? 'T' : occ.pid === 'helper' ? 'H' : p.name.slice(0, 1).toUpperCase();
-    return `<button class="spot taken ${mine ? 'mine' : ''} ${SHARED.includes(occ.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-a="place" data-area="${area}" data-idx="${idx}" data-wstart="${occ.start}" aria-label="${label}: ${esc(p.name)}"><span class="ini">${esc(ini)}</span><em class="sec"></em></button>`;
+    return `<button class="spot taken ${mine ? 'mine' : ''} ${SHARED.includes(occ.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-a="place" data-area="${area}" data-idx="${idx}" data-wstart="${occ.start}" aria-label="${label}: ${esc(p.name)}">${area==='stove'?asset('pan','hob-pan'):''}${chef(p.color)}<span class="ini">${esc(ini)}</span><em class="sec"></em></button>`;
   }
 
   function miniTicket(g, dishId) {
@@ -2146,10 +2161,10 @@ safe-buffer/index.js:
     const money = E.cfgOf(g).money;
     if (d.vip) {
       const [a, b] = d.parts.map(k => E.DISHES[k]);
-      return `<span class="mt-top"><span class="mt-e">👑</span><span class="mt-n">${d.name}</span>${money ? coin(d.c) : ''}</span>
-        <span class="mt-r vipr">${[a, b].map(x => `${plateBadge(x.plate)}<span class="mt-i">${x.e}</span>`).join('<span class="plus">+</span>')}</span>`;
+      return `<span class="mt-top"><span class="mt-e">VIP</span><span class="mt-n">${d.name}</span>${money ? coin(d.c) : ''}</span>
+        <span class="mt-r vipr">${[a, b].map(x => `${plateBadge(x.plate)}<span class="mt-i">${dishArt(x)}</span>`).join('<span class="plus">+</span>')}</span>`;
     }
-    return `<span class="mt-top"><span class="mt-e">${d.e}</span><span class="mt-n">${d.ch ? '⭐ ' : ''}${d.name}</span>${money ? coin(d.c) : ''}</span><span class="mt-r">${plateBadge(d.plate)}<span class="mt-i">${ingRow(d.ing)}${spIcons(d)}</span>${pot(d.cook)}</span>`;
+    return `<span class="mt-top"><span class="mt-e">${dishArt(d)}</span><span class="mt-n">${d.ch ? '⭐ ' : ''}${d.name}</span>${money ? coin(d.c) : ''}</span><span class="mt-r">${plateBadge(d.plate)}<span class="mt-i">${ingRow(d.ing)}${spIcons(d)}</span>${pot(d.cook)}</span>`;
   }
 
   function myOpen(g) { return g.open[me.pid] || null; }
@@ -2173,9 +2188,9 @@ safe-buffer/index.js:
       if (canServe && !o.served) {
         const parts = o.group ? g.orders.filter(x => x.group === o.group) : [o];
         const ready = parts.every(x => !E.checkOrder(g, x).length);
-        return `<button class="shchip serve ${armed ? 'warn' : ''}" data-a="serve" data-order="${o.id}" ${ready ? 'data-ready="1"' : ''} aria-label="Serve ${esc(d.name)} early">${d.e}<small>${armed ? 'tap again' : '🛎️ serve'}</small></button>`;
+        return `<button class="shchip serve ${armed ? 'warn' : ''}" data-a="serve" data-order="${o.id}" ${ready ? 'data-ready="1"' : ''} aria-label="Serve ${esc(d.name)} early">${dishArt(d)}<small>${armed ? 'tap again' : '🛎️ serve'}</small></button>`;
       }
-      return `<button class="shchip ${o.served ? 'srv' : ''}" data-a="peek" data-order="${o.id}" aria-label="${esc(d.name)}">${d.e}<small>${o.served ? '🛎️' : '✓'}</small></button>`;
+      return `<button class="shchip ${o.served ? 'srv' : ''}" data-a="peek" data-order="${o.id}" aria-label="${esc(d.name)}">${dishArt(d)}<small>${o.served ? '🛎️' : '✓'}</small></button>`;
     };
     return `<div class="shelf"><span class="shl">Ready</span>${aside.map(chip).join('')}</div>`;
   }
@@ -2195,9 +2210,9 @@ safe-buffer/index.js:
     const chips = placed.map(i => {
       const armed = ui.armed && ui.armed.order === o.id && ui.armed.ing === i;
       return mine && cfg.fix
-        ? `<button class="chip ${armed ? 'armed' : ''}" data-a="ret" data-order="${o.id}" data-ing="${i}" aria-label="${E.ING_INFO[i].n}">${E.ING_INFO[i].e}</button>`
-        : `<span class="chip">${E.ING_INFO[i].e}</span>`;
-    }).join('') + E.SPICES.flatMap(i => Array(((o.sp || {})[i]) || 0).fill(i)).map(i => `<span class="chip spc">${E.SP_INFO[i].e}</span>`).join('');
+        ? `<button class="chip ${armed ? 'armed' : ''}" data-a="ret" data-order="${o.id}" data-ing="${i}" aria-label="${E.ING_INFO[i].n}">${asset(i)}</button>`
+        : `<span class="chip">${asset(i)}</span>`;
+    }).join('') + E.SPICES.flatMap(i => Array(((o.sp || {})[i]) || 0).fill(i)).map(i => `<span class="chip spc">${asset(i)}</span>`).join('');
     const cookTxt = d.cook === 0 ? (o.row ? `Cooked ${o.row}× — needs no stove` : 'No cooking') : `Cooked ${o.row} of ${d.cook}`;
     const live = !o.served && !o.parked;
     const armedPark = ui.armedPark && ui.armedPark.order === o.id && Date.now() - ui.armedPark.t < 4000;
@@ -2213,15 +2228,17 @@ safe-buffer/index.js:
     const patron = o.patron ? E.DISHES[o.patron] : null;
     const vip = patron && patron.vip ? `<div class="vipband">👑 ${patron.name} · ${patron.parts.indexOf(o.dish) + 1} of 2${cfg.money ? ` · ${coin(patron.c)}` : ''}</div>` : '';
     const price = !patron && cfg.money ? coin(d.c) : '';
-    return `<div class="ticket ${sel ? 'sel' : ''} ${canCook ? 'cookable' : ''} ${o.served ? 'served' : ''} ${patron ? 'vipt' : ''}" ${mine && live ? `data-a="sel" data-order="${o.id}"` : ''}>
-      ${vip}
-      <div class="tk-head"><span class="tk-e">${d.e}</span><span class="tk-n">${d.ch ? '⭐ ' : ''}${d.name}</span>${price}${o.served ? '<span class="tk-tag srv">🛎️ served</span>' : o.parked ? '<span class="tk-tag srv">✓ ready</span>' : sel && canFill ? '<span class="tk-tag">filling</span>' : ''}</div>
-      <div class="tk-need">${plateBadge(d.plate, E.plateOk(g, o) ? 'got' : '')}<span class="tk-i">${needIcons(d, o)}${spIcons(d, o)}</span>${pot(d.cook)}</div>
-      <div class="tk-plate">${o.plate ? plateBadge(o.plate, 'big') : `<span class="noplate">${mine ? 'Take a plate from the cupboard' : 'no plate'}</span>`}<span class="chips">${chips}</span></div>
-      <div class="tk-cook"><span class="cells">${cells.join('')}</span><span class="ct">${cookTxt}</span>${parkBtn}${bin}</div>
-      ${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">Cook one step</button>` : ''}
-      ${canServe ? serveBtn(g, o) : ''}
-    </div>`;
+    const cookProgress=d.cook?Math.min(1,o.row/d.cook):1;
+    return `<div class="ticket ${sel ? 'sel' : ''} ${canCook ? 'cookable' : ''} ${o.served ? 'served' : ''} ${patron ? 'vipt' : ''}" data-ticket="${o.id}" ${mine && live ? `data-a="sel" data-order="${o.id}"` : ''}>
+      ${vip}<div class="tk-head"><span class="tk-n">${d.ch ? '☆ ' : ''}${d.name}</span>${price}</div>
+      <div class="meal-art">${dishArt(d)}</div>
+      <div class="ticket-details"><div class="plate-requirement ${E.plateOk(g,o)?'':'missing'}">${asset('plate')}<span>Plate ${d.plate}${o.plate&&o.plate!==d.plate?` · using ${o.plate}`:''}</span><b>${E.plateOk(g,o)?'✓':'○'}</b></div>
+      ${checklist(d,o)}
+      <div class="cook-status"><span class="cook-ring ${o.row>d.cook?'over':''}" style="--progress:${cookProgress}"></span><span>Cook <b>${o.row} / ${d.cook}</b></span>${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">Cook +1</button>` : ''}</div>
+      <div class="ticket-actions"><span class="next-need ${!E.checkOrder(g,o).length?'ready':''}">${o.served?'Served':o.parked?'Set aside':nextNeed(g,o)}</span>${canServe?serveBtn(g,o):parkBtn}${bin}</div>
+      ${cfg.fix&&chips?`<div class="return-row"><small>Tap twice to return</small>${chips}</div>`:''}
+      </div></div>`;
+
   }
 
   // ---------- screens ----------
@@ -2230,33 +2247,18 @@ safe-buffer/index.js:
     const canResume = saved && saved.pid === me.pid && Date.now() - saved.savedAt < 12 * 3600e3;
     const gsaved = LS.get('kc-guest', null);
     const canRejoin = gsaved && Date.now() - gsaved.at < 12 * 3600e3;
-    return `<main class="home">
-      <h1 class="logo">Küchen<span>-</span>Chaos</h1>
-      <p class="sub">The real-time kitchen game for 2–4 chefs, one iPad each.</p>
-      <section class="card homecard">
-        <label class="fld">Your name<input id="nm" maxlength="14" value="${esc(me.name)}" placeholder="e.g. Juna" autocomplete="off"></label>
-        <div class="fld">Your colour<div class="colors">${COLOR_NAMES.map(c => `<button class="cbtn ${me.color === c ? 'on' : ''}" style="--c:${COLORS[c]}" data-a="color" data-c="${c}" aria-label="${c}"></button>`).join('')}</div></div>
-        <div class="split">
-          <div class="half">
-            <h2>Start a game</h2>
-            <p>Use this on one iPad. The others join with the code it shows.</p>
-            <button class="btn big" data-a="host">Open the restaurant</button>
-            ${canResume ? `<button class="btn ghost" data-a="resume">Continue ${esc(saved.room)}</button>` : ''}
-          </div>
-          <div class="half">
-            <h2>Join a game</h2>
-            <p>Type the code from the host iPad.</p>
-            <input id="code" class="codein" maxlength="12" placeholder="MANGO42" autocapitalize="characters" autocomplete="off" value="${esc(ui.code != null ? ui.code : canRejoin ? gsaved.room : '')}">
-            <button class="btn big" data-a="join">Join</button>
-          </div>
-        </div>
-      </section>
-      <section class="card homecard solocard">
-        <div><h2>Play alone <small class="extra">extra, not in the rulebook</small></h2><p>The solo campaign: cook your way through all 8 restaurants and the master chef missions, one after the other, with our own one-chef goals. Your progress is saved on this iPad.</p></div>
-        <button class="btn big" data-a="campaign">Solo campaign</button>
-      </section>
-      <button class="link" data-a="help">How to play</button>
-    </main>`;
+    const looks={blue:['Kai','Indigo apron'],yellow:['Ayu','Saffron apron'],red:['Maya','Terracotta apron'],green:['Wayan','Forest apron']};
+    return `<main class="home welcome">
+      <section class="welcome-art"><div class="welcome-heading"><span class="eyebrow">A LITTLE RESTAURANT IN BALI</span><h1>Canggu<br><em>Kitchen</em></h1><p>Good food. Great company.<br>A beautifully busy kitchen.</p></div><div class="welcome-plan" aria-hidden="true"></div><div class="welcome-dishes">${asset('noodles')}${asset('soup')}${asset('skewers')}</div><div class="welcome-caption">Gather your people. Make a little chaos.</div></section>
+      <section class="welcome-form"><span class="eyebrow">WELCOME TO THE TEAM</span><h2>Who’s cooking today?</h2><p class="welcome-intro">Choose your chef. You’ll recognise them by their apron in the kitchen.</p>
+        <label class="fld">Your name<input id="nm" maxlength="14" value="${esc(me.name)}" placeholder="Your name" autocomplete="off"></label>
+        <div class="chef-roster" role="group" aria-label="Choose your chef">${['blue','yellow','red','green'].map(c=>`<button class="chef-choice ${me.color===c?'chosen':''}" style="--c:${COLORS[c]}" data-a="color" data-c="${c}" aria-pressed="${me.color===c}" aria-label="Choose ${looks[c][0]}, ${looks[c][1]}"><span class="chef-stage">${chef(c)}</span><b>${looks[c][0]}</b><small>${looks[c][1]}</small><span class="choice-check">${me.color===c?'✓':''}</span></button>`).join('')}</div>
+        <div class="welcome-actions"><button class="btn big" data-a="host">Open a restaurant <span>→</span></button><button class="btn ghost" data-a="campaign">Play solo</button></div>
+        <div class="join-box"><label for="code">Joining friends?</label><div><input id="code" class="codein" maxlength="12" placeholder="Room code" autocapitalize="characters" autocomplete="off" value="${esc(ui.code!=null?ui.code:canRejoin?gsaved.room:'')}"><button class="btn ghost" data-a="join">Join their kitchen</button></div></div>
+        ${canResume?`<button class="link" data-a="resume">Continue restaurant ${esc(saved.room)}</button>`:''}
+        <div class="welcome-footer"><span>1–4 players · 13 restaurants & missions</span><button class="link" data-a="help">How to play</button></div>
+      </section></main>`;
+
   }
 
   // ---------- solo campaign ----------
@@ -2308,7 +2310,7 @@ safe-buffer/index.js:
     const normal = E.SCEN[n].normal;
     const canChallenge = n >= 3 && n <= 8 && c.done[n] && c.done[n].won;
     return `<main class="lobby campaign">
-      <h1 class="logo small">Küchen<span>-</span>Chaos</h1>
+      <h1 class="logo small">Canggu <span>Kitchen</span></h1>
       <section class="card">
         <h2>${esc(me.name || 'Chef')}'s solo campaign</h2>
         <div class="cprog"><div style="width:${wonCount / 8 * 100}%"></div></div>
@@ -2330,8 +2332,8 @@ safe-buffer/index.js:
   }
 
   const SCEN_BLURB = {
-    1: 'Seat friends, take orders, fetch ingredients, cook. One sand timer each.',
-    2: 'New: spices from the greenhouse, two sand timers each, and plates one size bigger are fine. Mistakes can no longer be put back.',
+    1: 'Seat friends, take orders, fetch ingredients, cook. One chef each.',
+    2: 'New: spices from the greenhouse, two chefs each, and plates one size bigger are fine. Mistakes can no longer be put back.',
     3: 'New: wash dirty plates at the sink and earn coins. Botched meals go in the bin.',
     4: 'New: two shifts, shopping at the van, and 18 demanding ⭐ guests who pay more.',
     5: 'New: bread and pasta get their own storage room, and the chefs want a salary after every shift.',
@@ -2339,13 +2341,13 @@ safe-buffer/index.js:
     7: 'New: VIP guests 👑 who order two dishes, awards 🏆, four shifts, and unpaid timers go on strike.',
     8: 'New: a locked storage room, a broken stove, a shared temp 🤍, and the office to fix it all.',
     9: 'Every chef serves guests early in every one of the four shifts.',
-    10: 'Every chef starts with one sand timer on strike.',
+    10: 'Every chef starts with one chef on strike.',
     11: 'Ordinary, ⭐ and 👑 guests for every chef — and coins.',
     12: 'Storage rooms and the spice bag start empty, and there is no locksmith.',
     13: 'Lots of coins and lots of reputation.',
   };
   const RESTAURANTS = [1, 2, 3, 4, 5, 6, 7, 8], MISSIONS = [9, 10, 11, 12, 13];
-  const DUO_RULES = 'a shared helper sand timer 🤝 for whoever has no free timer, you may put ingredients and spices on and cook your partner\'s meals, and each van trip allows two purchases.';
+  const DUO_RULES = 'a shared helper chef 🤝 for whoever has no free chef, you may put ingredients and spices on and cook your partner\'s meals, and each van trip allows two purchases.';
   const scenTitle = n => n <= 8 ? `${n}. ${E.SCEN[n].name}` : E.SCEN[n].name;
 
   // Presence: guests ping the host every 5 s; the host passes the times on in every state.
@@ -2373,7 +2375,7 @@ safe-buffer/index.js:
     const goal = E.goalOf(scen, L.players.length, S.challenge && !cfg.mission);
     const scenBtn = n => `<button class="scen ${scen === n ? 'on' : ''}" ${host ? `data-a="set" data-k="scenario" data-v="${n}"` : 'disabled'}><b>${scenTitle(n)}${won(n) ? ' <span class="won">✓</span>' : ''}</b><small>${SCEN_BLURB[n]}</small></button>`;
     return `<main class="lobby">
-      <h1 class="logo small">Küchen<span>-</span>Chaos</h1>
+      <h1 class="logo small">Canggu <span>Kitchen</span></h1>
       <section class="card">
         <p class="sub">On the other iPads, open this page, tap Join and type</p>
         <div class="roomcode">${esc(wrap.room)}</div>
@@ -2441,33 +2443,35 @@ safe-buffer/index.js:
       if (s.reserved) return `<div class="seat reserved"><span>Reserved</span></div>`;
       if (!s.dish) return `<div class="seat empty"></div>`;
       const picked = ui.throwSel.includes(i);
-      if (recOpen) return `<button class="seat guest throwable ${picked ? 'picked' : ''}" data-a="pickThrow" data-seat="${i}">${miniTicket(g, s.dish)}${picked ? '<span class="outtag">out!</span>' : ''}</button>`;
-      return `<button class="seat guest ${op && op.type === 'order' ? 'glow' : ''} ${E.DISHES[s.dish].vip ? 'vipseat' : ''}" data-a="takeOrder" data-seat="${i}">${miniTicket(g, s.dish)}</button>`;
+      const diner=asset(i%2?'guestB':'guestA','diner');
+      if (recOpen) return `<button class="seat guest throwable ${picked ? 'picked' : ''}" data-a="pickThrow" data-seat="${i}">${diner}${miniTicket(g, s.dish)}${picked ? '<span class="outtag">out!</span>' : ''}</button>`;
+      return `<button class="seat guest ${op && op.type === 'order' ? 'glow' : ''} ${E.DISHES[s.dish].vip ? 'vipseat' : ''}" data-a="takeOrder" data-seat="${i}">${diner}${miniTicket(g, s.dish)}</button>`;
     }).join('');
 
     const room = (area, key, num) => {
       const active = op && op.type === 'storage' && op.room === key;
       const locked = g.locked && g.locked[key];
       return `<section class="area store st${num} ${active ? 'active' : ''} ${locked ? 'locked' : ''}">
-        <div class="ahead"><h3>Storage ${num}${locked ? ' 🔒' : ''}</h3><div class="spots">${g.spaces[area].map((_, i) => spot(g, area, i)).join('')}</div></div>
-        <div class="ings">${E.roomIngs(g, key).map(i => `<button class="ing ${active && g.storage[key][i] ? 'glow' : ''}" data-a="takeIng" data-room="${key}" data-ing="${i}" ${g.storage[key][i] && !locked ? '' : 'disabled'} aria-label="${E.ING_INFO[i].n}"><span>${E.ING_INFO[i].e}</span><b>${g.storage[key][i]}</b></button>`).join('')}</div>
-        ${locked ? '<div class="lockmsg">Locked — call the locksmith in the office 🏢</div>' : ''}
+        <div class="ahead"><h3>${num===3?'Dry Store':'Storage '+key}${locked ? ' 🔒' : ''}</h3><div class="spots">${g.spaces[area].map((_, i) => spot(g, area, i)).join('')}</div></div>
+        <div class="ings">${E.roomIngs(g, key).map(i => `<button class="ing ${active && g.storage[key][i] ? 'glow' : ''}" data-a="takeIng" data-room="${key}" data-ing="${i}" ${g.storage[key][i] && !locked ? '' : 'disabled'} aria-label="${E.ING_INFO[i].n}: ${g.storage[key][i]} in storage ${key}"><span class="heap">${asset(i)}</span><span class="stock-label">${E.ING_INFO[i].n}<b>${g.storage[key][i]}</b></span></button>`).join('')}</div>
+        ${locked ? '<div class="lockmsg">Locked · unlock in Office</div>' : ''}
       </section>`;
     };
 
+    const dormant=(cls,name,n)=>`<section class="area ${cls} dormant"><h3>${name}</h3><span class="later">Opens in restaurant ${n}</span></section>`;
     const greenActive = op && op.type === 'spice';
     const green = cfg.spices ? `<section class="area green ${greenActive ? 'active' : ''}">
-        <div class="gh"><div class="ahead"><h3>Greenhouse</h3><div class="spots">${g.spaces.green.map((_, i) => spot(g, 'green', i)).join('')}</div></div>
-        <div class="spices">${E.SPICES.map(i => `<button class="ing spice ${greenActive && g.bag[i] ? 'glow' : ''}" data-a="takeSpice" data-spice="${i}" ${g.bag[i] ? '' : 'disabled'} aria-label="${E.SP_INFO[i].n}"><span>${E.SP_INFO[i].e}</span><b>${g.bag[i]}</b></button>`).join('')}</div></div></section>` : '';
+        <div class="gh"><div class="ahead"><h3>Spices</h3><div class="spots">${g.spaces.green.map((_, i) => spot(g, 'green', i)).join('')}</div></div>
+        <div class="spices">${E.SPICES.map(i => `<button class="ing spice ${greenActive && g.bag[i] ? 'glow' : ''}" data-a="takeSpice" data-spice="${i}" ${g.bag[i] ? '' : 'disabled'} aria-label="${E.SP_INFO[i].n}: ${g.bag[i]} portions"><span class="heap">${asset(i)}</span><span class="stock-label">${E.SP_INFO[i].n}<b>${g.bag[i]}</b></span></button>`).join('')}</div></div></section>` : dormant('green','Spices',2);
 
     const washActive = op && op.type === 'wash';
     const sink = cfg.sink ? `<section class="area sink ${washActive ? 'active' : ''}">
-        <div class="gh"><div class="ahead"><h3>Sink${washActive ? ` <small>wash ${op.left}</small>` : ' <small>dirty</small>'}</h3><div class="spots">${g.spaces.sink.map((_, i) => spot(g, 'sink', i)).join('')}</div></div>
-        <div class="plates">${E.PLATES.map(sz => `<button class="pbtn dirty ${washActive && g.dirty[sz] ? 'glow' : ''}" data-a="wash" data-size="${sz}" ${g.dirty[sz] ? '' : 'disabled'}>${plateBadge(sz, 'dirtyp')}<b>×${g.dirty[sz]}</b></button>`).join('')}</div></div></section>` : '';
+        <div class="gh"><div class="ahead"><h3>Wash${washActive ? ` <small>wash ${op.left}</small>` : ' <small>dirty</small>'}</h3><div class="spots">${g.spaces.sink.map((_, i) => spot(g, 'sink', i)).join('')}</div></div>
+        <div class="plates">${E.PLATES.map(sz => `<button class="pbtn dirty ${washActive && g.dirty[sz] ? 'glow' : ''}" data-a="wash" data-size="${sz}" ${g.dirty[sz] ? '' : 'disabled'}>${plateBadge(sz, 'dirtyp')}<b>×${g.dirty[sz]}</b></button>`).join('')}</div></div></section>` : dormant('sink','Wash',3);
 
     const ring = x => {
       const p = whoOf(g, x.pid);
-      return `<span class="vt ${SHARED.includes(x.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-wstart="${x.start}"><span class="ini">${esc(x.pid === 'temp' ? 'T' : x.pid === 'helper' ? 'H' : p.name.slice(0, 1).toUpperCase())}</span><em class="sec"></em></span>`;
+      return `<span class="vt ${SHARED.includes(x.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-wstart="${x.start}">${chef(p.color)}<span class="ini">${esc(x.pid === 'temp' ? 'T' : x.pid === 'helper' ? 'H' : p.name.slice(0, 1).toUpperCase())}</span><em class="sec"></em></span>`;
     };
     // The van and the office have no room on the board, so they live in the top bar where every chef can reach them.
     const van = cfg.shop ? `<div class="vanbar ${op && op.type === 'shop' ? 'active' : ''}"><button class="vanbtn" data-a="place" data-area="van" data-idx="0" ${g.coins < 1 ? 'disabled' : ''} aria-label="Van: go shopping for 1 coin">🚐 <span>Shop<small>1 🪙</small></span></button><div class="vts">${g.spaces.van.map(ring).join('')}</div></div>` : '';
@@ -2501,8 +2505,8 @@ safe-buffer/index.js:
     else if (op && op.type === 'cook') { prompt = liveOrders.length ? `🔥 Tap “Cook one step” on a meal.${g.duo ? ' You can also cook for your partner from their row.' : ''}` : g.duo ? '🔥 Tap your partner\'s row to cook one of their meals.' : '🔥 You have nothing to cook yet.'; promptBtn = '<button class="btn ghost" data-a="done">Skip</button>'; }
     else if (g.phase === 'grace') prompt = 'Time is up! Waiting for the others to finish.';
     else if (now < g.shiftStart) prompt = 'Get ready…';
-    else if (!nTimers && !g.workers.temp) prompt = 'All your sand timers are on strike — a late payment in the office brings one back.';
-    else prompt = ready ? (nTimers > 1 ? 'You have a free timer. Tap a circle.' : 'A timer is free. Tap a circle.') : 'Your sand is running. Plan your next move.';
+    else if (!nTimers && !g.workers.temp) prompt = 'All your chefs are on strike — a late payment in the office brings one back.';
+    else prompt = ready ? (nTimers > 1 ? 'You have a free chef. Tap an available station.' : 'A chef is ready. Tap an available station.') : 'Your chefs are working. Plan your next move.';
     if (g.phase === 'grace' && op) prompt = 'Time is up! Finish this: ' + prompt;
     if (platePrompt && meP && g.phase !== 'results') prompt += platePrompt;
 
@@ -2511,7 +2515,7 @@ safe-buffer/index.js:
     const goOn = ready && g.phase === 'play' && now >= g.shiftStart && !op;
     const glasses = ws.map((w, t) => g.off[me.pid][t]
       ? '<div class="glass strike" title="On strike">⛔</div>'
-      : `<div class="glass ${w ? '' : 'free'} ${goOn && E.timerReady(g, w, now) ? 'go' : ''}" ${w ? `data-wstart="${w.start}"` : ''}><span class="hg">⏳</span><em class="sec"></em></div>`).join('');
+      : `<div class="glass ${w ? '' : 'free'} ${goOn && E.timerReady(g, w, now) ? 'go' : ''}" ${w ? `data-wstart="${w.start}"` : ''}>${chef(meP.color)}<em class="sec"></em></div>`).join('');
     const status = meP ? `<div class="me" style="--c:${myColor}">
         <div class="glasses n${ws.length}">${glasses}</div>
         <div class="prompt"><p id="prompt">${prompt}</p>${promptBtn}</div>
@@ -2523,33 +2527,36 @@ safe-buffer/index.js:
 
     return `<div class="game phase-${g.phase} ${g.settings.strict ? 'strict' : ''}">
       <header class="bar ${cfg.shop ? 'crowded' : ''}">
-        <div class="brand"><small>${esc(wrap.room)}</small></div>
+        <div class="brand">Canggu Kitchen<small>${esc(wrap.room)}</small></div>
         <div class="clock" id="clock">${clock}</div>
         ${goalChip(g)}
-        ${van}${office}${temps}
-        <div class="who">${g.players.map(p => `<span class="pchip" style="--c:${COLORS[p.color]}" data-wpid="${p.id}">${esc(p.name)}${strikes(p.id) ? ` ⛔${strikes(p.id) > 1 ? strikes(p.id) : ''}` : ''}</span>`).join('')}</div>
+        ${temps}
+        <button class="btn team-toggle" data-a="team">Team · ${g.players.length}</button><div class="plan-tools"><button class="btn ghost" data-a="fitPlan">Whole plan</button><button class="btn ghost zoom-btn" data-a="zoomOut" aria-label="Zoom out">−</button><button class="btn ghost zoom-btn" data-a="zoomIn" aria-label="Zoom in">+</button></div><div class="who">${g.players.map(p => `<span class="pchip" style="--c:${COLORS[p.color]}" data-wpid="${p.id}">${esc(p.name)}${strikes(p.id) ? ` ⛔${strikes(p.id) > 1 ? strikes(p.id) : ''}` : ''}</span>`).join('')}</div>
         <div class="net" id="net"></div>
         <button class="menu-b" data-a="menu" aria-label="Menu">☰</button>
       </header>
       <div class="main">
-        <div class="board scen-${Math.min(g.settings.scenario, 8)}">
+        <div class="plan-scroll" aria-label="Pan and zoom the kitchen"><div class="plan-stage"><div class="board scen-${Math.min(g.settings.scenario, 8)}" tabindex="0" aria-label="Kitchen floor plan. Scroll to see all rooms.">
           <section class="area reception ${recOpen ? 'active' : ''}"><h3>Reception</h3><div class="rc"><div class="spots">${spot(g, 'reception', 0)}</div>
             <div class="queue"><div class="stack" style="--n:${Math.min(guestsLeft, 4)}"></div><p>${guestsLeft ? `${guestsLeft} waiting` : 'Nobody outside'}</p></div></div></section>
-          <section class="area dining"><h3>Dining room</h3><div class="seats">${seats}</div><div class="spots">${g.spaces.dining.map((_, i) => spot(g, 'dining', i)).join('')}</div></section>
+          <section class="area dining"><h3>Dining</h3><div class="seats">${seats}</div><div class="spots">${g.spaces.dining.map((_, i) => spot(g, 'dining', i)).join('')}</div></section>
           ${green}
           ${room('storA', 'A', 1)}
           ${room('storB', 'B', 2)}
-          ${g.storage.C ? room('storC', 'C', 3) : ''}
-          <section class="area stove ${op && op.type === 'cook' ? 'active' : ''}"><h3>Stove</h3><div class="spots">${g.spaces.stove.map((_, i) => spot(g, 'stove', i)).join('')}</div></section>
-          <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>Cupboard <small>free, any time</small></h3><div class="plates">${E.PLATES.map(sz => `<button class="pbtn ${plateGlow && g.cupboard[sz] ? 'glow' : ''}" data-a="plate" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'}>${plateBadge(sz, 'big')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
+          ${g.storage.C ? room('storC', 'C', 3) : dormant('st3','Dry Store',5)}
+          <section class="area stove ${op && op.type === 'cook' ? 'active' : ''}"><h3>Stove</h3>${Array.from({length:6-g.spaces.stove.length},(_,i)=>`<span class="unused-hob" style="left:${55+(i+g.spaces.stove.length)*150}px">Closed</span>`).join('')}<div class="spots">${g.spaces.stove.map((_, i) => spot(g, 'stove', i)).join('')}</div></section>
+          <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>Clean Plates</h3><div class="plates">${E.PLATES.map(sz => `<button class="pbtn ${plateGlow && g.cupboard[sz] ? 'glow' : ''}" data-a="plate" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'}>${plateBadge(sz, 'big')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
           ${sink}
-        </div>
+          ${cfg.shop?`<section class="area market"><h3>Shop</h3>${van}<small>1 coin · 5 food / 3 spices / 2 premium</small></section>`:dormant('market','Shop',4)}
+          ${cfg.office?`<section class="area office"><h3>Office</h3>${office}<small>Repairs · unlock · hire</small></section>`:dormant('office','Office',7)}
+        </div></div></div>
         <aside class="kitchen">
-          ${status}
+          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> My orders <small>(${liveOrders.length})</small></h2><span>${meP?chef(meP.color):''} ${ready?'Chef ready':'Working'}</span></div>${status}
           <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${ticket(g, partnerSel, false)}</div>` : ''}${shelf(g, aside)}${liveOrders.length ? liveOrders.map(o => ticket(g, o, true)).join('') : aside.length ? '<p class="empty-k">All your meals are ready. Take the next order in the dining room 📝.</p>' : (meP ? '<p class="empty-k">Your order tickets land here. Start at the dining room 📝, or seat more guests at the reception 🚪.</p>' : '')}</div>
-          <div class="teamdock">${teamPanel(g, now)}${feedPanel(g)}</div>
+          
         </aside>
       </div>
+      ${ui.team?`<div class="sheet" data-a="team"><div class="card team-card" data-stop="1"><h2>The team</h2>${teamPanel(g,now)}${feedPanel(g)}<button class="btn ghost" data-a="team">Back to kitchen</button></div></div>`:''}
       ${ui.mate && g.players.some(p => p.id === ui.mate) ? renderMate(g, ui.mate) : ''}
       ${ui.peek && myOrders.some(o => o.id === ui.peek && (o.served || o.parked)) ? `<div class="sheet" data-a="closePeek"><div class="card peekcard" data-stop="1">${ticket(g, myOrders.find(o => o.id === ui.peek), false)}<p class="note">Put aside — it is checked when the shift ends.</p><button class="btn" data-a="closePeek">Close</button></div></div>` : ''}
       ${g.phase === 'ready' ? renderReady(g) : ''}
@@ -2565,7 +2572,7 @@ safe-buffer/index.js:
     const pantry = E.cfgOf(g).pantry;
     const sh = ui.shop;
     const n = E.has(g, 'bulk') ? 7 : 5;
-    const ingBtn = i => `<button class="sbtn ${sh.ing === i ? 'on' : ''}" data-a="shopIng" data-ing="${i}">${E.ING_INFO[i].e}<small>×${n}</small></button>`;
+    const ingBtn = i => `<button class="sbtn ${sh.ing === i ? 'on' : ''}" data-a="shopIng" data-ing="${i}">${asset(i)}<small>×${n}</small></button>`;
     let rooms = '';
     if (sh.ing) {
       const opts = pantry && E.PANTRY_INGS.includes(sh.ing) ? [['C', 3]] : [['A', 1], ['B', 2]];
@@ -2573,11 +2580,11 @@ safe-buffer/index.js:
     }
     const tray = (kind, k) => {
       const picks = sh[kind];
-      return `<div class="tray">${Array.from({ length: k }, (_, i) => `<span class="slot">${picks[i] ? E.SP_INFO[picks[i]].e : ''}</span>`).join('')}
+      return `<div class="tray">${Array.from({ length: k }, (_, i) => `<span class="slot">${picks[i] ? asset(picks[i]) : ''}</span>`).join('')}
         ${picks.length ? `<button class="link" data-a="shopClear" data-kind="${kind}">clear</button>` : ''}
         ${picks.length === k ? `<button class="btn" data-a="buySp" data-kind="${kind}">Buy these</button>` : ''}</div>`;
     };
-    const spBtn = (kind, i) => `<button class="sbtn" data-a="shopSp" data-kind="${kind}" data-spice="${i}">${E.SP_INFO[i].e}<small>${E.SP_INFO[i].n}</small></button>`;
+    const spBtn = (kind, i) => `<button class="sbtn" data-a="shopSp" data-kind="${kind}" data-spice="${i}">${asset(i)}<small>${E.SP_INFO[i].n}</small></button>`;
     return `<div class="sheet shopsheet"><div class="card shop">
       <h2>🚐 Shopping${myOpen(g) && myOpen(g).left > 1 ? ' <small class="badge">2 purchases this trip</small>' : g.duo ? ' <small class="badge">last purchase</small>' : ''}</h2>
       <p class="note">Each purchase costs 1 coin from the office (now ${g.coins}). Pick one of the three.</p>
@@ -2597,9 +2604,9 @@ safe-buffer/index.js:
     Object.keys(g.off).forEach(owner => g.off[owner].forEach((off, t) => { if (off) striking.push({ owner, t }); }));
     const late = striking.length
       ? striking.map(x => `<button class="obtn" data-a="latePay" data-owner="${x.owner}" data-t="${x.t}" ${g.coins < E.LATE_PAY ? 'disabled' : ''}><b>⛔ ${esc(whoOf(g, x.owner).name)}'s ${x.owner === 'temp' ? 'temp' : `timer ${x.t + 1}`}</b><small>Pay ${E.LATE_PAY} 🪙 — it works again</small></button>`).join('')
-      : '<p class="note">No sand timer is on strike.</p>';
+      : '<p class="note">No chef is on strike.</p>';
     const cards = cfg.officeCards ? (g.officeOpen.length
-      ? g.officeOpen.map(k => { const c = E.OFFICE[k]; return `<button class="obtn" data-a="officeCard" data-card="${k}" ${g.coins < c.cost ? 'disabled' : ''}><b>${c.e} ${c.n} · ${c.cost} 🪙</b><small>${c.d}</small></button>`; }).join('')
+      ? g.officeOpen.map(k => { const c = E.OFFICE[k]; return `<button class="obtn" data-a="officeCard" data-card="${k}" ${g.coins < c.cost ? 'disabled' : ''}><b>${c.e} ${c.n} · ${c.cost} 🪙</b><small>${c.d.replace(/sand timer/g,'chef').replace(/timer/g,'chef')}</small></button>`; }).join('')
       : '<p class="note">Nothing left to order.</p>') : '';
     return `<div class="sheet shopsheet"><div class="card shop">
       <h2>🏢 Office</h2>
@@ -2622,12 +2629,12 @@ safe-buffer/index.js:
       }[op.type] || '';
     }
     if (g.phase !== 'play' || now < g.shiftStart) return '';
-    return E.workerReady(g, pid, now) ? 'has a free timer' : 'is waiting for the sand';
+    return E.workerReady(g, pid, now) ? 'has a free chef' : 'is waiting for the sand';
   }
   // Just the dish — whether it's right is for the chef to check, same as on your own tickets.
   function ticketSummary(g, o) {
     const d = E.DISHES[o.dish];
-    return `<span class="ts ${o.served || o.parked ? 'srv' : ''}" title="${esc(d.name)}">${d.e}${o.served ? '🛎️' : o.parked ? '✓' : ''}</span>`;
+    return `<span class="ts ${o.served || o.parked ? 'srv' : ''}" title="${esc(d.name)}">${dishArt(d)}${o.served ? '🛎️' : o.parked ? '✓' : ''}</span>`;
   }
   function teamPanel(g, now) {
     const mates = g.players.filter(p => p.id !== me.pid);
@@ -2768,19 +2775,19 @@ safe-buffer/index.js:
     const salary = activeTimers(g) * E.SALARY_PER_TIMER;
     const extra = {
       1: 'Seat friends, take their orders, grab the right plate, fetch ingredients and cook.',
-      2: 'New: spices come from the greenhouse 🌿 and can be added even while a meal cooks. A plate one size bigger is fine. Each chef now has two sand timers. Wrong ingredients can no longer be put back.',
+      2: 'New: spices come from the greenhouse 🌿 and can be added even while a meal cooks. A plate one size bigger is fine. Each chef now has two chefs. Wrong ingredients can no longer be put back.',
       3: 'New: most plates start dirty — wash up to 3 per visit at the sink 🧽. A botched meal can go in the bin 🗑️: its plate goes to the sink and the guest waits for a fresh one. Every new guest buys a drink (+1 coin), served meals pay their price, every guest you took an order from but didn\'t serve gets a free drink (−1).',
       4: 'New: storage rooms and the spice bag start nearly empty — send a timer to the van 🚐 (top bar) to buy 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin. ⭐ guests are demanding: more to prepare, better pay. Between shifts, served meals pay, unfinished ones keep cooking, and mistakes are thrown away.',
-      5: `New: bread and pasta live only in storage room 3. After every shift the chefs take a salary of ${E.SALARY_PER_TIMER} coins per sand timer — ${salary} coins for the team. If the office can't pay, the restaurant closes.`,
+      5: `New: bread and pasta live only in storage room 3. After every shift the chefs take a salary of ${E.SALARY_PER_TIMER} coins per chef — ${salary} coins for the team. If the office can't pay, the restaurant closes.`,
       6: 'New: reputation ⭐. A served ⭐ guest gives +1, a ⭐ guest left waiting at the end of a shift costs −1 (no free drink). In the dining room you can now serve a finished meal early 🛎️ for a tip (+1 coin) — but if it turns out wrong, reputation drops by 1 more. At the reception you can throw 1 or 2 waiting guests out; the new guests buy no drinks.',
-      7: 'New: VIP guests 👑 order two dishes and only pay when both are right (+2 reputation; −2 if left unfinished). Reputation wins awards 🏆 that help until the end of the game. Four shifts. Timers you can\'t pay go on strike — bring them back with a late payment in the office 🏢 (top bar).',
+      7: 'New: VIP guests 👑 order two dishes and only pay when both are right (+2 reputation; −2 if left unfinished). Reputation wins awards 🏆 that help until the end of the game. Four shifts. Timers you can\'t pay go on strike — bring them back with a late payment in the office 🏢 (on the plan).',
       8: 'New: storage room 2 is locked and one stove is broken. A shared temp 🤍 jumps in when your own timers are busy (salary 3 per shift). The office 🏢 can call the locksmith or the technician, hire a second temp or buy plates.',
     }[n] || `Master chef mission with all the rules of restaurant 8. ${SCEN_BLURB[n]}`;
     return `<div class="sheet readysheet"><div class="card">
       <h2>${scenTitle(n)}</h2>
       <p>${extra}</p>
       ${g.duo ? `<p>🤝 <b>Two-chef helpers (extra, not in the rulebook):</b> ${DUO_RULES}</p>` : ''}
-      <p><b>Goal:</b> ${E.goalText(g.goal, g.players.length === 1)}. ${cfg.shifts > 1 ? `${cfg.shifts} shifts of ${t}.` : `${t} on the clock.`} Each chef has ${cfg.timers === 1 ? 'one sand timer' : 'two sand timers'} of ${g.settings.workerSec} seconds.${g.settings.strict ? ' Wrong moves are blocked.' : ' Meals are checked when a shift ends.'}</p>
+      <p><b>Goal:</b> ${E.goalText(g.goal, g.players.length === 1)}. ${cfg.shifts > 1 ? `${cfg.shifts} shifts of ${t}.` : `${t} on the clock.`} Each chef has ${cfg.timers === 1 ? 'one chef' : 'two chefs'} of ${g.settings.workerSec} seconds.${g.settings.strict ? ' Wrong moves are blocked.' : ' Meals are checked when a shift ends.'}</p>
       ${host ? '<button class="btn big" data-a="startShift">Start the shift</button>' : `<p class="note">Waiting for ${esc(hostP ? hostP.name : 'the host')} to start the shift.</p>`}
       <button class="link" data-a="help">How to play</button>
     </div></div>`;
@@ -2793,7 +2800,7 @@ safe-buffer/index.js:
     const best = wins.length ? Math.min.apply(null, wins.map(x => x.goalAt)) : null;
     const head = R.win ? 'You did it — every goal reached!'
       : R.bankrupt ? 'The office couldn\'t pay the salaries — the restaurant had to close.'
-      : R.allStrike ? 'Every sand timer went on strike — the restaurant had to close.'
+      : R.allStrike ? 'Every chef went on strike — the restaurant had to close.'
       : R.equalityFailed ? 'Not every chef served enough guests early in that shift.'
       : 'Not every goal reached this time.';
     const checks = (R.checks || []).map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><span class="mark">${c.ok ? '✓' : '✗'}</span>${esc(c.label)} <small>(you: ${esc(String(c.have))})</small></li>`).join('');
@@ -2820,7 +2827,7 @@ safe-buffer/index.js:
   function renderHelp() {
     return `<div class="sheet" data-a="closeHelp"><div class="card help" data-stop="1">
       <h2>How to play</h2>
-      <p>Everyone plays at the same time. Tap a free circle to put a sand timer there and do that action straight away. The circle stays blocked until the sand has run out and the timer moves somewhere else.</p>
+      <p>Everyone plays at the same time. Tap a free circle to put a chef there and do that action straight away. The circle stays blocked until the sand has run out and the timer moves somewhere else.</p>
       <ul>
         <li><b>🚪 Reception</b> seats up to 2 new guests at free tables. From restaurant 6 you may instead throw 1 or 2 waiting guests out.</li>
         <li><b>📝 Dining room</b> lets you take one guest's order — or, from restaurant 6, serve one of your meals early for a tip 🛎️. Plates come from the cupboard: free, any time.</li>
@@ -2830,7 +2837,7 @@ safe-buffer/index.js:
         <li><b>🌿 Greenhouse</b> (from restaurant 2) puts spices on your plates — even on a meal that is already cooking.</li>
         <li><b>🧽 Sink</b> (from restaurant 3) washes up to 3 dirty plates.</li>
         <li><b>🚐 Van</b> (from restaurant 4, top bar) buys 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin.</li>
-        <li><b>🤝 Two-chef helpers</b> (an extra, not in the rulebook; switch it on in the lobby when two chefs play): a shared helper sand timer (top bar) that either chef can use when their own timers are busy; you may put ingredients and spices on, and cook, your partner's meals — tap their row; and each van trip allows two purchases. The helper is paid first and is the last to go on strike.</li>
+        <li><b>🤝 Two-chef helpers</b> (an extra, not in the rulebook; switch it on in the lobby when two chefs play): a shared helper chef (top bar) that either chef can use when their own timers are busy; you may put ingredients and spices on, and cook, your partner's meals — tap their row; and each van trip allows two purchases. The helper is paid first and is the last to go on strike.</li>
         <li><b>🏢 Office</b> (from restaurant 7, top bar) pays a timer back from strike for 3 coins, and from restaurant 8 calls the locksmith, the technician, hires a temp or buys plates.</li>
       </ul>
       <p>Meals are checked when a shift ends: right plate (from restaurant 2, one size bigger is fine), exactly the right ingredients and spices, and the right cooking. ⭐ guests are demanding, 👑 VIP guests order two dishes and only pay if both are right.</p>
@@ -2861,18 +2868,31 @@ safe-buffer/index.js:
   document.addEventListener('pointercancel', lift, true);
   setInterval(() => { if (touching && Date.now() - touching > 1500) { touching = 0; if (pendingRender) { pendingRender = false; render(); } } }, 500);
 
+  function fitPlan() {
+    const port=document.querySelector('.plan-scroll'),stage=document.querySelector('.plan-stage'),board=document.querySelector('.board');
+    if(!port||!stage||!board)return;
+    const fit=Math.min((port.clientWidth-8)/1730,(port.clientHeight-8)/909);
+    const scale=ui.planZoom||Math.max(.28,fit);ui.planScale=scale;
+    stage.style.width=`${1730*scale}px`;stage.style.height=`${909*scale}px`;
+    board.style.transform=`scale(${scale})`;
+  }
+  window.addEventListener('resize',fitPlan);
   function render() {
     if (touching) { pendingRender = true; return; }
     let html;
     if (ui.screen === 'home' || !role) html = renderHome();
-    else if (ui.joining || !wrap) html = `<main class="home"><h1 class="logo small">Küchen<span>-</span>Chaos</h1><p class="sub">Looking for ${esc(room || '')}…</p>${Date.now() - (ui.joinSince || 0) > 12000 ? `<p class="note">Still looking. Check that the code matches the host iPad and that the host iPad is awake.</p>` : ''}<button class="btn ghost" data-a="cancelJoin">Cancel</button></main>`;
+    else if (ui.joining || !wrap) html = `<main class="home"><h1 class="logo small">Canggu <span>Kitchen</span></h1><p class="sub">Looking for ${esc(room || '')}…</p>${Date.now() - (ui.joinSince || 0) > 12000 ? `<p class="note">Still looking. Check that the code matches the host iPad and that the host iPad is awake.</p>` : ''}<button class="btn ghost" data-a="cancelJoin">Cancel</button></main>`;
     else if (!wrap.game) html = role === 'solo' ? renderCampaign() : renderLobby();
     else html = renderGame(wrap.game);
     if (ui.help) html += renderHelp();
     if (ui.menu) html += renderMenu();
     const focusId = document.activeElement && document.activeElement.id;
     const caret = focusId && document.activeElement.selectionStart;
+    const scrollState = [...app.querySelectorAll('.plan-scroll,.mytks,.kitchen,.ticket,.sheet .card')].map((el,i)=>[el.dataset.ticket||el.className,i,el.scrollLeft,el.scrollTop]);
     app.innerHTML = html;
+    fitPlan();
+    for(const [key,i,x,y] of scrollState){const el=[...app.querySelectorAll('.plan-scroll,.mytks,.kitchen,.ticket,.sheet .card')][i];if(el&&(el.dataset.ticket||el.className)===key){el.scrollLeft=x;el.scrollTop=y;}}
+
     if (focusId) { const el = document.getElementById(focusId); if (el) { el.focus(); try { el.setSelectionRange(caret, caret); } catch (e) { /* not text */ } } }
     renderStatus();
     frame(true);
@@ -2996,6 +3016,9 @@ safe-buffer/index.js:
       case 'cancelJoin': cancelJoin(); break;
       case 'help': ui.help = true; ui.menu = false; render(); break;
       case 'closeHelp': ui.help = false; render(); break;
+      case 'fitPlan': ui.planZoom=0; fitPlan(); break;
+      case 'zoomIn': ui.planZoom=Math.min(1.6,(ui.planScale||.7)*1.25); fitPlan(); break;
+      case 'zoomOut': ui.planZoom=Math.max(.35,(ui.planScale||.7)/1.25); fitPlan(); break;
       case 'menu': ui.menu = true; render(); break;
       case 'closeMenu': ui.menu = false; render(); break;
       case 'sound': sound = !sound; LS.set('kc-sound', sound); render(); break;
@@ -3059,7 +3082,8 @@ safe-buffer/index.js:
       }
       case 'peek': ui.peek = +t.dataset.order; render(); break;
       case 'closePeek': ui.peek = null; render(); break;
-      case 'mate': ui.mate = t.dataset.id; render(); break;
+      case 'team': ui.team=!ui.team; render(); break;
+      case 'mate': ui.team=false; ui.mate = t.dataset.id; render(); break;
       case 'helpSel': ui.sel = +t.dataset.order; ui.mate = null; render(); break;
       case 'helpCook': if (g && act({ type: 'cook', order: +t.dataset.order })) { ui.mate = null; toast('🔥 Cooked for your partner'); render(); } break;
       case 'selMine': ui.sel = null; render(); break;
@@ -3103,7 +3127,7 @@ safe-buffer/index.js:
         if (!g) return;
         const op = myOpen(g);
         if (!op || op.type !== 'storage') { act({ type: 'takeIng', order: ui.sel || 0, ing: t.dataset.ing }); return; } // the engine explains why
-        if (op.room !== t.dataset.room) { toast(`Your timer is in storage room ${op.room === 'A' ? 1 : 2}.`, 'err'); return; }
+        if (op.room !== t.dataset.room) { toast(`Your chef is in storage room ${op.room === 'A' ? 1 : 2}.`, 'err'); return; }
         if (!ui.sel) { toast('Take an order first — ingredients only go on your own plates.', 'err'); return; }
         act({ type: 'takeIng', order: ui.sel, ing: t.dataset.ing });
         break;
@@ -3120,7 +3144,7 @@ safe-buffer/index.js:
       case 'wash': {
         if (!g) return;
         const op = myOpen(g);
-        if (!op || op.type !== 'wash') { toast('Put a timer at the sink first.', 'err'); return; }
+        if (!op || op.type !== 'wash') { toast('Send a chef to the wash station first.', 'err'); return; }
         act({ type: 'wash', size: t.dataset.size });
         break;
       }
@@ -3158,6 +3182,11 @@ safe-buffer/index.js:
 
   const E_NET = window.Net;
   if (DEV) window.__kc = { get wrap() { return wrap; }, get auth() { return authWrap; }, get role() { return role; }, get net() { return net; }, get pending() { return pending; }, me };
+  if(DEV) Object.assign(window.__kc, {render, act, ui, loadScenario(n,count=4){
+    role='solo';room='DESIGN';ui.screen='game';ui.results=false;ui.team=false;ui.mate=null;ui.sel=null;
+    const players=Array.from({length:count},(_,i)=>({id:i===0?me.pid:'qa'+i,name:['Luca','Maya','Priya','Alex'][i],color:['yellow','blue','red','green'][i]}));
+    me.name='Luca';me.color='yellow';wrap={room,rev:1,lobby:{players,settings:{scenario:n,workerSec:30,shiftSec:240,strict:true}},game:null};wrap.game=E.newGame(wrap.lobby.settings,players);render();return wrap.game;
+  }});
   render();
   // After a reload (Safari drops pages it hasn't shown for a while), go straight back into the game
   // this iPad was in most recently: hosting it or playing in it.

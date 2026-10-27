@@ -1,0 +1,5 @@
+dist/
+tests/engine-snapshot.js
+tests/simulation-results.json
+redesign.py
+.DS_Store

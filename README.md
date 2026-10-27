@@ -1,4 +1,4 @@
-# Küchen-Chaos
+# Canggu Kitchen · Ink & Linen
 
 A real-time cooperative kitchen game for 1–4 players, one iPad each, played in the browser. It follows all eight scenarios and the five Master Chef missions of the Kitchen Rush revised rules, with its own dishes and artwork.
 
@@ -37,16 +37,17 @@ The standard restaurants follow the rulebook. With exactly two players, the host
 
 ## Publish
 
-1. Create a new GitHub repository, for example `CangguKitchen`.
-2. Upload `index.html` (and this README) to the main branch.
-3. In the repository, open Settings → Pages, choose "Deploy from a branch", branch `main`, folder `/ (root)`, and save.
-4. After a minute the game runs at `https://<your-username>.github.io/CangguKitchen/`.
+The game is deployed on GitHub Pages at https://ikarus-eth.github.io/CangguKitchen/.
 
-Everything is in the single `index.html`. No account or server setup is needed.
+Pages serves the `main` branch from `/ (root)`. Keep `index.html`, `design.css`, `reference.css`, `.nojekyll`, and `assets/` together. A push to `main` updates the game after GitHub completes its Pages deployment.
+
+No build step is required for GitHub Pages. `node build.mjs` also produces a portable `dist/` folder for other static hosts. The `.openai/hosting.json` manifest belongs to the separate Sites preview and is not needed by GitHub Pages.
+
+The illustrated edition uses a zoomable kitchen plan, live stock quantities, and four selectable overhead chef characters. Choose a chef on the start screen; all of your workers wear the same apron colour.
 
 ## Start a game
 
-1. On every iPad, open the game address in Safari, type a name and pick a colour.
+1. On every iPad, open the game address in Safari, type a name and choose a chef.
 2. On one iPad (the host), tap "Open the restaurant". It shows a code such as `MANGO42`.
 3. On the other iPads, type that code and tap "Join".
 4. The host picks the settings and taps "Set the tables", then "Start the shift" once you have made a plan.
