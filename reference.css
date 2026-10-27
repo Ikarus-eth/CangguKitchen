@@ -83,3 +83,164 @@ button,input,select{font:inherit}button{touch-action:manipulation}.btn{backgroun
 @media(max-width:1150px){.ticket-body{grid-template-columns:90px minmax(0,1fr);gap:6px}.ticket .ticket-body .meal-art{width:90px;height:90px}.ticket .tk-n{font-size:16px}.order-heading .play-mode{font-size:10px}}
 @media(max-width:800px){.order-heading .play-mode{display:none}.order-heading .worker-toggle{margin-left:auto}.ticket .tk-head{min-height:40px}.worker-row{gap:6px}.worker-row .btn{font-size:12px;padding:8px}.delivery-split{gap:7px}}
 @media(max-width:560px){.game .bar{height:auto;min-height:53px;flex-wrap:wrap!important;padding:5px 7px;gap:4px}.bar .team-toggle{margin-left:0}.game .bar .clock{min-width:48px}.bar .goalchip{padding:0 3px}.order-heading h2{font-size:15px}.order-heading h2 i{margin:0 5px}}
+
+/* ===== 2026-10-27 readability pass (Claude) =====
+   The plan renders at roughly half size on an iPad, so everything drawn on it is sized for that scale. */
+
+/* Stock: rows end above the chefs' heads, so a chef standing in front no longer hides a quantity. */
+.game .board .area.store .ings{top:38px;height:auto;grid-template-rows:repeat(2,88px)!important;gap:4px 10px}
+.game .board .area.store .ings:has(.ing:nth-child(5)){grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.game .board .area.st3 .ings{grid-template-columns:1fr!important;grid-template-rows:84px 84px!important}
+.game .board .area.store .ing .heap,.board .ings:has(.ing:nth-child(4):last-child) .ing .heap{height:52px;position:relative}
+.game .board .area.store .ing .heap .asset,.board .ings:has(.ing:nth-child(4):last-child) .ing .heap .asset{width:78px;height:54px}
+.board .ing .stock-label{min-width:0;padding:1px 8px;gap:7px;font:17px Georgia;line-height:30px;border-radius:4px;border:1px solid #b9a37c}
+.board .ing .stock-label b{font:700 30px Georgia;line-height:30px;color:#1f2a1c}
+.board .ing{transition:transform .12s}
+.board .ing:not(:disabled):active{transform:scale(.92)}
+
+/* Running low and empty are visible at a glance. */
+.board .ing.low .stock-label{background:#fbe3b4f2;border-color:#c48a2c}
+.board .ing.low .stock-label b{color:#a8580e}
+.board .ing.empty .heap .asset{opacity:.25;filter:grayscale(1)!important}
+.board .ing.empty .stock-label{background:#f4cfc6f2;border-color:#b5432f;color:#8e2c1e}
+.board .ing.empty .stock-label b{color:#b5432f}
+.empty-tag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);font:700 19px Georgia;letter-spacing:.06em;text-transform:uppercase;color:#b5432f;border:3px solid #b5432f;border-radius:5px;padding:0 6px;background:#fff8eecc;white-space:nowrap;z-index:2}
+.board .ing:disabled{opacity:1}
+
+/* Spices: a one-line short name and a large number. */
+.board .spices .ing .stock-label{flex-direction:column;gap:0;width:100%;padding:2px 2px 0;white-space:nowrap;line-height:18px}
+.board .spices .ing .stock-label .nm{display:block;font:16px Georgia;line-height:19px;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.board .spices .ing b{font:700 28px Georgia;line-height:30px}
+
+/* Sand timers on the plan: a large seconds badge under every chef. */
+.game .board .spot .sec,.board .market .vt .sec{position:absolute;right:-18px;bottom:-22px;min-width:42px;height:32px;padding:0 6px;border-radius:16px;background:#2c2a22ee;color:#fff;font:700 26px Georgia;line-height:32px;text-align:center;z-index:4;box-shadow:0 1px 3px #0006}
+.game .board .spot .sec:empty,.board .market .vt .sec:empty{display:none}
+.game .board .spot.taken.expired .sec{display:none}
+.game .board .spot .ini{width:28px!important;height:26px!important;left:-12px;bottom:-18px;font:700 18px Georgia;line-height:26px;text-align:center;border-radius:13px;background:var(--c);color:#fff;text-shadow:0 1px 1px #0007;z-index:4}
+.game .board .spot.taken.mine:after{background:conic-gradient(var(--c) calc(var(--p)*360deg),#e7ddc6 0)}
+
+/* Clean plates in the cupboard, dirty plates at the sink. */
+.board .cupboard h3{color:#2c5e45}
+.board .cupboard .plates{background:#fdfbf4ee;border:2px solid #7fa58a;border-radius:4px}
+.board .cupboard .pbtn b{font:700 24px Georgia}
+.board .cupboard .pbtn.empty b{color:#b5432f}
+.board .cupboard .pbtn.empty .pl{opacity:.3}
+.board .pl.cleanp .asset{filter:brightness(1.08) saturate(1.1)!important}
+.board .sink .plates{grid-template-rows:auto 1fr 1fr;background:#e9dccbee;border:2px solid #8a6a45;top:38px}
+.board .sink .tray-title{grid-column:1/-1;font:700 17px Georgia;color:#6b4526;text-align:center;line-height:22px}
+.board .pl.dirtyp{position:relative}
+.board .pl.dirtyp .asset{filter:sepia(.75) saturate(1.4) brightness(.78)!important}
+.board .pl.dirtyp:after{content:'';position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle at 30% 35%,#7a4f22aa 0 14%,transparent 16%),radial-gradient(circle at 68% 60%,#6b4219aa 0 12%,transparent 14%),radial-gradient(circle at 45% 75%,#8a5a2899 0 9%,transparent 11%);pointer-events:none}
+.board .sink .pbtn b{font:700 22px Georgia;color:#5d3b1d}
+.board .sink .pbtn.none{opacity:.35}
+
+/* Guests' orders at the tables: larger names and icons. */
+.board .dining .seats{top:34px;height:122px;gap:4px 8px}
+.board .dining .seat{height:58px}
+.board .seat.guest .mt-top{min-height:28px;padding:1px 5px}
+.board .dining .mt-n{font:600 20px Georgia;line-height:24px}
+.board .dining .coin{font-size:16px}
+.board .dining .mt-r{padding:1px 2px;gap:1px;min-height:28px;align-items:center;display:flex}
+.board .dining .mt-i .asset{width:24px;height:24px}
+.board .dining .mt-i small{font:700 14px Georgia;margin:0 2px 0 -2px}
+.board .dining .pl{width:28px!important;height:28px!important}
+.board .dining .pot{font-size:15px}
+.board .dining .pot b{font:700 15px Georgia}
+
+/* My orders: the whole recipe fits on the card. */
+.order-heading .worker-toggle{min-height:0!important;height:28px;padding:0 6px;display:flex;align-items:center;gap:4px;font:14px Georgia}
+.game .me{height:auto!important;min-height:38px}
+.game .me .prompt p{font:15px Georgia;line-height:18px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.game .me .prompt .btn{min-height:36px!important;height:36px!important;padding:0 18px!important;font:600 16px Georgia!important}
+.game .me .prompt .grace-left{color:#b5432f}
+.ticket-body{grid-template-columns:72px minmax(0,1fr);gap:6px;padding:5px 7px 6px}
+.ticket .ticket-body .meal-art{width:72px;height:72px;margin-top:2px}
+.ticket .tk-head{min-height:32px;padding:4px 9px}
+.ticket .tk-n{font:600 17px Georgia;line-height:21px}
+.ticket .coin{font-size:13px}
+.ticket-details{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:6px;align-items:center}
+.ticket-details>.plate-requirement,.ticket-details>.recipe-list,.ticket-details>.return-row{grid-column:1/-1}
+.ticket .plate-requirement{font:13px Georgia;min-height:26px;padding:1px 5px;border-radius:5px}
+.ticket .plate-requirement.noplate{border-color:#c9a86a;background:#fbefd3}
+.ticket .recipe-list{grid-template-columns:1fr 1fr;column-gap:8px}
+.ticket .recipe-line{font:13px Georgia;min-height:24px;padding:0 3px;border-radius:4px}
+.ticket .recipe-line>.asset{width:24px;height:22px;flex:none}
+.ticket .recipe-line b{font:700 14px Georgia}
+.ticket .cook-status{font:13px Georgia;padding-top:2px}
+.ticket-actions{margin-top:2px;justify-content:flex-end;flex-wrap:nowrap}
+.ticket .parkbtn,.ticket .cookbtn{min-height:32px;font:600 13px Georgia;padding:2px 10px}
+.ticket .bin{font-size:15px;min-height:32px}
+.game .mytks .ticket.sel{border-color:#2f6b4f;box-shadow:inset 0 0 0 3px #2f6b4f}
+.fill-tag{flex:none;background:#2f6b4f;color:#fff;font:600 11px system-ui;text-transform:uppercase;letter-spacing:.04em;padding:3px 7px;border-radius:10px}
+@media(max-width:1150px){.ticket-body{grid-template-columns:58px minmax(0,1fr)}.ticket .ticket-body .meal-art{width:58px;height:58px}}
+
+/* Pick feedback: the item flies to the ticket, the changed line flashes, the shelf shows −1. */
+@keyframes kc-bump{0%{background:#ffd75e;box-shadow:0 0 0 3px #f2b928}55%{background:#ffe9a8;box-shadow:0 0 0 2px #f2b92855}100%{background:transparent;box-shadow:none}}
+.recipe-line.bump,.plate-requirement.bump{animation:kc-bump 1.4s ease-out both}
+.fx-fly{position:fixed;width:54px;height:54px;z-index:1000;pointer-events:none;filter:drop-shadow(0 4px 4px #0005)}
+.fx-fly .asset{display:block;width:100%;height:100%}
+@keyframes kc-rise{0%{opacity:0;transform:translate(-50%,0) scale(.7)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-44px) scale(1)}}
+.fx-minus{position:fixed;z-index:1001;pointer-events:none;font:700 26px Georgia;color:#b5432f;text-shadow:0 0 3px #fff,0 0 6px #fff;animation:kc-rise .9s ease-out forwards}
+
+/* Header chip text stays inside its chip. */
+.bar .goalchip{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.bar .goalchip>small{max-width:86px;white-space:normal;line-height:11px}
+
+/* Long sheets keep their buttons in reach. */
+.sheet .card .rbtns{position:sticky;bottom:-24px;z-index:3;background:linear-gradient(#fbf6e900,#fbf6e9 30%);padding:18px 0 24px;margin:6px 0 -24px}
+.sheet .card.help>.btn:last-child{position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 12px #fbf6e9}
+.sheet .card.shop>.btn.ghost:last-child{position:sticky;bottom:-1px;z-index:3;box-shadow:0 -10px 12px #fbf6e9}
+
+/* Shopping: one tap picks where the delivery goes. */
+.sheet .sbtn.on{outline:3px solid #2f6b4f;background:#e4ecd5}
+.shoprooms .split-q{display:flex;align-items:center;gap:6px;font:600 16px Georgia;margin:8px 0 2px}
+.shoprooms .split-q .asset{width:32px;height:32px}
+.shoprooms .split-now{font:14px Georgia;color:#5d543f;margin:2px 0 6px}
+.split-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px;margin:0 0 12px}
+.split-opt{display:flex;flex-direction:column;gap:2px;padding:7px 8px 6px;border:2px solid #9b8459;border-radius:8px;background:#fffbf0;color:var(--ink);min-height:0;cursor:pointer}
+.split-opt:active{background:#e4ecd5;border-color:#2f6b4f;transform:scale(.97)}
+.so-row{display:flex;justify-content:space-between;align-items:baseline}
+.so-row i{font:italic 14px Georgia;color:#6b5f48}
+.so-row b{font:700 24px Georgia;line-height:26px}
+.split-opt small{font:11px Georgia;color:#7a6b52;text-align:center;border-top:1px dashed #cdbd9c;padding-top:3px;margin-top:2px;white-space:nowrap}
+
+/* Take an order: guests at full size. */
+.orderpick{max-width:820px;width:calc(100% - 32px)}
+.guest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin:8px 0 6px}
+.guest-grid.one{grid-template-columns:1fr}
+.gcard{position:relative;display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px 12px;border:2px solid #b79d70;border-radius:10px;background:#fffbf0;color:var(--ink);min-height:0;box-shadow:0 2px 4px #4c3a1c18}
+button.gcard:active{background:#eef3e3;border-color:#2f6b4f;transform:scale(.98)}
+.gcard.vip{border-color:#b98a2e;background:#fff7e3}
+.bg-part{display:flex;gap:10px;align-items:center}
+.bg-part .dish-art{width:62px;height:62px;flex:none}
+.bg-body{min-width:0}
+.bg-name{font:600 19px Georgia;line-height:22px;padding-right:38px}
+.bg-icons{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:5px}
+.bg-icons .pl{width:34px!important;height:34px!important}
+.gi{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;font-size:22px}
+.gi .asset{width:34px;height:34px}
+.gi b{position:absolute;right:-5px;bottom:-4px;min-width:19px;height:19px;padding:0 3px;border-radius:10px;background:#2c2a22;color:#fff;font:700 12px/19px system-ui;text-align:center}
+.bg-price{position:absolute;top:9px;right:10px;font-size:16px}
+.bg-vip{font:600 15px Georgia;color:#6a4f22}
+.bg-vip small{display:block;font:12px Georgia;color:#7b6a4c}
+.serve-list{display:grid;gap:6px;margin:4px 0}
+.serve-item{display:flex;align-items:center;gap:10px;font:16px Georgia}
+.serve-item .dish-art{width:40px;height:40px;flex:none}
+.serve-item b{flex:1;font-weight:600}
+
+/* Time is up: say it big, with the seconds left to finish. */
+.grace-banner{position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:40;background:#b5432f;color:#fff;font:600 19px Georgia;padding:9px 20px;border-radius:999px;box-shadow:0 4px 14px #0004;pointer-events:none;white-space:nowrap}
+.serve-item>.btn{flex:0 0 auto;width:auto;min-width:0;padding:0 14px;font-size:14px}
+.sheet .shoprooms{display:block;height:auto;flex-wrap:nowrap}
+.split-opts{align-items:start;grid-auto-rows:auto}
+.shoprooms .split-q,.shoprooms .split-now{width:100%}
+.sheet .card.shop>.btn.ghost:last-child{box-shadow:0 0 0 10px #fbf6e9}
+/* Short landscape screens (iPad Safari with toolbars): the start screen fits without scrolling. */
+@media(max-height:820px) and (min-width:721px){.home.welcome{min-height:0;margin:4px auto}.welcome-art{min-height:0}.welcome-heading{padding-top:22px}.welcome-heading h1{font-size:60px;margin:10px 0}.welcome-plan{top:250px}.welcome-form{padding:16px 30px 10px}.welcome-form h2{font-size:28px;margin:6px 0}.welcome-intro{margin-bottom:10px}.chef-roster{margin:10px 0 14px}.chef-stage{height:84px}.chef-stage .chef{width:66px;height:82px}.join-box{margin:14px 0 12px;padding-top:12px}.welcome-footer{padding-top:10px}}
+/* Portrait iPad: the plan takes its natural height and the order tickets use the rest, two per row. */
+@media(orientation:portrait) and (min-width:700px){
+  .game .main{grid-template-rows:calc((100vw - 16px) * .5254 + 10px) minmax(0,1fr)!important}
+  .game .mytks{flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;align-content:flex-start}
+  .game .mytks>.ticket{flex:1 1 calc(50% - 10px);min-width:0}
+  .game .mytks>.shelf{flex:1 1 100%}
+}

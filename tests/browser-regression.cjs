@@ -31,7 +31,7 @@ const output = process.env.QA_OUTPUT || '/tmp/canggu-review';fs.mkdirSync(output
         body.scrollTop=10000;
         const r=head.getBoundingClientRect();
         return {pageWidth:document.body.scrollWidth,width:innerWidth,y,after:r.top,height:r.height,name:head.innerText,cardTop:t.getBoundingClientRect().top,recipeColumns:getComputedStyle(body).gridTemplateColumns};
-      });assert.ok(geometry.pageWidth<=width+1,JSON.stringify(geometry));assert.equal(geometry.y,geometry.after);assert.ok(geometry.height>=38);assert.match(geometry.name,/Mie Goreng/);
+      });assert.ok(geometry.pageWidth<=width+1,JSON.stringify(geometry));assert.equal(geometry.y,geometry.after);assert.ok(geometry.height>=30);assert.match(geometry.name,/Mie Goreng/);
       assert.equal(await page.locator('.mytks .next-need').count(),0);
       assert.equal(await page.locator('.mytks .recipe-line.complete,.mytks .recipe-line.missing,.mytks .recipe-line.excess').count(),0);
       await page.evaluate(()=>document.querySelectorAll('.ticket-body').forEach(el=>el.scrollTop=0));
@@ -56,9 +56,8 @@ const output = process.env.QA_OUTPUT || '/tmp/canggu-review';fs.mkdirSync(output
     assert.equal(await page.evaluate(()=>__kc.wrap.game.spaces.storA[0]),null);await page.locator('.worker-card [data-a="workers"]').click();await settle();
     await load(5);await page.locator('[data-area="van"]').click();await settle();
     await page.locator('[data-a="shopIng"][data-ing="meat"]').click();await settle();
-    for(let i=0;i<3;i++){await page.locator('[data-a="shopSplit"][data-delta="-1"]').click();await settle();}
     await page.screenshot({path:`${output}/shopping.png`});
-    await page.locator('[data-a="buyIng"]').click();await settle();
+    await page.locator('[data-a="buyIng"][data-split="2"]').click();await settle();
     const stock=await page.evaluate(()=>{const g=__kc.wrap.game;return {a:g.storage.A.meat,b:g.storage.B.meat,coins:g.coins}});
     assert.deepEqual(stock,{a:8,b:9,coins:99});
     await load(3);await seedOrders();

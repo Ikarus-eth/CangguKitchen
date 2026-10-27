@@ -87,12 +87,20 @@ test('Two people can wash simultaneously, each with a separate allowance of thre
   for(let i=0;i<3;i++)ok(s,'wash',{size:'M'});
   assert.equal(s.open.p0,null);assert.equal(s.open.p1.left,3);assert.equal(s.dirty.M,5);
 });
-test('Grace period finishes existing actions even after 20 seconds, and blocks new visits',()=>{
-  const s=game(3),o=order(s);visit(s,'storA');E.tick(s,s.shiftEnd);
-  assert.equal(s.phase,'grace');E.tick(s,s.shiftEnd+60000);assert.equal(s.phase,'grace');
-  ok(s,'takeIng',{order:o.id,ing:'meat'},s.shiftEnd+60000);
-  assert.match(act(s,'place',{area:'stove',idx:0},s.shiftEnd+60000),/not running/);
-  ok(s,'done',{},s.shiftEnd+60000);E.tick(s,s.shiftEnd+60001);assert.equal(s.phase,'results');
+test('Grace period lets a running sand timer finish, then closes forgotten actions',()=>{
+  const s=game(3),o=order(s);visit(s,'storA',0,'p0',s.shiftEnd-5000);E.tick(s,s.shiftEnd);
+  assert.equal(s.phase,'grace');E.tick(s,s.shiftEnd+20000);assert.equal(s.phase,'grace');
+  ok(s,'takeIng',{order:o.id,ing:'meat'},s.shiftEnd+20000);
+  assert.match(act(s,'place',{area:'stove',idx:0},s.shiftEnd+20000),/not running/);
+  E.tick(s,s.shiftEnd+25001);assert.equal(s.phase,'results');
+});
+test('A forgotten Done never blocks the end of the shift',()=>{
+  const s=game(3);visit(s,'storA');E.tick(s,s.shiftEnd);assert.equal(s.phase,'grace');
+  E.tick(s,s.shiftEnd+9000);assert.equal(s.phase,'grace');
+  E.tick(s,s.shiftEnd+10000);assert.equal(s.phase,'results');
+});
+test('Done still ends the shift straight away',()=>{
+  const s=game(3);visit(s,'storA');E.tick(s,s.shiftEnd);ok(s,'done',{},s.shiftEnd+100);E.tick(s,s.shiftEnd+101);assert.equal(s.phase,'results');
 });
 test('Shopping splits one bundle across rooms for one coin and respects bread/pasta separation',()=>{
   const s=game(5),a=s.storage.A.meat,b=s.storage.B.meat,c=s.coins;visit(s,'van');

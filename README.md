@@ -66,7 +66,10 @@ Tips for the iPads:
 - Meal checks: “At shift end” keeps quantities and recipes visible without live correctness hints. Every mistake is listed in the shift report. “Practice: live hints” gives immediate help and blocks wrong plates, excess ingredients/spices and overcooking.
 - Standing spaces have visible green dashed rings, apron-coloured occupied rings, and distinct locked/broken markings. My chefs lets you release a finished worker without starting a new visit.
 - Shopping can split one ingredient bundle between eligible storerooms. General ingredient and spice supplies are finite, and availability is shown in the Shop.
-- At the end of a shift, ongoing actions can be finished without an arbitrary timeout. New worker placements are closed.
+- At the end of a shift, new worker placements are closed. An action already under way runs as long as its sand timer, and at least 10 seconds; a banner counts down. An action nobody finished (a forgotten Done) then closes by itself, so the shift report always appears.
+- Picking a plate, ingredient or spice shows where it went: the item flies to the ticket, the ticket line flashes and the shelf shows −1. Empty shelves are greyed out and stamped EMPTY; a shelf with one left is marked amber.
+- In the dining room a sheet shows the waiting guests at full size. Tapping a guest on the plan without a chef there opens the same card as a preview.
+- Shopping: after choosing an ingredient, one tap on a split (A 5 · B 0 … A 0 · B 5) buys and delivers it.
 
 ## Game log
 

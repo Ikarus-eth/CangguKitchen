@@ -8,7 +8,7 @@ Source: [publisher's rulebook](https://pegasusna.com/media/pdf/78/1e/77/42502317
 
 - Standard play now leaves correctness decisions to the players until the shift report. Recipes, actual quantities, plate sizes and cooking counts remain visible. No green completion badges, automatic next-step hints or correctness-dependent service confirmation. The optional practice setting retains live assistance.
 - Reports show every error, rather than hiding errors after the first three. Illegal actions still explain why they cannot be performed immediately.
-- A shift no longer cuts off an existing action after 20 extra seconds. Once the clock stops, new visits are blocked and the shift ends when everyone finishes or skips their current action.
+- Once the clock stops, new visits are blocked. An existing action runs as long as its sand timer (at least 10 seconds), then closes by itself, so a forgotten Done can no longer keep the shift from ending (changed 27 October, Claude).
 - A shopping bundle can be distributed between eligible storerooms. Locked stores and bread/pasta separation are enforced. General supply counts include stored items and items on plates, including meals served early. Binned and completed meals return ingredients to general supply.
 - A finished chef can be recalled to free a standing space without starting another action. Shared workers can be reused by another player, and doing so ends their previous visit without leaving duplicate occupancy.
 - Mission 3 requires the patron mix; Mission 4 requires 12/18/24 coins for 2/3/4 players. The coin requirement had been attached to Mission 3, and Mission 4 had inherited scenario 8's reputation target. Both are corrected.
