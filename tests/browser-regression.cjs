@@ -57,7 +57,9 @@ const output = process.env.QA_OUTPUT || '/tmp/canggu-review';fs.mkdirSync(output
     await load(5);await page.locator('[data-area="van"]').click();await settle();
     await page.locator('[data-a="shopIng"][data-ing="meat"]').click();await settle();
     await page.screenshot({path:`${output}/shopping.png`});
-    await page.locator('[data-a="buyIng"][data-split="2"]').click();await settle();
+    await page.evaluate(()=>{const r=document.getElementById('splitRange');r.value='2';r.dispatchEvent(new Event('input',{bubbles:true}));});await settle();
+    assert.equal(await page.locator('[data-a="buyIng"]').getAttribute('data-split'),'2');
+    await page.locator('[data-a="buyIng"]').click();await settle();
     const stock=await page.evaluate(()=>{const g=__kc.wrap.game;return {a:g.storage.A.meat,b:g.storage.B.meat,coins:g.coins}});
     assert.deepEqual(stock,{a:8,b:9,coins:99});
     await load(3);await seedOrders();

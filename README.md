@@ -69,7 +69,9 @@ Tips for the iPads:
 - At the end of a shift, new worker placements are closed. An action already under way runs as long as its sand timer, and at least 10 seconds; a banner counts down. An action nobody finished (a forgotten Done) then closes by itself, so the shift report always appears.
 - Picking a plate, ingredient or spice shows where it went: the item flies to the ticket, the ticket line flashes and the shelf shows −1. Empty shelves are greyed out and stamped EMPTY; a shelf with one left is marked amber.
 - In the dining room a sheet shows the waiting guests at full size. Tapping a guest on the plan without a chef there opens the same card as a preview.
-- Shopping: after choosing an ingredient, one tap on a split (A 5 · B 0 … A 0 · B 5) buys and delivers it.
+- Shopping: choose one of three tabs (ingredient, cheap spices, expensive spices). For an ingredient, a slider splits the delivery between Storage A (purple) and Storage B (teal); tapping an item also moves the split.
+- Plates: clean plates sit in a white tray with a green CLEAN band; dirty plates in a brown tray with a DIRTY band at the sink, with a wash arrow between them. A taken plate shows as a green chip on the ticket.
+- Landscape iPads put the player's chefs and the current instruction in a column left of the plan, so the plan and the tickets get more room.
 
 ## Game log
 

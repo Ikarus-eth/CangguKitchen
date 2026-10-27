@@ -619,7 +619,7 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 
 </style>
 <link rel="stylesheet" href="design.css?v=20261027-rules">
-<link rel="stylesheet" href="reference.css?v=20261027-ui">
+<link rel="stylesheet" href="reference.css?v=20261027-ui2">
 </head>
 <body>
 <div id="app"></div>
@@ -2163,11 +2163,12 @@ safe-buffer/index.js:
     blue:[51,544,165,195],yellow:[283,530,164,209],red:[520,538,174,203],green:[739,538,170,204],temp:[968,546,151,197],guestA:[1134,581,153,155],guestB:[1375,584,145,158],
     noodles:[12,752,254,248],soup:[266,752,254,247],skewers:[512,751,259,250],greens:[768,754,250,244],toast:[1014,754,259,245],pan:[1282,748,248,244]
   };
-  function asset(key, extra='') { const [x,y,w,h]=ART[key]||ART.plate;return `<span aria-hidden="true" class="asset art-${key} ${extra}" style="background-size:${1536/w*100}% ${1024/h*100}%;background-position:${x/(1536-w)*100}% ${y/(1024-h)*100}%"></span>`; }
+  function asset(key, extra='') { if (key === 'pasta') return `<span aria-hidden="true" class="asset art-pasta pasta-svg ${extra}"></span>`; // drawn farfalle: the painted bundle was hard to recognise
+    const [x,y,w,h]=ART[key]||ART.plate;return `<span aria-hidden="true" class="asset art-${key} ${extra}" style="background-size:${1536/w*100}% ${1024/h*100}%;background-position:${x/(1536-w)*100}% ${y/(1024-h)*100}%"></span>`; }
   function chef(color) { return asset(color, 'chef'); }
   function dishArt(d) { const n=d.name.toLowerCase();const k=/soup|curry|stew|dhal|risotto/.test(n)?'soup':/salad|bowl/.test(n)?'greens':/sandwich|toast|burger|bread|bagel|croissant|pizza|quiche|hot dog|burrito|wrap/.test(n)?'toast':/sate|steak|meat|kebab|chicken|schnitzel|ribs|pork|fish|lamb/.test(n)?'skewers':d.ing.pasta?'noodles':d.ing.meat?'skewers':d.ing.salad?'greens':d.ing.bread||d.ing.cheese?'toast':'soup';return `<span class="dish-art">${asset(k)}</span>`; }
   function nextNeed(g,o) { const d=E.DISHES[o.dish];if(!E.plateOk(g,o))return `Get plate ${d.plate}`;const i=E.ING.find(k=>(o.ing[k]||0)<(d.ing[k]||0));if(i)return `Get ${E.ING_INFO[i].n.toLowerCase()}`;const sp=E.SPICES.find(k=>(o.sp[k]||0)<(d.sp[k]||0));if(sp)return `Add ${E.SP_INFO[sp].n.toLowerCase()}`;if(o.row<d.cook)return 'Visit stove';if(o.row>d.cook)return 'Overcooked';return E.checkOrder(g,o).length?'Check portions':'Ready to serve'; }
-  function checklist(g,d,o) { return `<div class="recipe-list"><small>ON PLATE / RECIPE</small>${[...E.ING.filter(i=>d.ing[i]||(o.ing||{})[i]),...E.SPICES.filter(i=>d.sp[i]||(o.sp||{})[i])].map(i=>{const spice=E.SPICES.includes(i), need=(spice?d.sp:d.ing)[i]||0, have=((spice?o.sp:o.ing)||{})[i]||0, info=(spice?E.SP_INFO:E.ING_INFO)[i];const state=g.settings.strict?(have===need?'complete':have>need?'excess':'missing'):'unchecked';return `<div class="recipe-line ${state}${bumpCls(o.id,i)}" data-k="${i}" title="${info.n}"${bumpStyle(o.id,i)}>${asset(i)}<span>${shortName(info.n)}</span><b aria-label="${have} on plate, ${need} in recipe">${have} / ${need}</b></div>`}).join('')}</div>`; }
+  function checklist(g,d,o) { return `<div class="recipe-list"><small>ON PLATE / RECIPE</small>${[...E.ING.filter(i=>d.ing[i]||(o.ing||{})[i]),...E.SPICES.filter(i=>d.sp[i]||(o.sp||{})[i])].map(i=>{const spice=E.SPICES.includes(i), need=(spice?d.sp:d.ing)[i]||0, have=((spice?o.sp:o.ing)||{})[i]||0, info=(spice?E.SP_INFO:E.ING_INFO)[i];const state=g.settings.strict?(have===need?'complete':have>need?'excess':'missing'):'unchecked';const toks=Array.from({length:Math.max(need,have)},(_,k)=>`<span class="rtok ${k<have?'got':''} ${k>=need?'extra':''}">${asset(i)}</span>`).join('');return `<div class="recipe-line ${state}${bumpCls(o.id,i)}" data-k="${i}" title="${info.n}: ${have} on the plate, recipe ${need}"${bumpStyle(o.id,i)}><span class="rtoks">${toks}</span><b aria-label="${have} on plate, ${need} in recipe"><em>${have}</em>/${need}</b></div>`}).join('')}</div>`; }
   // Board and ticket labels use the first word of a spice ("Curry & mustard" → "Curry") so they stay on one line.
   const shortName = n => String(n).split(' & ')[0];
   const stockCls = n => n <= 0 ? 'empty' : n === 1 ? 'low' : '';
@@ -2325,11 +2326,11 @@ safe-buffer/index.js:
     const cookProgress=d.cook?Math.min(1,o.row/d.cook):1;
     return `<div class="ticket ${sel ? 'sel' : ''} ${canCook ? 'cookable' : ''} ${o.served ? 'served' : ''} ${patron ? 'vipt' : ''}" data-ticket="${o.id}" ${mine && live ? `data-a="sel" data-order="${o.id}"` : ''}>
       ${vip}<div class="tk-head"><span class="tk-n">${d.ch ? '☆ ' : ''}${d.name}</span>${sel && canFill ? '<span class="fill-tag">Adding here</span>' : ''}${price}</div>
-      <div class="ticket-body" data-scroll="order-${o.id}"><div class="meal-art">${dishArt(d)}</div>
-      <div class="ticket-details"><div class="plate-requirement ${g.settings.strict&&!E.plateOk(g,o)?'missing':''}${o.plate?'':' noplate'}${bumpCls(o.id,'plate')}" data-k="plate"${bumpStyle(o.id,'plate')}>${asset('plate')}<span>Plate: ${o.plate||'none'} <small>· recipe ${d.plate}${cfg.bigger&&d.plate!=='XL'?` or ${E.PLATES[E.PLATES.indexOf(d.plate)+1]}`:''}</small></span>${g.settings.strict?`<b>${E.plateOk(g,o)?'✓':'○'}</b>`:''}</div>
+      <div class="ticket-body" data-scroll="order-${o.id}"><div class="meal-art ${o.plate ? 'has-plate' : 'no-plate'}">${dishArt(d)}${o.plate ? `<span class="art-plate">${o.plate}</span>` : ''}</div>
+      <div class="ticket-details"><div class="plate-requirement ${g.settings.strict&&!E.plateOk(g,o)?'missing':''}${o.plate?' hasplate':' noplate'}${bumpCls(o.id,'plate')}" data-k="plate"${bumpStyle(o.id,'plate')}>${o.plate ? `<span class="pl-chip">${o.plate}</span>` : '<span class="pl-empty" aria-hidden="true"></span>'}<span>${o.plate ? `<b>Plate ${o.plate}</b> taken` : '<b>No plate yet</b>'} <small>· recipe ${d.plate}${cfg.bigger&&d.plate!=='XL'?` or ${E.PLATES[E.PLATES.indexOf(d.plate)+1]}`:''}</small></span>${g.settings.strict?`<b>${E.plateOk(g,o)?'✓':'○'}</b>`:''}</div>
       ${checklist(g,d,o)}
-      <div class="cook-status"><span class="cook-ring ${g.settings.strict&&o.row>d.cook?'over':''} ${g.settings.strict?'':'unchecked'}" style="--progress:${cookProgress}"></span><span>Cook <b>${o.row} / ${d.cook}</b></span>${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">Cook +1</button>` : ''}</div>
-      <div class="ticket-actions">${g.settings.strict?`<span class="next-need ${!E.checkOrder(g,o).length?'ready':''}">${o.served?'Served':o.parked?'Set aside':nextNeed(g,o)}</span>`:''}${canServe?serveBtn(g,o):parkBtn}${bin}</div>
+      <div class="cook-status"><span class="cook-ring ${g.settings.strict&&o.row>d.cook?'over':''} ${g.settings.strict?'':'unchecked'}" style="--progress:${cookProgress}"></span><span>Cook <b>${o.row} / ${d.cook}</b></span></div>
+      <div class="ticket-actions">${g.settings.strict?`<span class="next-need ${!E.checkOrder(g,o).length?'ready':''}">${o.served?'Served':o.parked?'Set aside':nextNeed(g,o)}</span>`:''}${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">🔥 Cook +1</button>` : canServe?serveBtn(g,o):parkBtn}${bin}</div>
       ${cfg.fix&&chips?`<div class="return-row"><small>Tap twice to return</small>${chips}</div>`:''}
       </div></div></div>`;
 
@@ -2561,7 +2562,7 @@ safe-buffer/index.js:
     const washActive = op && op.type === 'wash';
     const sink = cfg.sink ? `<section class="area sink ${washActive ? 'active' : ''}">
         <div class="gh"><div class="ahead"><h3>Sink${washActive ? ` <small>wash ${op.left} more</small>` : ''}</h3><div class="spots">${g.spaces.sink.map((_, i) => spot(g, 'sink', i)).join('')}</div></div>
-        <div class="plates"><span class="tray-title">🧽 Dirty plates</span>${E.PLATES.map(sz => `<button class="pbtn dirty ${washActive && g.dirty[sz] ? 'glow' : ''} ${g.dirty[sz] ? '' : 'none'}" data-a="wash" data-size="${sz}" ${g.dirty[sz] ? '' : 'disabled'} aria-label="${g.dirty[sz]} dirty ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'dirtyp')}<b>×${g.dirty[sz]}</b></button>`).join('')}</div></div></section>` : dormant('sink','Wash',3);
+        <span class="wash-flow" aria-hidden="true">◀ wash ◀</span><div class="plates"><span class="tray-title">DIRTY</span>${E.PLATES.map(sz => `<button class="pbtn dirty ${washActive && g.dirty[sz] ? 'glow' : ''} ${g.dirty[sz] ? '' : 'none'}" data-a="wash" data-size="${sz}" ${g.dirty[sz] ? '' : 'disabled'} aria-label="${g.dirty[sz]} dirty ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'dirtyp')}<b>×${g.dirty[sz]}</b></button>`).join('')}</div></div></section>` : dormant('sink','Wash',3);
 
     const ring = x => {
       const p = whoOf(g, x.pid);
@@ -2639,7 +2640,7 @@ safe-buffer/index.js:
           ${room('storB', 'B', 2)}
           ${g.storage.C ? room('storC', 'C', 3) : dormant('st3','Dry Store',5)}
           <section class="area stove ${op && op.type === 'cook' ? 'active' : ''}"><h3>Stove</h3>${Array.from({length:6-g.spaces.stove.length},(_,i)=>`<span class="unused-hob" style="left:${55+(i+g.spaces.stove.length)*150}px">Closed</span>`).join('')}<div class="spots">${g.spaces.stove.map((_, i) => spot(g, 'stove', i)).join('')}</div></section>
-          <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>✨ Clean plates</h3><div class="plates">${E.PLATES.map(sz => `<button class="pbtn clean ${plateGlow && g.cupboard[sz] ? 'glow' : ''} ${stockCls(g.cupboard[sz])}" data-a="plate" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'} aria-label="${g.cupboard[sz]} clean ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'big cleanp')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
+          <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>Plates</h3><div class="plates"><span class="tray-title">CLEAN</span>${E.PLATES.map(sz => `<button class="pbtn clean ${plateGlow && g.cupboard[sz] ? 'glow' : ''} ${stockCls(g.cupboard[sz])}" data-a="plate" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'} aria-label="${g.cupboard[sz]} clean ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'big cleanp')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
           ${sink}
           ${cfg.shop?`<section class="area market"><h3>Shop</h3>${van}<small>1 coin · 5 food / 3 spices / 2 premium</small></section>`:dormant('market','Shop',4)}
           ${cfg.office?`<section class="area office"><h3>Office</h3>${office}<small>Repairs · unlock · hire</small></section>`:dormant('office','Office',7)}
@@ -2666,34 +2667,55 @@ safe-buffer/index.js:
     </div>`;
   }
 
+  // Shopping: pick one of three kinds of purchase (tabs), then the item(s), then where it goes.
+  // Storage A and B carry colours (purple, teal) on the plan and here, so the split is easy to follow.
+  const ROOM_LABEL = { A: 'Storage A', B: 'Storage B', C: 'Dry Store' };
+  function splitView(g, sh, n) {
+    const toA = Math.max(0, Math.min(n, sh.split == null ? Math.ceil(n / 2) : sh.split));
+    const a = g.storage.A[sh.ing], b = g.storage.B[sh.ing];
+    return `<div class="dsplit">
+      <div class="split-ends"><span class="ra">${ROOM_LABEL.A}<small>has ${a}</small></span><span class="rb">${ROOM_LABEL.B}<small>has ${b}</small></span></div>
+      <div class="split-toks">${Array.from({ length: n }, (_, i) => `<button class="stok ${i < toA ? 'ra' : 'rb'}" data-a="splitTok" data-i="${i}" aria-label="Item ${i + 1}: ${i < toA ? 'storage A' : 'storage B'}">${asset(sh.ing)}</button>`).join('')}</div>
+      <input id="splitRange" class="split-range" type="range" min="0" max="${n}" step="1" value="${toA}" style="--p:${toA / n * 100}%" aria-label="How many go to storage A">
+      <div class="split-sum"><span class="ra"><b data-sa>+${toA}</b> → <span data-ta>${a + toA}</span> in A</span><span class="rb"><span data-tb>${b + n - toA}</span> in B ← <b data-sb>+${n - toA}</b></span></div>
+      <p class="note split-help">Slide the white handle, or tap an item, to choose what goes where.</p>
+    </div>`;
+  }
   function renderShop(g) {
     const pantry = E.cfgOf(g).pantry;
     const sh = ui.shop;
+    const tab = sh.tab || 'ing';
     const n = E.has(g, 'bulk') ? 7 : 5;
-    const ingBtn = i => `<button class="sbtn ${sh.ing === i ? 'on' : ''}" data-a="shopIng" data-ing="${i}" ${E.supplyCount(g,i)<n?'disabled':''} aria-label="Buy ${n} ${E.ING_INFO[i].n}, ${E.supplyCount(g,i)} in supply">${asset(i)}<small>${E.ING_INFO[i].n} ×${n}</small><small>${E.supplyCount(g,i)} in supply</small></button>`;
-    let rooms = '';
-    if (sh.ing) {
-      const opts = (pantry && E.PANTRY_INGS.includes(sh.ing) ? ['C'] : ['A','B']).filter(r=>!g.locked[r]);
-      const split = Math.max(0,Math.min(n,sh.split==null?n:sh.split));
-      rooms = `<div class="shoprooms"><p class="split-q">${asset(sh.ing)} Deliver ${n} ${E.ING_INFO[sh.ing].n.toLowerCase()}</p>${opts.length===2?`<p class="split-now">Now in Storage A: <b>${g.storage.A[sh.ing]}</b> · Storage B: <b>${g.storage.B[sh.ing]}</b>. Tap where they go (buys for 1 coin):</p><div class="split-opts">${Array.from({length:n+1},(_,k)=>{const toA=n-k;return `<button class="split-opt" data-a="buyIng" data-split="${toA}" aria-label="${toA} to storage A, ${n-toA} to storage B"><span class="so-row"><i>A</i><b>${toA}</b></span><span class="so-row"><i>B</i><b>${n-toA}</b></span><small>A ${g.storage.A[sh.ing]+toA} · B ${g.storage.B[sh.ing]+n-toA}</small></button>`}).join('')}</div>`:opts.map(r=>`<button class="btn" data-a="buyIng" data-room="${r}">All ${n} to ${r==='C'?'Dry Store':'Storage '+r} · 1 coin</button>`).join('')}</div>`;
+    const left = myOpen(g) ? myOpen(g).left : 1;
+    const tabs = [['ing', `${asset('meat')}<b>${n} of one ingredient</b>`], ['cheap', `${asset('salt')}<b>3 cheap spices</b><small>salt · pepper · herbs</small>`], ['pricey', `${asset('chili')}<b>2 expensive spices</b><small>curry · chili</small>`]]
+      .map(([k, html]) => `<button class="shoptab ${tab === k ? 'on' : ''}" data-a="shopTab" data-tab="${k}">${html}</button>`).join('');
+    let body = '';
+    if (tab === 'ing') {
+      const ingBtn = i => `<button class="sbtn ${sh.ing === i ? 'on' : ''}" data-a="shopIng" data-ing="${i}" ${E.supplyCount(g, i) < n ? 'disabled' : ''} aria-label="Buy ${n} ${E.ING_INFO[i].n}, ${E.supplyCount(g, i)} in supply">${asset(i)}<small>${E.ING_INFO[i].n}</small><small>${E.supplyCount(g, i)} left</small></button>`;
+      body = `<p class="step">1 · Which ingredient?</p><div class="shoprow">${E.ING.map(ingBtn).join('')}</div>`;
+      if (sh.ing) {
+        const opts = (pantry && E.PANTRY_INGS.includes(sh.ing) ? ['C'] : ['A', 'B']).filter(r => !g.locked[r]);
+        const nm = E.ING_INFO[sh.ing].n.toLowerCase();
+        if (opts.length === 2) {
+          body += `<p class="step">2 · Where do the ${n} ${nm} go?</p>${splitView(g, sh, n)}<button class="btn big buybtn" data-a="buyIng" data-split="${Math.max(0, Math.min(n, sh.split == null ? Math.ceil(n / 2) : sh.split))}">Buy ${n} ${nm} · 1 coin</button>`;
+        } else if (opts.length === 1) {
+          body += `<p class="step">2 · All ${n} go to <span class="room-${opts[0]}">${ROOM_LABEL[opts[0]]}</span> (has ${g.storage[opts[0]][sh.ing]}).</p><button class="btn big buybtn" data-a="buyIng" data-room="${opts[0]}">Buy ${n} ${nm} · 1 coin</button>`;
+        } else body += '<p class="note">That storage room is locked.</p>';
+      }
+    } else {
+      const k = tab === 'cheap' ? 3 : 2, list = tab === 'cheap' ? E.CHEAP : E.PRICEY, picks = sh[tab];
+      const spBtn = i => `<button class="sbtn" data-a="shopSp" data-kind="${tab}" data-spice="${i}" ${picks.length >= k || picks.filter(x => x === i).length >= E.supplyCount(g, i) ? 'disabled' : ''}>${asset(i)}<small>${E.SP_INFO[i].n}</small><small>${E.supplyCount(g, i)} left</small></button>`;
+      body = `<p class="step">1 · Tap ${k} spices (any mix, the same one twice is fine)</p><div class="shoprow">${list.map(spBtn).join('')}</div>
+        <div class="tray">${Array.from({ length: k }, (_, i) => `<span class="slot">${picks[i] ? asset(picks[i]) : ''}</span>`).join('')}${picks.length ? '<button class="link" data-a="shopClear" data-kind="' + tab + '">start again</button>' : ''}</div>
+        <p class="step">2 · They go into the spice bag.</p>
+        <button class="btn big buybtn" data-a="buySp" data-kind="${tab}" ${picks.length === k ? '' : 'disabled'}>${picks.length === k ? `Buy these ${k} · 1 coin` : `Pick ${k - picks.length} more`}</button>`;
     }
-    const tray = (kind, k) => {
-      const picks = sh[kind];
-      return `<div class="tray">${Array.from({ length: k }, (_, i) => `<span class="slot">${picks[i] ? asset(picks[i]) : ''}</span>`).join('')}
-        ${picks.length ? `<button class="link" data-a="shopClear" data-kind="${kind}">clear</button>` : ''}
-        ${picks.length === k ? `<button class="btn" data-a="buySp" data-kind="${kind}">Buy these</button>` : ''}</div>`;
-    };
-    const spBtn = (kind, i) => `<button class="sbtn" data-a="shopSp" data-kind="${kind}" data-spice="${i}" ${sh[kind].filter(x=>x===i).length>=E.supplyCount(g,i)?'disabled':''}>${asset(i)}<small>${E.SP_INFO[i].n}</small><small>${E.supplyCount(g,i)} in supply</small></button>`;
     return `<div class="sheet shopsheet"><div class="card shop">
-      <h2>🚐 Shopping${myOpen(g) && myOpen(g).left > 1 ? ' <small class="badge">2 purchases this trip</small>' : g.duo ? ' <small class="badge">last purchase</small>' : ''}</h2>
-      <p class="note">Each purchase costs 1 coin from the office (now ${g.coins}). Pick one of the three.</p>
-      <h3>${n} of one ingredient</h3>
-      <div class="shoprow">${E.ING.map(ingBtn).join('')}</div>${rooms}
-      <h3>3 cheap spices, any mix</h3>
-      <div class="shoprow">${E.CHEAP.map(i => spBtn('cheap', i)).join('')}</div>${tray('cheap', 3)}
-      <h3>2 expensive spices, any mix</h3>
-      <div class="shoprow">${E.PRICEY.map(i => spBtn('pricey', i)).join('')}</div>${tray('pricey', 2)}
-      <button class="btn ghost" data-a="done">${g.duo && myOpen(g) && myOpen(g).left < 2 ? 'Done shopping' : 'Buy nothing'}</button>
+      <h2>🚐 Shopping <small class="badge">${left > 1 ? '2 purchases this trip' : '1 purchase'} · office has ${g.coins} 🪙</small></h2>
+      <p class="note">Each purchase costs 1 coin. Choose one kind:</p>
+      <div class="shoptabs">${tabs}</div>
+      <div class="shopbody">${body}</div>
+      <button class="btn ghost" data-a="done">${g.duo && left < 2 ? 'Done shopping' : 'Buy nothing'}</button>
     </div></div>`;
   }
 
@@ -3003,17 +3025,19 @@ safe-buffer/index.js:
   document.addEventListener('pointercancel', lift, true);
   setInterval(() => { if (touching && Date.now() - touching > 1500) { touching = 0; if (pendingRender) { pendingRender = false; render(); } } }, 500);
 
+  // The painted frame (plants and outer wall) is cropped off so the rooms get the space.
+  const CROP = { x: 26, y: 6, w: 1680, h: 862 };
   function fitPlan() {
     const port=document.querySelector('.plan-scroll'),stage=document.querySelector('.plan-stage'),board=document.querySelector('.board');
     if(!port||!stage||!board)return;
-    const fit=Math.min((port.clientWidth-8)/1730,(port.clientHeight-8)/909);
+    const fit=Math.min((port.clientWidth-4)/CROP.w,(port.clientHeight-4)/CROP.h);
     const scale=ui.planZoom||Math.max(.28,fit);ui.planScale=scale;
-    stage.style.width=`${1730*scale}px`;stage.style.height=`${909*scale}px`;
-    board.style.transform=`scale(${scale})`;
+    stage.style.width=`${CROP.w*scale}px`;stage.style.height=`${CROP.h*scale}px`;
+    board.style.transform=`translate(${-CROP.x*scale}px,${-CROP.y*scale}px) scale(${scale})`;
   }
   window.addEventListener('resize',fitPlan);
   function render() {
-    if (touching) { pendingRender = true; return; }
+    if (touching || ui.sliding) { pendingRender = true; return; }
     let html;
     if (ui.screen === 'home' || !role) html = renderHome();
     else if (ui.joining || !wrap) html = `<main class="home"><h1 class="logo small">Canggu <span>Kitchen</span></h1><p class="sub">Looking for ${esc(room || '')}…</p>${Date.now() - (ui.joinSince || 0) > 12000 ? `<p class="note">Still looking. Check that the code matches the host iPad and that the host iPad is awake.</p>` : ''}<button class="btn ghost" data-a="cancelJoin">Cancel</button></main>`;
@@ -3099,7 +3123,23 @@ safe-buffer/index.js:
   // ---------- input ----------
   function saveMe() { LS.set('kc-me', me); }
 
+  // The delivery slider updates in place; a full redraw would drop the finger off the handle.
+  function splitUpdate(el) {
+    const g = game(), sh = ui.shop; if (!g || !sh.ing) return;
+    const n = +el.max, toA = +el.value, a = g.storage.A[sh.ing], b = g.storage.B[sh.ing];
+    sh.split = toA;
+    el.style.setProperty('--p', `${toA / n * 100}%`);
+    const box = el.closest('.dsplit'), card = el.closest('.card');
+    box.querySelectorAll('.stok').forEach((x, i) => { x.classList.toggle('ra', i < toA); x.classList.toggle('rb', i >= toA); });
+    box.querySelector('[data-sa]').textContent = `+${toA}`; box.querySelector('[data-sb]').textContent = `+${n - toA}`;
+    box.querySelector('[data-ta]').textContent = a + toA; box.querySelector('[data-tb]').textContent = b + n - toA;
+    const buy = card && card.querySelector('[data-a="buyIng"]'); if (buy) buy.dataset.split = toA;
+  }
+  app.addEventListener('pointerdown', e => { if (e.target.id === 'splitRange') ui.sliding = true; });
+  document.addEventListener('pointerup', () => { if (ui.sliding) { ui.sliding = false; if (pendingRender) { pendingRender = false; render(); } } });
+  app.addEventListener('change', e => { if (e.target.id === 'splitRange') { ui.sliding = false; splitUpdate(e.target); } });
   app.addEventListener('input', e => {
+    if (e.target.id === 'splitRange') { splitUpdate(e.target); return; }
     if (e.target.id === 'nm') { me.name = e.target.value.trim(); saveMe(); }
     if (e.target.id === 'code') ui.code = e.target.value; // keep what was typed if the screen redraws
   });
@@ -3190,6 +3230,8 @@ safe-buffer/index.js:
       case 'startShift': if (isHost() && g) { E.apply(g, { type: 'start' }, Date.now()); changed(); keepAwake(); } break;
       case 'nextShift': if (isHost() && g) { const err = E.apply(g, { type: 'nextShift' }, Date.now()); if (err) toast(err, 'err'); changed(); keepAwake(); } break;
       case 'shopIng': ui.shop.ing = t.dataset.ing; ui.shop.split = null; render(); break;
+      case 'shopTab': ui.shop.tab = t.dataset.tab; render(); break;
+      case 'splitTok': { const i = +t.dataset.i, cur = ui.shop.split == null ? Math.ceil((E.has(g, 'bulk') ? 7 : 5) / 2) : ui.shop.split; ui.shop.split = i < cur ? i : i + 1; render(); break; }
       case 'shopSplit': ui.shop.split = Math.max(0,Math.min(E.has(g,'bulk')?7:5,(ui.shop.split==null?(E.has(g,'bulk')?7:5):ui.shop.split)+Number(t.dataset.delta))); render(); break;
       case 'pickThrow': {
         const i = +t.dataset.seat;
@@ -3230,7 +3272,7 @@ safe-buffer/index.js:
       case 'closeMate': ui.mate = null; render(); break;
       case 'latePay': if (g && act({ type: 'latePay', owner: t.dataset.owner, t: +t.dataset.t })) toast('⏳ The timer is back at work'); break;
       case 'officeCard': if (g && act({ type: 'officeCard', card: t.dataset.card })) toast(`${E.OFFICE[t.dataset.card].e} ${E.OFFICE[t.dataset.card].n} — done`); break;
-      case 'buyIng': if (g && ui.shop.ing && act({ type: 'buy', kind: 'ing', ing: ui.shop.ing, room: t.dataset.room, ...(t.dataset.split!=null?{allocation:{A:Number(t.dataset.split),B:(E.has(g,'bulk')?7:5)-Number(t.dataset.split)}}:{}) })) { toast(`🚐 Bought ${E.has(g, 'bulk') ? 7 : 5} ${E.ING_INFO[ui.shop.ing].e}`); ui.shop = { ing: null, cheap: [], pricey: [] }; render(); } break;
+      case 'buyIng': if (g && ui.shop.ing && act({ type: 'buy', kind: 'ing', ing: ui.shop.ing, room: t.dataset.room, ...(t.dataset.split!=null?{allocation:{A:Number(t.dataset.split),B:(E.has(g,'bulk')?7:5)-Number(t.dataset.split)}}:{}) })) { toast(`🚐 Bought ${E.has(g, 'bulk') ? 7 : 5} ${E.ING_INFO[ui.shop.ing].e}`); ui.shop = { ing: null, cheap: [], pricey: [], tab: ui.shop.tab }; render(); } break;
       case 'shopSp': {
         const k = t.dataset.kind, n = k === 'cheap' ? 3 : 2;
         if (ui.shop[k].length < n) ui.shop[k].push(t.dataset.spice);
@@ -3239,7 +3281,7 @@ safe-buffer/index.js:
       case 'shopClear': ui.shop[t.dataset.kind] = []; render(); break;
       case 'buySp': {
         const k = t.dataset.kind, picks = ui.shop[k].slice();
-        if (g && act({ type: 'buy', kind: k, spices: picks })) { toast(`🚐 Bought ${picks.map(x => E.SP_INFO[x].e).join('')}`); ui.shop = { ing: null, cheap: [], pricey: [] }; render(); }
+        if (g && act({ type: 'buy', kind: k, spices: picks })) { toast(`🚐 Bought ${picks.map(x => E.SP_INFO[x].e).join('')}`); ui.shop = { ing: null, cheap: [], pricey: [], tab: ui.shop.tab }; render(); }
         break;
       }
       case 'endNow': if (isHost() && g && confirm('End the shift now and check the meals?')) { E.apply(g, { type: 'endNow' }, Date.now()); ui.menu = false; changed(); } break;
