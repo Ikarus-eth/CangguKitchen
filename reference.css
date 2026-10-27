@@ -247,7 +247,7 @@ button.gcard:active{background:#eef3e3;border-color:#2f6b4f;transform:scale(.98)
 
 /* ===== 2026-10-27 second pass (Claude): layout, plates, tickets, shop ===== */
 :root{--roomA:#7a4a9c;--roomA-bg:#f1e7f7;--roomB:#147d86;--roomB-bg:#e1f2f2;--clean:#2f7a55;--dirty:#7a4b22}
-.asset.pasta-svg{background-image:url('assets/pasta.svg')!important;background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important}
+.asset.pasta-art{background-image:url('assets/pasta.png')!important;background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important}
 
 /* Storage rooms carry a colour, used again in the shop. */
 .board .st1 h3,.board .st2 h3{color:#fff;text-shadow:0 1px 2px #0006;border-radius:16px;left:22%;right:22%}
@@ -386,3 +386,97 @@ button.gcard:active{background:#eef3e3;border-color:#2f6b4f;transform:scale(.98)
 .board .cupboard .pbtn,.board .sink .pbtn{min-height:0!important;height:100%!important;max-height:100%;align-self:stretch;overflow:visible}
 .board .cupboard .pbtn .pl{width:34px!important;height:34px!important}
 .board .cupboard h3{display:none}.board .cupboard .plates{top:8px}
+
+/* ===== 2026-10-28 third pass (Claude): dining, plates in the linen palette, left rail ===== */
+:root{--roomA:#7b5684;--roomA-bg:#f2eaf3;--roomB:#3c7176;--roomB-bg:#e5f0ee;--clean:#32715b;--dirty:#9a5a33}
+
+/* Dining on the plan: one tidy card per guest, picture and name, no overlap. */
+.board .dining .seats{left:14px;right:14px;top:38px;height:124px;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:6px 10px}
+.board .dining .seat{height:auto!important;display:grid!important;grid-template-columns:50px minmax(0,1fr);align-items:center;gap:6px;padding:2px 8px 2px 3px!important;text-align:left;background:#fbf5e8f2!important;border:1.5px solid #b49d74!important;border-radius:8px;box-shadow:0 2px 4px #4a3a1f33!important;overflow:hidden}
+.board .dining .seat.empty,.board .dining .seat.reserved{background:transparent!important;border:0!important;box-shadow:none!important}
+.board .dining .seat.reserved{display:flex!important;font:16px Georgia;color:#7e6e50}
+.board .dining .seat .sc-art{width:50px;height:50px;display:flex}
+.board .dining .seat .sc-art .dish-art{width:50px;height:50px;flex:none}
+.board .dining .seat .sc-art.vip2 .dish-art{width:30px;height:30px;margin-right:-8px}
+.board .dining .seat .sc-art.vip2{align-items:center}
+.board .dining .seat .sc-name{font:600 20px/1.08 Georgia;color:#2a2a20;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.board .dining .seat.glow{outline:4px solid #e0a83a;outline-offset:1px}
+.board .dining .seat.vipseat{border-color:#b98a2e!important;background:#fff6e0f2!important}
+
+/* Plates in the linen palette: clean on a cream tray with a sage label, dirty on a terracotta one. */
+.board .tray-title{font:italic 600 19px/28px Georgia!important;letter-spacing:.02em;text-transform:none;height:28px!important;background:#faf3e0!important;border-bottom:1px solid #c8b48f;border-radius:4px 4px 0 0}
+.board .cupboard .tray-title{color:var(--clean)!important}
+.board .cupboard .tray-title:before{content:'✦ '}
+.board .sink .tray-title{color:var(--dirty)!important}
+.board .sink .tray-title:before{content:'≈ '}
+.board .cupboard .plates{grid-template-rows:28px repeat(4,1fr);background:#fffdf6;border:3px solid #8fae96;border-radius:6px;box-shadow:0 2px 6px #4a3a1f40;padding:0 4px 2px}
+.board .cupboard .pbtn b{color:#2f5e46}
+.board .sink .plates{grid-template-rows:28px 1fr 1fr;background:#f2e2cf;border:3px solid #c08a64;border-radius:6px;box-shadow:0 2px 6px #4a3a1f40;padding:0 4px 4px}
+.board .sink .pbtn b{color:#7a3f1f}
+.board .sink .pbtn.none{opacity:.45}
+.board .pl.dirtyp .asset{filter:saturate(.85) sepia(.15)!important}
+.board .pl.dirtyp:after{inset:16%;background:radial-gradient(ellipse 22% 16% at 34% 38%,#8a5a2acc 0 60%,transparent 64%),radial-gradient(ellipse 15% 11% at 66% 62%,#7b4d22bb 0 60%,transparent 64%),radial-gradient(circle at 48% 74%,#a0703aaa 0 7%,transparent 9%),radial-gradient(circle at 62% 30%,#b0763a99 0 5%,transparent 7%)}
+.board .wash-flow{font:italic 600 20px/28px Georgia;letter-spacing:.02em;color:#3a3a2c;background:#faf3e0f2;border:1px solid #ad9b7c;box-shadow:0 1px 3px #4a3a1f33;border-radius:15px}
+
+/* Left rail: name, my chefs and instruction, then the guests waiting at a readable size. */
+.guest-rail{display:none}
+@media(orientation:landscape) and (min-width:900px){
+  .game .main{grid-template-columns:minmax(200px,1fr) var(--planw,minmax(0,3fr))!important;grid-template-rows:auto auto minmax(0,1fr) 226px!important;grid-template-areas:"head plan" "me plan" "guests plan" "tix tix"}
+  .game .order-heading{flex-direction:row;flex-wrap:wrap;align-items:baseline;justify-content:space-between;padding:6px 10px;gap:2px 8px}
+  .order-heading h2{font-size:17px}
+  .order-heading .play-mode{display:none}
+  .game .me{overflow:visible;gap:8px;padding:8px 10px}
+  .game .me .glass{width:50px;height:50px}
+  .game .me .glass .chef{width:40px;height:48px}
+  .game .me .prompt p{font-size:14px}
+  .game .me .prompt .btn{height:40px!important;min-height:40px!important}
+  .guest-rail{grid-area:guests;display:flex;flex-direction:column;min-height:0;background:#faf5e9;border:1px solid #d6c8ab;border-radius:8px;padding:6px 6px 4px}
+  .guest-rail h3{font:600 15px Georgia;margin:0 4px 4px;display:flex;justify-content:space-between}
+  .guest-rail h3 small{font:600 13px system-ui;background:#e9dfc8;border-radius:9px;padding:1px 7px}
+  .gr-list{display:flex;flex-direction:column;gap:5px;overflow-y:auto;min-height:0;padding:2px}
+  .gr-row{display:block;text-align:left;padding:5px 6px;border:1.5px solid #c4b08a;border-radius:8px;background:#fffbf0;color:var(--ink);min-height:0;width:100%}
+  .gr-row.glow{border-color:#2f6b4f;box-shadow:0 0 0 2px #2f6b4f33}
+  .gr-row:active{background:#eef3e3}
+  .gr-row.vip{background:#fff6e0;border-color:#b98a2e}
+  .gr-top{display:flex;justify-content:space-between;font:600 14px Georgia;margin-bottom:2px}
+  .gr-part{display:flex;gap:7px;align-items:center}
+  .gr-part+.gr-part{margin-top:3px}
+  .gr-part .dish-art{width:38px;height:38px;flex:none}
+  .gr-part>div{min-width:0}
+  .gr-n{display:block;font:600 14px/1.15 Georgia;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gr-n .coin{font-size:11px;font-weight:400}
+  .gr-i{display:flex;flex-wrap:wrap;gap:3px 4px;align-items:center;margin-top:2px}
+  .gr-i .gi{width:22px;height:22px;font-size:14px}
+  .gr-i .gi .asset{width:22px;height:22px}
+  .gr-i .gi b{min-width:14px;height:14px;font:700 10px/14px system-ui;right:-5px;bottom:-4px}
+  .gr-pl{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px solid #8fae96;background:#fff;font:800 10px system-ui;color:#2f5e46}
+  .gr-hint{font:11px Georgia;color:#7a6b52;margin:4px 4px 0}
+}
+@media(orientation:landscape) and (min-width:900px){.gr-row{flex:none}.gr-list{flex:1}}
+.board .tray-title{font-size:17px!important;white-space:nowrap}
+.board .sink .plates{background:#efdfc6}
+.board .pl.dirtyp:after{inset:12%;background:radial-gradient(ellipse 26% 18% at 34% 40%,#7e4f22d0 0 60%,transparent 66%),radial-gradient(ellipse 18% 13% at 66% 62%,#6f441cc0 0 60%,transparent 66%),radial-gradient(circle at 48% 76%,#9a6a34b0 0 8%,transparent 10%),radial-gradient(circle at 64% 30%,#a8703aa0 0 6%,transparent 8%)}
+/* Portrait iPad: the guest list sits under the tickets, using the free space. */
+@media(orientation:portrait) and (min-width:700px){
+  .guest-rail{display:block;order:3;flex:none;max-height:38%;overflow-y:auto;background:#faf5e9;border:1px solid #d6c8ab;border-radius:8px;padding:6px;margin-top:6px}
+  .game .mytks{order:2;flex:0 1 auto}
+  .guest-rail h3{font:600 15px Georgia;margin:0 4px 4px;display:flex;gap:8px}
+  .guest-rail h3 small{font:600 13px system-ui;background:#e9dfc8;border-radius:9px;padding:1px 7px}
+  .gr-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .gr-row{display:block;text-align:left;padding:5px 6px;border:1.5px solid #c4b08a;border-radius:8px;background:#fffbf0;color:var(--ink);min-height:0;width:100%}
+  .gr-row.glow{border-color:#2f6b4f;box-shadow:0 0 0 2px #2f6b4f33}
+  .gr-row.vip{background:#fff6e0;border-color:#b98a2e}
+  .gr-top{display:flex;justify-content:space-between;font:600 14px Georgia}
+  .gr-part{display:flex;gap:7px;align-items:center}
+  .gr-part .dish-art{width:38px;height:38px;flex:none}
+  .gr-part>div{min-width:0}
+  .gr-n{display:block;font:600 14px/1.15 Georgia;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gr-n .coin{font-size:11px;font-weight:400}
+  .gr-i{display:flex;flex-wrap:wrap;gap:3px 4px;align-items:center;margin-top:2px}
+  .gr-i .gi{width:22px;height:22px;font-size:14px}
+  .gr-i .gi .asset{width:22px;height:22px}
+  .gr-i .gi b{min-width:14px;height:14px;font:700 10px/14px system-ui;right:-5px;bottom:-4px}
+  .gr-pl{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px solid #8fae96;background:#fff;font:800 10px system-ui;color:#2f5e46}
+  .gr-hint{font:11px Georgia;color:#7a6b52;margin:4px 4px 0}
+}
+@media(orientation:portrait) and (min-width:700px){.gr-list{align-items:start}}

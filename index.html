@@ -619,7 +619,7 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 
 </style>
 <link rel="stylesheet" href="design.css?v=20261027-rules">
-<link rel="stylesheet" href="reference.css?v=20261027-ui2">
+<link rel="stylesheet" href="reference.css?v=20261028-ui3">
 </head>
 <body>
 <div id="app"></div>
@@ -2163,7 +2163,7 @@ safe-buffer/index.js:
     blue:[51,544,165,195],yellow:[283,530,164,209],red:[520,538,174,203],green:[739,538,170,204],temp:[968,546,151,197],guestA:[1134,581,153,155],guestB:[1375,584,145,158],
     noodles:[12,752,254,248],soup:[266,752,254,247],skewers:[512,751,259,250],greens:[768,754,250,244],toast:[1014,754,259,245],pan:[1282,748,248,244]
   };
-  function asset(key, extra='') { if (key === 'pasta') return `<span aria-hidden="true" class="asset art-pasta pasta-svg ${extra}"></span>`; // drawn farfalle: the painted bundle was hard to recognise
+  function asset(key, extra='') { if (key === 'pasta') return `<span aria-hidden="true" class="asset art-pasta pasta-art ${extra}"></span>`; // loose penne cut from the sprite sheet (assets/pasta.png): the tied bundle was hard to recognise
     const [x,y,w,h]=ART[key]||ART.plate;return `<span aria-hidden="true" class="asset art-${key} ${extra}" style="background-size:${1536/w*100}% ${1024/h*100}%;background-position:${x/(1536-w)*100}% ${y/(1024-h)*100}%"></span>`; }
   function chef(color) { return asset(color, 'chef'); }
   function dishArt(d) { const n=d.name.toLowerCase();const k=/soup|curry|stew|dhal|risotto/.test(n)?'soup':/salad|bowl/.test(n)?'greens':/sandwich|toast|burger|bread|bagel|croissant|pizza|quiche|hot dog|burrito|wrap/.test(n)?'toast':/sate|steak|meat|kebab|chicken|schnitzel|ribs|pork|fish|lamb/.test(n)?'skewers':d.ing.pasta?'noodles':d.ing.meat?'skewers':d.ing.salad?'greens':d.ing.bread||d.ing.cheese?'toast':'soup';return `<span class="dish-art">${asset(k)}</span>`; }
@@ -2262,6 +2262,23 @@ safe-buffer/index.js:
     return `<span class="mt-top"><span class="mt-e">${dishArt(d)}</span><span class="mt-n">${d.ch ? '⭐ ' : ''}${d.name}</span>${money ? coin(d.c) : ''}</span><span class="mt-r">${plateBadge(d.plate)}<span class="mt-i">${ingRow(d.ing)}${spIcons(d)}</span>${pot(d.cook)}</span>`;
   }
 
+  // On the plan a guest is just the dish picture and its name; the full order is in the guest list.
+  function seatCard(g, dishId) {
+    const d = E.DISHES[dishId];
+    const art = d.vip ? `<span class="sc-art vip2">${d.parts.map(k => dishArt(E.DISHES[k])).join('')}</span>` : `<span class="sc-art">${dishArt(d)}</span>`;
+    return `${art}<span class="sc-name">${d.vip ? '👑 ' : d.ch ? '⭐ ' : ''}${d.name}</span>`;
+  }
+  // Guest list beside the plan (landscape): every waiting order at a readable size.
+  function guestRail(g, op) {
+    const list = g.seats.map((x, i) => x.dish ? { i, d: E.DISHES[x.dish] } : null).filter(Boolean);
+    const icons = x => `${'<span class="gr-pl">' + x.plate + '</span>'}${E.ING.filter(k => x.ing[k]).map(k => `<span class="gi">${asset(k)}${x.ing[k] > 1 ? `<b>${x.ing[k]}</b>` : ''}</span>`).join('')}${E.SPICES.filter(k => x.sp[k]).map(k => `<span class="gi">${asset(k)}${x.sp[k] > 1 ? `<b>${x.sp[k]}</b>` : ''}</span>`).join('')}<span class="gi cook">🍳<b>${x.cook}</b></span>`;
+    const money = E.cfgOf(g).money, taking = op && op.type === 'order';
+    const row = ({ i, d }) => `<button class="gr-row ${d.vip ? 'vip' : ''} ${taking ? 'glow' : ''}" data-a="takeOrder" data-seat="${i}">
+      ${d.vip ? `<div class="gr-top"><b>👑 ${d.name}</b>${money ? coin(d.c) : ''}</div>${d.parts.map(k => { const x = E.DISHES[k]; return `<div class="gr-part">${dishArt(x)}<div><span class="gr-n">${x.name}</span><span class="gr-i">${icons(x)}</span></div></div>`; }).join('')}`
+        : `<div class="gr-part">${dishArt(d)}<div><span class="gr-n">${d.ch ? '⭐ ' : ''}${d.name}${money ? ` ${coin(d.c)}` : ''}</span><span class="gr-i">${icons(d)}</span></div></div>`}
+    </button>`;
+    return `<div class="guest-rail"><h3>Guests waiting <small>${list.length}</small></h3>${list.length ? `<div class="gr-list">${list.map(row).join('')}</div>` : '<p class="note">Nobody at the tables. Seat guests at the reception 🚪.</p>'}${list.length && !taking ? '<p class="gr-hint">Send a chef to the dining room, then tap a guest.</p>' : ''}</div>`;
+  }
   function myOpen(g) { return g.open[me.pid] || null; }
   // Serving early is a gamble: an unfinished meal costs reputation, so ask twice.
   function serveBtn(g, o) {
@@ -2538,9 +2555,8 @@ safe-buffer/index.js:
       if (s.reserved) return `<div class="seat reserved"><span>Reserved</span></div>`;
       if (!s.dish) return `<div class="seat empty"></div>`;
       const picked = ui.throwSel.includes(i);
-      const diner=asset(i%2?'guestB':'guestA','diner');
-      if (recOpen) return `<button class="seat guest throwable ${picked ? 'picked' : ''}" data-a="pickThrow" data-seat="${i}">${diner}${miniTicket(g, s.dish)}${picked ? '<span class="outtag">out!</span>' : ''}</button>`;
-      return `<button class="seat guest ${op && op.type === 'order' ? 'glow' : ''} ${E.DISHES[s.dish].vip ? 'vipseat' : ''}" data-a="takeOrder" data-seat="${i}">${diner}${miniTicket(g, s.dish)}</button>`;
+      if (recOpen) return `<button class="seat guest throwable ${picked ? 'picked' : ''}" data-a="pickThrow" data-seat="${i}">${seatCard(g, s.dish)}${picked ? '<span class="outtag">out!</span>' : ''}</button>`;
+      return `<button class="seat guest ${op && op.type === 'order' ? 'glow' : ''} ${E.DISHES[s.dish].vip ? 'vipseat' : ''}" data-a="takeOrder" data-seat="${i}">${seatCard(g, s.dish)}</button>`;
     }).join('');
 
     const room = (area, key, num) => {
@@ -2562,7 +2578,7 @@ safe-buffer/index.js:
     const washActive = op && op.type === 'wash';
     const sink = cfg.sink ? `<section class="area sink ${washActive ? 'active' : ''}">
         <div class="gh"><div class="ahead"><h3>Sink${washActive ? ` <small>wash ${op.left} more</small>` : ''}</h3><div class="spots">${g.spaces.sink.map((_, i) => spot(g, 'sink', i)).join('')}</div></div>
-        <span class="wash-flow" aria-hidden="true">◀ wash ◀</span><div class="plates"><span class="tray-title">DIRTY</span>${E.PLATES.map(sz => `<button class="pbtn dirty ${washActive && g.dirty[sz] ? 'glow' : ''} ${g.dirty[sz] ? '' : 'none'}" data-a="wash" data-size="${sz}" ${g.dirty[sz] ? '' : 'disabled'} aria-label="${g.dirty[sz]} dirty ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'dirtyp')}<b>×${g.dirty[sz]}</b></button>`).join('')}</div></div></section>` : dormant('sink','Wash',3);
+        <span class="wash-flow" aria-hidden="true">◀ wash ◀</span><div class="plates"><span class="tray-title">Dirty plates</span>${E.PLATES.map(sz => `<button class="pbtn dirty ${washActive && g.dirty[sz] ? 'glow' : ''} ${g.dirty[sz] ? '' : 'none'}" data-a="wash" data-size="${sz}" ${g.dirty[sz] ? '' : 'disabled'} aria-label="${g.dirty[sz]} dirty ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'dirtyp')}<b>×${g.dirty[sz]}</b></button>`).join('')}</div></div></section>` : dormant('sink','Wash',3);
 
     const ring = x => {
       const p = whoOf(g, x.pid);
@@ -2640,13 +2656,13 @@ safe-buffer/index.js:
           ${room('storB', 'B', 2)}
           ${g.storage.C ? room('storC', 'C', 3) : dormant('st3','Dry Store',5)}
           <section class="area stove ${op && op.type === 'cook' ? 'active' : ''}"><h3>Stove</h3>${Array.from({length:6-g.spaces.stove.length},(_,i)=>`<span class="unused-hob" style="left:${55+(i+g.spaces.stove.length)*150}px">Closed</span>`).join('')}<div class="spots">${g.spaces.stove.map((_, i) => spot(g, 'stove', i)).join('')}</div></section>
-          <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>Plates</h3><div class="plates"><span class="tray-title">CLEAN</span>${E.PLATES.map(sz => `<button class="pbtn clean ${plateGlow && g.cupboard[sz] ? 'glow' : ''} ${stockCls(g.cupboard[sz])}" data-a="plate" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'} aria-label="${g.cupboard[sz]} clean ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'big cleanp')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
+          <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>Plates</h3><div class="plates"><span class="tray-title">Clean plates</span>${E.PLATES.map(sz => `<button class="pbtn clean ${plateGlow && g.cupboard[sz] ? 'glow' : ''} ${stockCls(g.cupboard[sz])}" data-a="plate" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'} aria-label="${g.cupboard[sz]} clean ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'big cleanp')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
           ${sink}
           ${cfg.shop?`<section class="area market"><h3>Shop</h3>${van}<small>1 coin · 5 food / 3 spices / 2 premium</small></section>`:dormant('market','Shop',4)}
           ${cfg.office?`<section class="area office"><h3>Office</h3>${office}<small>Repairs · unlock · hire</small></section>`:dormant('office','Office',7)}
         </div></div></div>
         <aside class="kitchen">
-          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> My orders <small>(${liveOrders.length})</small></h2><span class="play-mode">${g.settings.strict?'Practice · live hints':'Meals checked at shift end'}</span><button class="link worker-toggle" data-a="workers">${meP?chef(meP.color):''} My chefs</button></div>${status}
+          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> My orders <small>(${liveOrders.length})</small></h2><span class="play-mode">${g.settings.strict?'Practice · live hints':'Meals checked at shift end'}</span><button class="link worker-toggle" data-a="workers">${meP?chef(meP.color):''} My chefs</button></div>${status}${guestRail(g, op)}
           <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${ticket(g, partnerSel, false)}</div>` : ''}${shelf(g, aside)}${liveOrders.length ? liveOrders.map(o => ticket(g, o, true)).join('') : aside.length ? '<p class="empty-k">All your meals are set aside. Take the next order in the dining room 📝.</p>' : (meP ? '<p class="empty-k">Your order tickets land here. Start at the dining room 📝, or seat more guests at the reception 🚪.</p>' : '')}</div>
           
         </aside>
@@ -3030,7 +3046,14 @@ safe-buffer/index.js:
   function fitPlan() {
     const port=document.querySelector('.plan-scroll'),stage=document.querySelector('.plan-stage'),board=document.querySelector('.board');
     if(!port||!stage||!board)return;
-    const fit=Math.min((port.clientWidth-4)/CROP.w,(port.clientHeight-4)/CROP.h);
+    const main=document.querySelector('.game .main');
+    let fit=Math.min((port.clientWidth-4)/CROP.w,(port.clientHeight-4)/CROP.h);
+    if(main&&matchMedia('(orientation:landscape) and (min-width:900px)').matches){
+      // Landscape: the plan takes what its height allows (rail at least 220 px); the rail gets the rest of the width.
+      const cs=getComputedStyle(main),w=main.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-8;
+      fit=Math.min((port.clientHeight-4)/CROP.h,(w-220)/CROP.w);
+      main.style.setProperty('--planw',`${Math.floor(CROP.w*(ui.planZoom?Math.min(ui.planZoom,fit):fit))+4}px`);
+    } else if(main) main.style.removeProperty('--planw');
     const scale=ui.planZoom||Math.max(.28,fit);ui.planScale=scale;
     stage.style.width=`${CROP.w*scale}px`;stage.style.height=`${CROP.h*scale}px`;
     board.style.transform=`translate(${-CROP.x*scale}px,${-CROP.y*scale}px) scale(${scale})`;

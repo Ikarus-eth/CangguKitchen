@@ -70,8 +70,8 @@ Tips for the iPads:
 - Picking a plate, ingredient or spice shows where it went: the item flies to the ticket, the ticket line flashes and the shelf shows −1. Empty shelves are greyed out and stamped EMPTY; a shelf with one left is marked amber.
 - In the dining room a sheet shows the waiting guests at full size. Tapping a guest on the plan without a chef there opens the same card as a preview.
 - Shopping: choose one of three tabs (ingredient, cheap spices, expensive spices). For an ingredient, a slider splits the delivery between Storage A (purple) and Storage B (teal); tapping an item also moves the split.
-- Plates: clean plates sit in a white tray with a green CLEAN band; dirty plates in a brown tray with a DIRTY band at the sink, with a wash arrow between them. A taken plate shows as a green chip on the ticket.
-- Landscape iPads put the player's chefs and the current instruction in a column left of the plan, so the plan and the tickets get more room.
+- Plates: clean plates sit on a cream tray labelled “Clean plates”; dirty plates on a terracotta tray labelled “Dirty plates” at the sink, stained, with a wash arrow between them. A taken plate shows as a green chip on the ticket.
+- Landscape iPads put the player's chefs, the current instruction and the waiting guests' full orders in a column left of the plan; portrait shows the guest list under the tickets. On the plan each guest is a card with the dish picture and name.
 
 ## Game log
 
