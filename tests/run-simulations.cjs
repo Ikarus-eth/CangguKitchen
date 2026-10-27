@@ -22,7 +22,7 @@ function run(scenario, n, seed, load) {
     return s.spaces[area].findIndex((o,i)=>!(s.broken&&s.broken.area===area&&s.broken.idx===i)&&(!o||(o.pid===pid&&E.timerReady(s,s.workers[o.pid][o.t],now))));
   }
   function visit(area,pid) {const i=slot(area,pid);if(i<0){m.blockedStationDecisions++;return false;}if(!E.workerReady(s,pid,now))return false;const ok=act({type:'place',pid,area,idx:i});if(ok)m.visits[area]=(m.visits[area]||0)+1;return ok;}
-  function shop(pid,kind,item,room) { if(!E.cfgOf(s).shop||s.coins<1)return false;if(!visit('van',pid))return false;const a={type:'buy',pid,kind};if(kind==='ing'){a.ing=item;a.room=room;}else a.spices=Array(kind==='cheap'?3:2).fill(item);const ok=act(a);if(s.open[pid])act({type:'done',pid});return ok; }
+  function shop(pid,kind,item,room) { if(!E.cfgOf(s).shop||s.coins<1||E.supplyCount(s,item)<(kind==='ing'?(E.has(s,'bulk')?7:5):kind==='cheap'?3:2))return false;if(!visit('van',pid))return false;const a={type:'buy',pid,kind};if(kind==='ing'){a.ing=item;a.room=room;}else a.spices=Array(kind==='cheap'?3:2).fill(item);const ok=act(a);if(s.open[pid])act({type:'done',pid});return ok; }
   function service(pid,card) {if(!s.officeOpen.includes(card)||s.coins<E.OFFICE[card].cost)return false;return visit('office',pid)&&act({type:'officeCard',pid,card});}
   function seat(pid) {return s.deck.length&&s.seats.some(x=>!x.reserved&&!x.dish)&&visit('reception',pid)&&(s.open[pid]?.type==='reception'?act({type:'seat',pid}):true);}
   function decide(pid) {

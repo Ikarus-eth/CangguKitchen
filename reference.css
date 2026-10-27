@@ -41,3 +41,45 @@ button,input,select{font:inherit}button{touch-action:manipulation}.btn{backgroun
 /* Transparent hit slop keeps small overview stations easier to tap. */
 .game .board button.spot:before{display:block!important;content:'';position:absolute;inset:-16px;width:auto;height:auto;background:transparent;border:0;border-radius:50%;box-shadow:none;pointer-events:auto}
 .unused-hob{position:absolute;top:36px;width:113px;height:94px;display:flex;align-items:center;justify-content:center;background:#eee5d0a8;backdrop-filter:grayscale(1);font:15px Georgia;color:#625642;border:1px solid #a09273;border-radius:4px}
+
+/* Action spaces remain legible against the illustrated floor, including at whole-plan scale. */
+.game .board .area .spot{border:4px dashed #63745b;background:#fff9e5d9;box-shadow:0 0 0 3px #fffbf0,0 2px 6px #42392645;opacity:1}
+.game .board .area .spot.free-spot:hover,.game .board .area .spot.free-spot:focus-visible{background:#e4ecd5;border-color:#2e6249;outline:3px solid #2e6249;outline-offset:5px}
+.game .board .area .spot .slot-number{position:static;display:block;font:600 22px Georgia;color:#3c5034;opacity:1;text-align:center}
+.game .board .area .spot.taken{border:3px solid var(--c);background:#fff8e6bf!important;box-shadow:0 0 0 3px #fffbf0,0 2px 5px #3e392b35;opacity:1}
+.game .board .spot.taken:after{inset:-2px;background:conic-gradient(var(--c) calc(var(--p)*360deg),#e7ddc6 0);mask:radial-gradient(transparent 56%,black 59%);z-index:0}
+.game .board .spot.taken.expired{border-style:dashed}
+.game .board .area .spot.unavailable{border:3px solid #93816e;background:repeating-linear-gradient(135deg,#d8c7ac80 0 7px,#f4ead8bc 7px 14px);box-shadow:0 0 0 2px #fff5e2;color:#765c46;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.game .board .area .spot.unavailable .slot-number{font:17px Georgia;color:#66503c}
+.game .board .spot .slot-symbol{font:30px Georgia;line-height:26px}
+.game .board .spot .ini,.game .board .spot .sec{background:#fff8e7;color:#3d382b;font-size:15px;box-shadow:0 1px 3px #42392635}
+.game .board .market .vanbtn{border:4px dashed #63745b!important;box-shadow:0 0 0 3px #fff9e8;min-width:72px;flex:none}
+
+/* The meal name stays outside the scroll area, even for long recipes and VIPs. */
+.game .ticket,.sheet .ticket{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:0;gap:0;isolation:isolate}
+.ticket .tk-head{position:relative;flex:none;min-height:38px;display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f4eddd;border-bottom:1px solid #d8c9ae;z-index:2}
+.ticket .tk-n{display:block;color:#292c23;font:600 17px/1.2 Georgia;overflow:visible;white-space:normal;text-overflow:clip;overflow-wrap:anywhere;min-width:0}
+.ticket .coin{flex:none;font-size:12px}
+.ticket .vipband{position:static;flex:none;margin:0;border-radius:0;padding:3px 9px;font-size:11px}
+.ticket-body{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#a99571 #f3ecdc;padding:7px 9px 10px;align-items:start;flex:1}
+.ticket .ticket-body .meal-art{grid-column:1;grid-row:1;width:112px;height:112px;align-self:start;position:sticky;top:0;margin-top:10px}
+.ticket .ticket-details{grid-column:2;grid-row:1;min-width:0}
+.ticket .recipe-list>small{display:block;grid-column:1/-1;font:8px/1.6 system-ui;letter-spacing:.06em;color:#72654d}
+.ticket .recipe-line.unchecked,.ticket .recipe-line.unchecked b{color:#3c3d30;font-style:normal}
+.ticket .recipe-line b{font-variant-numeric:tabular-nums;font-style:normal}
+.ticket .plate-requirement{font-size:11px;line-height:1.35;align-items:center}
+.plate-requirement small{font-size:10px;color:#766a55}
+.cook-ring.unchecked{background:conic-gradient(#8c7b58 calc(var(--progress)*360deg),#e2d9c6 0)}
+.ticket .ticket-actions{padding-top:3px;gap:6px}
+.ticket .ticket-actions .btn,.ticket .parkbtn,.ticket .bin{min-height:36px}
+.ticket .shelf{flex:none}.shelf .shchip{display:grid;grid-template-columns:38px 1fr;gap:2px 6px;text-align:left;width:100%;height:auto;min-height:58px;padding:5px}
+.shelf .shchip .dish-art{grid-row:1/3}.shelf .shchip>b{font:13px/1.25 Georgia;white-space:normal}.shelf .shchip>small{position:static;font-size:10px}.shelf .shl{font-size:10px;white-space:normal}
+.order-heading .play-mode{font:11px Georgia;color:#70644f;margin-left:auto;margin-right:12px}
+.worker-toggle{display:flex;align-items:center;gap:4px;font:12px Georgia;color:#3e5b42;white-space:nowrap;min-height:29px}.worker-toggle .chef{width:21px;height:25px}
+.worker-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid #d4c6a8;padding:12px 0}.worker-row>.chef{width:42px;height:53px;flex:none}.worker-row>div{flex:1}.worker-row small{display:block;color:#756951;margin-top:5px}.worker-card>.btn{margin-top:20px}
+.delivery-split{display:flex;align-items:center;gap:12px;margin:8px 0}.delivery-split span{flex:1;text-align:center}.shoprooms{padding:10px 0}.shoprooms>p{margin:0 0 6px}
+.glist .meal-errors{padding-left:18px;margin:6px 0 4px;list-style:disc;color:#823c2e}.glist .meal-errors li{font:13px/1.45 Georgia;margin:0;padding:0;border:0;background:none}
+.sheet .ticket-body{overflow:visible;flex:none}.sheet .ticket{margin-bottom:12px}.sheet .recipe-line.unchecked b{color:#3c3d30}
+@media(max-width:1150px){.ticket-body{grid-template-columns:90px minmax(0,1fr);gap:6px}.ticket .ticket-body .meal-art{width:90px;height:90px}.ticket .tk-n{font-size:16px}.order-heading .play-mode{font-size:10px}}
+@media(max-width:800px){.order-heading .play-mode{display:none}.order-heading .worker-toggle{margin-left:auto}.ticket .tk-head{min-height:40px}.worker-row{gap:6px}.worker-row .btn{font-size:12px;padding:8px}.delivery-split{gap:7px}}
+@media(max-width:560px){.game .bar{height:auto;min-height:53px;flex-wrap:wrap!important;padding:5px 7px;gap:4px}.bar .team-toggle{margin-left:0}.game .bar .clock{min-width:48px}.bar .goalchip{padding:0 3px}.order-heading h2{font-size:15px}.order-heading h2 i{margin:0 5px}}
