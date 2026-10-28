@@ -9,7 +9,7 @@ const output = process.env.QA_OUTPUT || '/tmp/canggu-review';fs.mkdirSync(output
   page.on('pageerror',e=>errors.push(e.message));
   const settle=()=>page.waitForTimeout(160);
   async function load(sc=8,n=4) {
-    await page.evaluate(({sc,n})=>{__kc.ui.workers=false;__kc.ui.team=false;__kc.ui.peek=null;__kc.ui.mate=null;__kc.ui.planZoom=0;__kc.ui.sel=null;const g=__kc.loadScenario(sc,n);g.settings.strict=false;Engine.apply(g,{type:'start'},Date.now()-5000);g.coins=100;__kc.render();},{sc,n});await settle();
+    await page.evaluate(({sc,n})=>{Object.assign(__kc.ui,{detail:null,stationOpen:false,plateMenu:false,washMenu:false,stations:false,guests:false,seatPeek:null,orderHide:null});__kc.ui.workers=false;__kc.ui.team=false;__kc.ui.peek=null;__kc.ui.mate=null;__kc.ui.planZoom=0;__kc.ui.sel=null;const g=__kc.loadScenario(sc,n);g.settings.strict=false;Engine.apply(g,{type:'start'},Date.now()-5000);g.coins=100;__kc.render();},{sc,n});await settle();
   }
   async function seedOrders() {
     await page.evaluate(()=>{const g=__kc.wrap.game;['mie','soup','antipasti'].forEach((dish,i)=>g.orders.push({id:g.nextOrder++,pid:__kc.me.pid,dish,plate:i===0?'M':null,ing:i===0?{meat:1,veg:1,pasta:1}:{},sp:{},src:[],row:i===0?2:0}));__kc.render();});await settle();
@@ -27,17 +27,20 @@ const output = process.env.QA_OUTPUT || '/tmp/canggu-review';fs.mkdirSync(output
     for(const [width,height] of [[1280,960],[1194,834],[1024,768],[768,1024],[390,844]]){
       await page.setViewportSize({width,height});await load();await seedOrders();
       const geometry=await page.evaluate(()=>{
-        const t=document.querySelector('.mytks>.ticket'),head=t.querySelector('.tk-head'),body=t.querySelector('.ticket-body'),y=head.getBoundingClientRect().top;
-        body.scrollTop=10000;
-        const r=head.getBoundingClientRect();
-        return {pageWidth:document.body.scrollWidth,width:innerWidth,y,after:r.top,height:r.height,name:head.innerText,cardTop:t.getBoundingClientRect().top,recipeColumns:getComputedStyle(body).gridTemplateColumns};
-      });assert.ok(geometry.pageWidth<=width+1,JSON.stringify(geometry));assert.equal(geometry.y,geometry.after);assert.ok(geometry.height>=30);assert.match(geometry.name,/Mie Goreng/);
-      assert.equal(await page.locator('.mytks .next-need').count(),0);
-      assert.equal(await page.locator('.mytks .recipe-line.complete,.mytks .recipe-line.missing,.mytks .recipe-line.excess').count(),0);
-      await page.evaluate(()=>document.querySelectorAll('.ticket-body').forEach(el=>el.scrollTop=0));
+        const board=document.querySelector('.plan-stage').getBoundingClientRect(),port=document.querySelector('.plan-scroll').getBoundingClientRect(),cards=[...document.querySelectorAll('.order-summary')].map(e=>{const r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,scroll:e.scrollHeight,height:e.clientHeight};});
+        return {width:innerWidth,height:innerHeight,pageWidth:document.body.scrollWidth,board:{height:board.height,width:board.width},port:{height:port.height,width:port.width},cards};
+      });assert.ok(geometry.pageWidth<=width+1,JSON.stringify(geometry));assert.equal(geometry.cards.length,3);
+      assert.ok(geometry.cards.every(c=>c.bottom<=height&&c.left>=0&&c.right<=width&&c.scroll<=c.height+1),JSON.stringify(geometry));
+      assert.ok(geometry.board.width<=geometry.port.width+1&&geometry.board.height<=geometry.port.height+1,JSON.stringify(geometry));
+      if(width>=1024)assert.ok(geometry.board.height>height*.55,JSON.stringify(geometry));
+      assert.equal(await page.locator('.mytks .next-need,.mytks .complete,.mytks .missing,.mytks .excess').count(),0);
       await page.screenshot({path:`${output}/game-${width}.png`});
     }
-    console.log('Pinned meal names and neutral quantities verified at five screen sizes');
+    console.log('Entire plan and all three compact recipes visible at five screen sizes');
+    await page.setViewportSize({width:1194,height:834});await load();
+    await page.evaluate(()=>{const g=__kc.wrap.game;const ids=Object.keys(Engine.DISHES).filter(k=>!Engine.DISHES[k].vip).sort((a,b)=>Object.keys(Engine.DISHES[b].ing).length+Object.keys(Engine.DISHES[b].sp).length-Object.keys(Engine.DISHES[a].ing).length-Object.keys(Engine.DISHES[a].sp).length);ids.slice(0,6).forEach(dish=>g.orders.push({id:g.nextOrder++,pid:__kc.me.pid,dish,plate:null,ing:{},sp:{},src:[],row:0}));__kc.render();});await settle();
+    const large=await page.locator('.order-summary').evaluateAll(es=>es.map(e=>({h:e.clientHeight,s:e.scrollHeight,b:e.getBoundingClientRect().bottom})));assert.equal(large.length,6);assert.ok(large.every(r=>r.s<=r.h+1&&r.b<=834),JSON.stringify(large));
+
     await page.setViewportSize({width:1194,height:834});await load();await seedOrders();
     const free=await page.evaluate(()=>[...document.querySelectorAll('.board .free-spot')].map(el=>{
       const r=el.getBoundingClientRect(),s=getComputedStyle(el);const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.spot');
@@ -45,9 +48,10 @@ const output = process.env.QA_OUTPUT || '/tmp/canggu-review';fs.mkdirSync(output
     }));for(const x of free){assert.ok(x.hit,x.name);assert.equal(x.border,'4px');assert.notEqual(x.bg,'rgba(0, 0, 0, 0)');}
     assert.equal(await page.locator('.locked-spot').count(),2);assert.equal(await page.locator('.spot.broken').count(),1);
     await page.locator('.st1 [data-a="place"]').first().click();await settle();
-    await page.locator('.st1 [data-a="takeIng"][data-ing="cheese"]').click();await settle();
+    await page.locator('.tray-item[data-ing="cheese"]').click();await settle();
     // This dish is already cooked, so the action is illegal even without correctness hints.
     assert.match(await page.locator('#toast').innerText(),/already cooking/);
+    await page.locator('[data-a="closeOrder"]').click();await settle();
     await page.evaluate(()=>{const g=__kc.wrap.game;for(const [i,area,idx] of [[1,'sink',0],[2,'sink',1],[3,'stove',4]]){const err=Engine.apply(g,{type:'place',pid:g.players[i].id,area,idx},Date.now());if(err)throw Error(err);}__kc.render();});await settle();
     assert.equal(await page.locator('.sink .spot.taken').count(),2);
     await page.screenshot({path:`${output}/busy-kitchen.png`});
