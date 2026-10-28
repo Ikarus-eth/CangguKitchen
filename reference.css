@@ -480,3 +480,135 @@ button.gcard:active{background:#eef3e3;border-color:#2f6b4f;transform:scale(.98)
   .gr-hint{font:11px Georgia;color:#7a6b52;margin:4px 4px 0}
 }
 @media(orientation:portrait) and (min-width:700px){.gr-list{align-items:start}}
+
+/* ---- Claude 2026-10-28, fourth readability pass: clock, selected meal, plates, reception, shop ---- */
+/* Shift clock: a solid pill that reads from across the table; red in the last 30 s. */
+.game .bar .clock{font:700 30px/40px Georgia!important;color:#fff!important;background:#2f5e46!important;border:0!important;border-radius:10px;padding:0 14px!important;min-width:104px!important;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 2px 5px #2f5e4655}
+.game .bar .clock.hurry{background:#b5432f!important;animation:kc-hurry 1s ease-in-out infinite}
+@keyframes kc-hurry{50%{transform:scale(1.07)}}
+@media(max-width:1150px){.game .bar .clock{font-size:26px!important;min-width:88px!important;padding:0 10px!important}}
+@media(max-width:560px){.game .bar .clock{font-size:22px!important;line-height:34px!important;min-width:72px!important}}
+
+/* Selected meal: thick green frame, green header band, raised; the other tickets step back. */
+.game .mytks .ticket.sel{border:0!important;outline:5px solid #23885a;outline-offset:-5px;box-shadow:0 6px 16px #23885a55!important;background:#f3faf3;z-index:1}
+.game .mytks .ticket.sel .tk-head{background:#23885a;color:#fff;margin:-8px -8px 4px -8px;padding:6px 10px 6px 12px;border-radius:5px 5px 0 0}
+.game .mytks .ticket.sel .tk-head .tk-n{color:#fff}
+.game .mytks .ticket.sel .tk-head .tk-n:before{content:'▶ ';font-size:13px;vertical-align:2px}
+.game .mytks .ticket.sel .tk-head .coin{color:#fff}
+.game .mytks:has(.ticket.sel) .ticket:not(.sel){opacity:.72;filter:saturate(.7)}
+.game .mytks .ticket.sel .fill-tag{background:#fff;color:#23885a}
+.game .mytks .ticket.sel .meal-art{mix-blend-mode:normal}
+
+/* Plates on the ticket: four finger-sized buttons under "Take a plate". */
+.plate-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:0 0 5px}
+.ppbtn{display:flex;align-items:center;justify-content:center;gap:3px;min-height:46px;padding:2px 3px;border:2px solid #8fae96;border-radius:8px;background:#fffdf6;color:#2f5e46;cursor:pointer}
+.ppbtn .pl{width:32px!important;height:32px!important;flex:none}
+.ppbtn .pl>b{font:800 12px system-ui!important;color:#1d2a1f}
+.ppbtn>b{font:700 16px Georgia}
+.ppbtn:active{transform:scale(.95);background:#e4ecd5}
+.ppbtn:disabled,.ppbtn.none{opacity:.35;border-style:dashed}
+.ppbtn.big{min-height:64px;min-width:72px;flex-direction:column;gap:0}
+.ppbtn.big .pl{width:42px!important;height:42px!important}
+.ppbtn.big .pl>b{font-size:15px!important}
+.ppbtn.big small{font:11px Georgia;color:#6b6250}
+.ppbtn.dirty{border-color:#a57449;color:#6b3f1d}
+
+/* Plate letters stay readable on every plate: a white disc behind the size. */
+.pl>b{z-index:2}
+.pl.dirtyp>b,.board .pl.dirtyp>b{inset:auto!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%);width:auto;min-width:1.6em;height:1.6em;padding:0 .2em;border-radius:1em;background:#fffdf6;color:#3d2412!important;box-shadow:0 0 0 1.5px #7a4f22;line-height:1.6em;display:block!important;text-align:center}
+.board .sink .plates{overflow:hidden}
+.board .sink .pbtn{min-width:0;overflow:hidden!important}
+.board .sink .pbtn .pl,.board .sink .pbtn .pl.pl-XL,.board .sink .pbtn .pl.big{width:40px!important;height:40px!important}
+.board .sink .pbtn b{font-size:18px!important}
+.board .cupboard .plates,.board .sink .plates{cursor:pointer}
+.board .cupboard .pbtn:disabled,.board .sink .pbtn:disabled{cursor:pointer}
+.board .wash-flow{display:none}
+
+/* Plate and wash menus */
+.platemenu,.washmenu{max-width:600px;width:calc(100vw - 32px)}
+.pm-stock{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
+.pm-s{display:flex;align-items:center;gap:4px;padding:4px 10px 4px 4px;border:1.5px solid #c9b996;border-radius:22px;background:#fffdf6;font:700 17px Georgia}
+.pm-s .pl{width:34px!important;height:34px!important}
+.pm-s .pl>b{font:800 12px system-ui!important}
+.pm-s small{font:400 12px Georgia;color:#7a6b52}
+.pm-s.none{opacity:.45}
+.pm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px;border:1.5px solid #d6c7a6;border-radius:10px;margin:0 0 8px;background:#fffbf0}
+.pm-row.sel{border:3px solid #23885a}
+.pm-dish{display:flex;align-items:center;gap:8px;min-width:0}
+.pm-dish .dish-art{width:48px;height:48px;flex:none}
+.pm-dish b{display:block;font:600 17px Georgia}
+.pm-dish small{font:13px Georgia;color:#7a6b52}
+.pm-btns{display:flex;gap:6px}
+.wm-label{font:600 15px Georgia;color:#6b3f1d;margin:6px 0 4px}
+.wm-label.clean{color:#2f5e46}
+.wm-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.washmenu .btn{margin-top:8px;margin-right:6px}
+@media(max-width:560px){.pm-row{flex-direction:column;align-items:stretch}.pm-btns{justify-content:space-between}.ppbtn.big{min-width:0;flex:1}}
+
+/* Reception choice */
+.reception-card{max-width:560px;width:calc(100vw - 32px)}
+.rec-opts{display:grid;gap:12px;margin:8px 0 6px}
+.rec-opt{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px;border:2px solid #9b8459;border-radius:12px;background:#fffbf0;color:var(--ink);min-height:84px;cursor:pointer}
+.rec-opt.seat{border:3px solid #23885a;background:#eef6ec}
+.rec-opt:active{transform:scale(.98)}
+.rec-opt:disabled{opacity:.45;cursor:default}
+.rec-opt .ro-ic{font-size:36px;flex:none}
+.rec-opt b{display:block;font:700 21px Georgia;margin-bottom:3px}
+.rec-opt small{display:block;font:14px/1.35 Georgia;color:#5d543f}
+.gr-row.throwable{border:2px dashed #b5432f;position:relative}
+.gr-row.picked{background:#f8e1d8;border:3px solid #b5432f}
+.gr-row .outtag{position:absolute;right:6px;top:4px;background:#b5432f;color:#fff;font:700 12px system-ui;padding:2px 7px;border-radius:9px}
+
+/* Shop: all three kinds visible at once */
+.shopgrid{display:grid;gap:8px;margin:4px 0 6px}
+.sg-pair{display:grid;grid-template-columns:3fr 2fr;gap:8px}
+.sgroup{border:1.5px solid #d3c3a1;border-radius:10px;padding:6px 8px 8px;background:#fffdf7}
+.sgroup.on{border:3px solid #23885a;background:#f1f8ef}
+.sgroup.off{opacity:.6}
+.sg-h{display:flex;align-items:baseline;gap:8px;margin:0 0 5px}
+.sg-h b{font:700 16px Georgia}
+.sg-h small{font:12px Georgia;color:#7a6b52}
+.sheet .shopgrid .shoprow{display:flex;gap:6px;flex-wrap:nowrap;margin:0}
+.sheet .shopgrid .sbtn{flex:1;min-width:0!important;position:relative;padding:4px 2px;display:flex;flex-direction:column;align-items:center}
+.sheet .shopgrid .shoprow .asset{width:46px;height:46px}
+.sheet .shopgrid .sbtn small{font:12px Georgia;white-space:nowrap}
+.sheet .shopgrid .sbtn small.left{font-size:11px;color:#7a6b52}
+.sbtn .pickn{position:absolute;top:2px;right:4px;background:#23885a;color:#fff;font:700 13px system-ui;padding:1px 6px;border-radius:9px}
+.shop-start{text-align:center;margin:10px 0}
+.shop .tray{display:flex;align-items:center;gap:8px;margin:6px 0 8px}
+.shop .tray-l{font:600 15px Georgia}
+@media(max-width:600px){.sg-pair{grid-template-columns:1fr}.sheet .shopgrid .shoprow{flex-wrap:wrap}.sheet .shopgrid .sbtn{flex:0 0 calc(33% - 4px)}}
+
+/* Split: one wide track with the items on it and a handle between A and B. */
+.dsplit .split-ends{display:flex;justify-content:space-between;align-items:flex-end;margin:2px 0 6px}
+.dsplit .split-ends>span{display:flex;flex-direction:column;line-height:1.1}
+.dsplit .split-ends .rb{align-items:flex-end}
+.dsplit .sx-room{font:700 16px Georgia}
+.dsplit .split-ends b{font:700 34px Georgia}
+.dsplit .split-ends small{margin:0!important;font:13px Georgia!important}
+.dsplit .ra,.dsplit .ra b{color:var(--roomA)}.dsplit .rb,.dsplit .rb b{color:var(--roomB)}
+.split-track{position:relative;display:flex;align-items:center;height:84px;border-radius:16px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;
+  background:linear-gradient(90deg,var(--roomA-bg,#eadff0) 0 var(--p),var(--roomB-bg,#dbecec) var(--p) 100%);box-shadow:inset 0 0 0 3px #0000,inset 0 0 0 2px #a99a7b}
+.split-track:before{content:'';position:absolute;left:0;top:0;bottom:0;width:var(--p);border-radius:16px 0 0 16px;box-shadow:inset 0 -6px 0 var(--roomA)}
+.split-track:after{content:'';position:absolute;right:0;top:0;bottom:0;width:calc(100% - var(--p));border-radius:0 16px 16px 0;box-shadow:inset 0 -6px 0 var(--roomB)}
+.split-track .stok{flex:1;height:100%;position:relative;z-index:1}
+.split-track .stok .asset{width:50px;height:50px}
+.split-handle{position:absolute;z-index:2;left:var(--p);top:-8px;bottom:-8px;width:30px;transform:translateX(-50%);border-radius:15px;background:#fff;border:3px solid #2c2a22;box-shadow:0 2px 8px #0006;pointer-events:none;display:grid;place-items:center}
+.split-handle i{width:10px;height:30px;border-left:2.5px solid #2c2a22;border-right:2.5px solid #2c2a22}
+.dsplit .split-range{position:absolute;width:1px;height:1px;opacity:0;margin:0;pointer-events:none}
+.dsplit{position:relative}
+.dsplit .split-help{margin:10px 0 0}
+.ticket .plate-requirement.noplate.pick{min-height:20px!important;border:0!important;background:none!important;padding:0 2px!important;margin:0 0 2px!important}
+.ticket .plate-requirement.pick .pl-empty{display:none}
+.ticket .plate-pick .ppbtn{min-height:40px}
+.gr-row .outtag{top:auto;bottom:4px}
+.washmenu .pl.dirtyp{position:relative}
+.washmenu .pl.dirtyp .asset{filter:sepia(.55) saturate(1.2) brightness(.82)!important}
+.washmenu .pl.dirtyp:after{content:'';position:absolute;inset:14%;border-radius:50%;background:radial-gradient(ellipse 26% 18% at 34% 40%,#7e4f22d0 0 60%,transparent 66%),radial-gradient(ellipse 18% 13% at 66% 62%,#6f441cc0 0 60%,transparent 66%);pointer-events:none}
+.plate-pick{grid-template-columns:auto repeat(4,1fr)!important;align-items:center;gap:4px!important;margin:0 0 4px!important}
+.pp-l{display:flex;flex-direction:column;line-height:1.1;padding-right:2px}
+.pp-l b{font:700 14px Georgia;color:#8a5a1c}
+.pp-l small{font:11px Georgia;color:#766a55;white-space:nowrap}
+.ticket .plate-pick .ppbtn{min-height:38px;padding:1px 2px;gap:2px}
+.ticket .plate-pick .ppbtn .pl{width:28px!important;height:28px!important}
+.ticket .plate-pick .ppbtn>b{font-size:14px}

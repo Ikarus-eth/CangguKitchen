@@ -20,6 +20,17 @@ function order(s, dish='mie', extra={}) {
 }
 function complete(s,dish='mie',extra={}) { const d=E.DISHES[dish];return order(s,dish,{plate:d.plate,ing:{...d.ing},sp:{...d.sp},row:d.cook,...extra}); }
 
+test('Restaurant 6+: a reception left without a choice still seats guests',()=>{
+  const s=game(6,false,3);
+  s.seats.forEach(x=>{x.dish=null;});
+  visit(s,'reception');assert.equal(s.open.p0.type,'reception');
+  const before=s.coins;
+  visit(s,'storA');assert.equal(s.open.p0.type,'storage');
+  assert.equal(s.seats.filter(x=>x.dish).length,2);assert.ok(s.coins>before);
+  const t=game(6,false,3);visit(t,'reception',0,'p0',4000);t.seats.forEach(x=>{x.dish=null;});ok(t,'done',{},5000);
+  assert.equal(t.open.p0,null);assert.equal(t.seats.filter(x=>x.dish).length,2);
+});
+
 test('All 13 scenarios and 1–4 players have the required worker capacities',()=>{
   for(let sc=1;sc<=13;sc++)for(let n=1;n<=4;n++){
     const s=game(sc,false,n),p=Math.max(n,2);
