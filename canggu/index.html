@@ -656,21 +656,21 @@ safe-buffer/index.js:
 
   const ING = ['cheese', 'meat', 'bread', 'salad', 'veg', 'pasta'];
   const ING_INFO = {
-    cheese: { e: '🧀', n: 'Cheese' },
-    meat: { e: '🥩', n: 'Meat' },
-    bread: { e: '🍞', n: 'Bread' },
-    salad: { e: '🥬', n: 'Salad' },
-    veg: { e: '🥕', n: 'Veggies' },
-    pasta: { e: '🍝', n: 'Pasta' },
+    cheese: { e: '🧀', n: 'Vegan cheese' },
+    meat: { e: '🥩', n: 'Protein' },
+    bread: { e: '🍞', n: 'Sourdough' },
+    salad: { e: '🥬', n: 'Kale' },
+    veg: { e: '🥕', n: 'Organic veg' },
+    pasta: { e: '🍝', n: 'GF pasta' },
   };
-  // The five spice colours of the original: white, black, green, yellow, red.
+  // Canggu: the five spices are superfoods, keeping the original's colours: white, black, green, yellow, red.
   const SPICES = ['salt', 'pepper', 'herbs', 'curry', 'chili'];
   const SP_INFO = {
-    salt: { e: '🧂', n: 'Salt & sugar' },
-    pepper: { e: '⚫', n: 'Pepper' },
-    herbs: { e: '🌿', n: 'Herbs' },
-    curry: { e: '🟡', n: 'Curry & mustard' },
-    chili: { e: '🌶️', n: 'Chili' },
+    salt: { e: '🥥', n: 'Coconut' },
+    pepper: { e: '⚫', n: 'Chia' },
+    herbs: { e: '🍵', n: 'Matcha' },
+    curry: { e: '🟡', n: 'Turmeric' },
+    chili: { e: '🔴', n: 'Goji' },
   };
   const PLATES = ['S', 'M', 'L', 'XL'];
   const PLATE_NAME = { S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra large' };
@@ -678,94 +678,94 @@ safe-buffer/index.js:
   // 8 Friends (all scenarios) + 22 Regular patrons (scenario 2+). sp = spices, c = coins paid (scenario 3+).
   const DISHES = {
     // Friends
-    pizza:     { name: 'Pizza',               e: '🍕', plate: 'M',  ing: { bread: 2, cheese: 1 },          cook: 2, c: 3, friend: true },
-    burger:    { name: 'Burger',              e: '🍔', plate: 'M',  ing: { bread: 1, meat: 1, cheese: 1 }, cook: 2, c: 3, friend: true },
-    mac:       { name: 'Mac & Cheese',        e: '🥣', plate: 'M',  ing: { pasta: 1, cheese: 2 },          cook: 1, c: 2, friend: true },
-    salad:     { name: 'Garden Salad',        e: '🥗', plate: 'M',  ing: { salad: 2, cheese: 1 },          cook: 0, c: 2, friend: true },
-    sate:      { name: 'Sate Skewers',        e: '🍢', plate: 'S',  ing: { meat: 2 },                      cook: 1, c: 2, friend: true },
-    toast:     { name: 'Cheese Toast',        e: '🥪', plate: 'S',  ing: { bread: 1, cheese: 1 },          cook: 1, c: 2, friend: true },
-    spaghetti: { name: 'Spaghetti Bolognese', e: '🍝', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },    cook: 3, c: 4, friend: true },
-    schnitzel: { name: 'Schnitzel & Veggies', e: '🍖', plate: 'XL', ing: { meat: 1, salad: 1, veg: 2 },    cook: 2, c: 4, friend: true },
+    pizza:     { name: 'Sourdough Pizza',               e: '🍕', art: 'toast', plate: 'M',  ing: { bread: 2, cheese: 1 },          cook: 2, c: 3, friend: true },
+    burger:    { name: 'Protein Burger',              e: '🍔', art: 'toast', plate: 'M',  ing: { bread: 1, meat: 1, cheese: 1 }, cook: 2, c: 3, friend: true },
+    mac:       { name: 'Vegan Mac',        e: '🥣', art: 'noodles', plate: 'M',  ing: { pasta: 1, cheese: 2 },          cook: 1, c: 2, friend: true },
+    salad:     { name: 'Kale Salad',        e: '🥗', art: 'greens', plate: 'M',  ing: { salad: 2, cheese: 1 },          cook: 0, c: 2, friend: true },
+    sate:      { name: 'Chicken Sate',        e: '🍢', art: 'skewers', plate: 'S',  ing: { meat: 2 },                      cook: 1, c: 2, friend: true },
+    toast:     { name: 'Avo Toast',        e: '🥑', art: 'toast', plate: 'S',  ing: { bread: 1, cheese: 1 },          cook: 1, c: 2, friend: true },
+    spaghetti: { name: 'Zoodle Bolognese', e: '🍝', art: 'noodles', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },    cook: 3, c: 4, friend: true },
+    schnitzel: { name: 'Buddha Bowl', e: '🥙', art: 'greens', plate: 'XL', ing: { meat: 1, salad: 1, veg: 2 },    cook: 2, c: 4, friend: true },
     // Regular patrons
-    mie:       { name: 'Mie Goreng',          e: '🥡', plate: 'M',  ing: { pasta: 1, veg: 1, meat: 1 },    sp: { chili: 1 },              cook: 2, c: 4 },
-    soup:      { name: 'Tomato Soup',         e: '🍅', plate: 'M',  ing: { veg: 2 },                       sp: { herbs: 1, salt: 1 },     cook: 2, c: 3 },
-    quesadilla:{ name: 'Quesadilla',          e: '🫓', plate: 'M',  ing: { bread: 1, cheese: 1, veg: 1 },  sp: { chili: 1 },              cook: 1, c: 3 },
-    doner:     { name: 'Döner Kebab',         e: '🥙', plate: 'M',  ing: { bread: 1, meat: 1, salad: 1 },  sp: { herbs: 1 },              cook: 1, c: 3 },
-    tacos:     { name: 'Tacos',               e: '🌮', plate: 'M',  ing: { bread: 1, meat: 1, veg: 1 },    sp: { chili: 1 },              cook: 1, c: 3 },
-    meatballs: { name: 'Meatballs',           e: '🧆', plate: 'M',  ing: { meat: 2, bread: 1 },            sp: { herbs: 1 },              cook: 2, c: 3 },
-    stew:      { name: 'Veggie Stew',         e: '🍲', plate: 'M',  ing: { veg: 2, bread: 1 },             sp: { pepper: 1, salt: 1 },    cook: 3, c: 4 },
-    spaetzle:  { name: 'Käsespätzle',         e: '🫕', plate: 'M',  ing: { pasta: 1, cheese: 2 },          sp: { salt: 1 },               cook: 2, c: 3 },
-    pancakes:  { name: 'Pancakes',            e: '🥞', plate: 'M',  ing: { bread: 2 },                     sp: { salt: 1 },               cook: 1, c: 2 },
-    chili:     { name: 'Chili con Carne',     e: '🫘', plate: 'M',  ing: { meat: 1, veg: 1 },              sp: { chili: 2 },              cook: 2, c: 4 },
-    hotdog:    { name: 'Hot Dog',             e: '🌭', plate: 'S',  ing: { bread: 1, meat: 1 },            sp: { curry: 1 },              cook: 1, c: 3 },
-    veggies:   { name: 'Grilled Veggies',     e: '🫑', plate: 'S',  ing: { veg: 2 },                       sp: { herbs: 1, salt: 1 },     cook: 1, c: 2 },
-    lasagne:   { name: 'Lasagne',             e: '🥘', plate: 'L',  ing: { pasta: 2, meat: 1, cheese: 1 }, sp: { herbs: 1 },              cook: 3, c: 5 },
-    caesar:    { name: 'Caesar Salad',        e: '🥗', plate: 'L',  ing: { salad: 2, cheese: 1, bread: 1 }, sp: { pepper: 1 },            cook: 0, c: 3 },
-    curry:     { name: 'Chicken Curry',       e: '🍛', plate: 'L',  ing: { meat: 1, veg: 1 },              sp: { curry: 2 },              cook: 2, c: 4 },
-    steak:     { name: 'Steak & Fries',       e: '🍟', plate: 'L',  ing: { meat: 2, veg: 1 },              sp: { salt: 1, pepper: 1 },    cook: 2, c: 5 },
-    gado:      { name: 'Gado-Gado',           e: '🥜', plate: 'L',  ing: { salad: 1, veg: 2 },             sp: { curry: 1 },              cook: 1, c: 3 },
-    ramen:     { name: 'Ramen',               e: '🍜', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },    sp: { salt: 1, herbs: 1 },     cook: 2, c: 4 },
-    burrito:   { name: 'Burrito',             e: '🌯', plate: 'L',  ing: { bread: 1, meat: 1, veg: 1, cheese: 1 }, sp: { chili: 1 },      cook: 1, c: 4 },
-    diavola:   { name: 'Spicy Pizza',         e: '🍕', plate: 'L',  ing: { bread: 2, cheese: 1, meat: 1 }, sp: { chili: 1 },              cook: 2, c: 4 },
-    platter:   { name: 'Family Platter',      e: '🍱', plate: 'XL', ing: { meat: 1, veg: 1, salad: 1, bread: 1, cheese: 1 }, sp: { salt: 1, pepper: 1 }, cook: 2, c: 6 },
-    roast:     { name: 'Sunday Roast',        e: '🍗', plate: 'XL', ing: { meat: 2, veg: 2 },              sp: { salt: 1, herbs: 1 },     cook: 3, c: 6 },
+    mie:       { name: 'Mie Goreng',          e: '🥡', art: 'noodles', plate: 'M',  ing: { pasta: 1, veg: 1, meat: 1 },    sp: { chili: 1 },              cook: 2, c: 4 },
+    soup:      { name: 'Detox Soup',         e: '🍅', art: 'soup', plate: 'M',  ing: { veg: 2 },                       sp: { herbs: 1, salt: 1 },     cook: 2, c: 3 },
+    quesadilla:{ name: 'Vegan Quesadilla',          e: '🫓', art: 'toast', plate: 'M',  ing: { bread: 1, cheese: 1, veg: 1 },  sp: { chili: 1 },              cook: 1, c: 3 },
+    doner:     { name: 'Tempeh Wrap',         e: '🥙', art: 'toast', plate: 'M',  ing: { bread: 1, meat: 1, salad: 1 },  sp: { herbs: 1 },              cook: 1, c: 3 },
+    tacos:     { name: 'Jackfruit Tacos',               e: '🌮', art: 'toast', plate: 'M',  ing: { bread: 1, meat: 1, veg: 1 },    sp: { chili: 1 },              cook: 1, c: 3 },
+    meatballs: { name: 'Lentil Balls',           e: '🧆', art: 'skewers', plate: 'M',  ing: { meat: 2, bread: 1 },            sp: { herbs: 1 },              cook: 2, c: 3 },
+    stew:      { name: 'Golden Dhal',         e: '🍲', art: 'soup', plate: 'M',  ing: { veg: 2, bread: 1 },             sp: { pepper: 1, salt: 1 },    cook: 3, c: 4 },
+    spaetzle:  { name: 'Pesto Zoodles',         e: '🫕', art: 'noodles', plate: 'M',  ing: { pasta: 1, cheese: 2 },          sp: { salt: 1 },               cook: 2, c: 3 },
+    pancakes:  { name: 'Protein Pancakes',            e: '🥞', art: 'toast', plate: 'M',  ing: { bread: 2 },                     sp: { salt: 1 },               cook: 1, c: 2 },
+    chili:     { name: 'Vegan Chili',     e: '🫘', art: 'soup', plate: 'M',  ing: { meat: 1, veg: 1 },              sp: { chili: 2 },              cook: 2, c: 4 },
+    hotdog:    { name: 'Tofu Dog',             e: '🌭', art: 'toast', plate: 'S',  ing: { bread: 1, meat: 1 },            sp: { curry: 1 },              cook: 1, c: 3 },
+    veggies:   { name: 'Charred Broccolini',     e: '🥦', art: 'greens', plate: 'S',  ing: { veg: 2 },                       sp: { herbs: 1, salt: 1 },     cook: 1, c: 2 },
+    lasagne:   { name: 'Zucchini Lasagne',             e: '🥘', art: 'noodles', plate: 'L',  ing: { pasta: 2, meat: 1, cheese: 1 }, sp: { herbs: 1 },              cook: 3, c: 5 },
+    caesar:    { name: 'Kale Caesar',        e: '🥗', art: 'greens', plate: 'L',  ing: { salad: 2, cheese: 1, bread: 1 }, sp: { pepper: 1 },            cook: 0, c: 3 },
+    curry:     { name: 'Golden Curry',       e: '🍛', art: 'soup', plate: 'L',  ing: { meat: 1, veg: 1 },              sp: { curry: 2 },              cook: 2, c: 4 },
+    steak:     { name: 'Grass-fed Steak',       e: '🥩', art: 'skewers', plate: 'L',  ing: { meat: 2, veg: 1 },              sp: { salt: 1, pepper: 1 },    cook: 2, c: 5 },
+    gado:      { name: 'Gado-Gado',           e: '🥜', art: 'greens', plate: 'L',  ing: { salad: 1, veg: 2 },             sp: { curry: 1 },              cook: 1, c: 3 },
+    ramen:     { name: 'Bone Broth Ramen',               e: '🍜', art: 'noodles', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },    sp: { salt: 1, herbs: 1 },     cook: 2, c: 4 },
+    burrito:   { name: 'Breakfast Burrito',             e: '🌯', art: 'toast', plate: 'L',  ing: { bread: 1, meat: 1, veg: 1, cheese: 1 }, sp: { chili: 1 },      cook: 1, c: 4 },
+    diavola:   { name: 'Spicy Sourdough',         e: '🍕', art: 'toast', plate: 'L',  ing: { bread: 2, cheese: 1, meat: 1 }, sp: { chili: 1 },              cook: 2, c: 4 },
+    platter:   { name: 'Mezze Platter',      e: '🍱', art: 'toast', plate: 'XL', ing: { meat: 1, veg: 1, salad: 1, bread: 1, cheese: 1 }, sp: { salt: 1, pepper: 1 }, cook: 2, c: 6 },
+    roast:     { name: 'Paleo Roast',        e: '🍗', art: 'skewers', plate: 'XL', ing: { meat: 2, veg: 2 },              sp: { salt: 1, herbs: 1 },     cook: 3, c: 6 },
     // Challenging patrons (scenario 4+): more ingredients, longer cooking, better pay
-    campur:    { name: 'Nasi Campur',         e: '🍚', plate: 'L',  ing: { meat: 2, veg: 1, salad: 1 },   sp: { chili: 1, curry: 1 },    cook: 2, c: 7, ch: true },
-    dumplings: { name: 'Dumplings',           e: '🥟', plate: 'M',  ing: { pasta: 1, meat: 1, veg: 1 },   sp: { herbs: 1, salt: 1 },     cook: 3, c: 6, ch: true },
-    pretzel:   { name: 'Pretzel Platter',     e: '🥨', plate: 'L',  ing: { bread: 2, cheese: 1, meat: 1 }, sp: { salt: 1, curry: 1 },    cook: 2, c: 6, ch: true },
-    bagel:     { name: 'Bagel Brunch',        e: '🥯', plate: 'M',  ing: { bread: 1, cheese: 1, meat: 1, salad: 1 }, sp: { pepper: 1 },   cook: 1, c: 5, ch: true },
-    turkey:    { name: 'Turkey Dinner',       e: '🦃', plate: 'XL', ing: { meat: 2, veg: 2, bread: 1 },   sp: { herbs: 1, salt: 1 },     cook: 3, c: 8, ch: true },
-    croissant: { name: 'Croissant Breakfast', e: '🥐', plate: 'M',  ing: { bread: 2, cheese: 1 },        sp: { salt: 1 },               cook: 2, c: 5, ch: true },
-    waffles:   { name: 'Waffle Tower',        e: '🧇', plate: 'M',  ing: { bread: 3 },                    sp: { salt: 2 },               cook: 2, c: 5, ch: true },
-    quiche:    { name: 'Quiche',              e: '🥧', plate: 'L',  ing: { bread: 1, cheese: 2, veg: 1, meat: 1 }, sp: { pepper: 1, herbs: 1 }, cook: 3, c: 7, ch: true },
-    bacon:     { name: 'Bacon & Toast',       e: '🥓', plate: 'M',  ing: { meat: 2, bread: 1 },           sp: { salt: 1, pepper: 1 },    cook: 2, c: 5, ch: true },
-    corn:      { name: 'Corn Feast',          e: '🌽', plate: 'L',  ing: { veg: 3, cheese: 1 },           sp: { chili: 1, salt: 1 },     cook: 2, c: 6, ch: true },
-    risotto:   { name: 'Mushroom Risotto',    e: '🍄', plate: 'L',  ing: { pasta: 2, veg: 1, cheese: 1 }, sp: { herbs: 1, salt: 1 },     cook: 3, c: 7, ch: true },
-    enchiladas:{ name: 'Enchiladas',          e: '🫔', plate: 'L',  ing: { bread: 2, meat: 1, cheese: 1, veg: 1 }, sp: { chili: 2 },     cook: 2, c: 7, ch: true },
-    sushi:     { name: 'Sushi Rolls',         e: '🍣', plate: 'M',  ing: { pasta: 1, meat: 1, veg: 1, salad: 1 }, sp: { herbs: 1 },      cook: 0, c: 6, ch: true },
-    riceballs: { name: 'Rice Balls',          e: '🍙', plate: 'S',  ing: { pasta: 2, salad: 1 },          sp: { salt: 1 },               cook: 1, c: 4, ch: true },
-    fries:     { name: 'Sweet Potato Fries',  e: '🍠', plate: 'S',  ing: { veg: 2 },                      sp: { salt: 1, chili: 1 },     cook: 2, c: 4, ch: true },
-    cake:      { name: 'Birthday Cake',       e: '🎂', plate: 'XL', ing: { bread: 3, cheese: 1 },         sp: { salt: 2 },               cook: 3, c: 8, ch: true },
-    antipasti: { name: 'Antipasti',           e: '🫒', plate: 'L',  ing: { cheese: 2, meat: 1, salad: 1, bread: 1 }, sp: { pepper: 1, herbs: 1 }, cook: 0, c: 6, ch: true },
-    picnic:    { name: 'Picnic Basket',       e: '🧺', plate: 'XL', ing: { bread: 1, cheese: 1, meat: 1, salad: 1, veg: 1 }, sp: { salt: 1, pepper: 1 }, cook: 1, c: 8, ch: true },
+    campur:    { name: 'Nasi Campur',         e: '🍚', art: 'skewers', plate: 'L',  ing: { meat: 2, veg: 1, salad: 1 },   sp: { chili: 1, curry: 1 },    cook: 2, c: 7, ch: true },
+    dumplings: { name: 'Kimchi Dumplings',           e: '🥟', art: 'noodles', plate: 'M',  ing: { pasta: 1, meat: 1, veg: 1 },   sp: { herbs: 1, salt: 1 },     cook: 3, c: 6, ch: true },
+    pretzel:   { name: 'Keto Pretzel Board',     e: '🥨', art: 'toast', plate: 'L',  ing: { bread: 2, cheese: 1, meat: 1 }, sp: { salt: 1, curry: 1 },    cook: 2, c: 6, ch: true },
+    bagel:     { name: 'Vegan Bagel Brunch',        e: '🥯', art: 'toast', plate: 'M',  ing: { bread: 1, cheese: 1, meat: 1, salad: 1 }, sp: { pepper: 1 },   cook: 1, c: 5, ch: true },
+    turkey:    { name: 'Protein Feast',       e: '🦃', art: 'skewers', plate: 'XL', ing: { meat: 2, veg: 2, bread: 1 },   sp: { herbs: 1, salt: 1 },     cook: 3, c: 8, ch: true },
+    croissant: { name: 'Gluten-free Croissant', e: '🥐', art: 'toast', plate: 'M',  ing: { bread: 2, cheese: 1 },        sp: { salt: 1 },               cook: 2, c: 5, ch: true },
+    waffles:   { name: 'Keto Waffles',        e: '🧇', art: 'toast', plate: 'M',  ing: { bread: 3 },                    sp: { salt: 2 },               cook: 2, c: 5, ch: true },
+    quiche:    { name: 'Vegan Quiche',              e: '🥧', art: 'toast', plate: 'L',  ing: { bread: 1, cheese: 2, veg: 1, meat: 1 }, sp: { pepper: 1, herbs: 1 }, cook: 3, c: 7, ch: true },
+    bacon:     { name: 'Tempeh Bacon Toast',       e: '🥓', art: 'toast', plate: 'M',  ing: { meat: 2, bread: 1 },           sp: { salt: 1, pepper: 1 },    cook: 2, c: 5, ch: true },
+    corn:      { name: 'Elote Bowl',          e: '🌽', art: 'greens', plate: 'L',  ing: { veg: 3, cheese: 1 },           sp: { chili: 1, salt: 1 },     cook: 2, c: 6, ch: true },
+    risotto:   { name: 'Cauliflower Risotto',    e: '🍄', art: 'soup', plate: 'L',  ing: { pasta: 2, veg: 1, cheese: 1 }, sp: { herbs: 1, salt: 1 },     cook: 3, c: 7, ch: true },
+    enchiladas:{ name: 'Jackfruit Enchiladas',          e: '🫔', art: 'toast', plate: 'L',  ing: { bread: 2, meat: 1, cheese: 1, veg: 1 }, sp: { chili: 2 },     cook: 2, c: 7, ch: true },
+    sushi:     { name: 'Poke Bowl',         e: '🍣', art: 'greens', plate: 'M',  ing: { pasta: 1, meat: 1, veg: 1, salad: 1 }, sp: { herbs: 1 },      cook: 0, c: 6, ch: true },
+    riceballs: { name: 'Onigiri',          e: '🍙', art: 'noodles', plate: 'S',  ing: { pasta: 2, salad: 1 },          sp: { salt: 1 },               cook: 1, c: 4, ch: true },
+    fries:     { name: 'Sweet Potato Fries',  e: '🍠', art: 'skewers', plate: 'S',  ing: { veg: 2 },                      sp: { salt: 1, chili: 1 },     cook: 2, c: 4, ch: true },
+    cake:      { name: 'Raw Vegan Cake',       e: '🎂', art: 'toast', plate: 'XL', ing: { bread: 3, cheese: 1 },         sp: { salt: 2 },               cook: 3, c: 8, ch: true },
+    antipasti: { name: 'Grazing Board',           e: '🫒', art: 'toast', plate: 'L',  ing: { cheese: 2, meat: 1, salad: 1, bread: 1 }, sp: { pepper: 1, herbs: 1 }, cook: 0, c: 6, ch: true },
+    picnic:    { name: 'Beach Club Basket',       e: '🧺', art: 'toast', plate: 'XL', ing: { bread: 1, cheese: 1, meat: 1, salad: 1, veg: 1 }, sp: { salt: 1, pepper: 1 }, cook: 1, c: 8, ch: true },
     // VIP dishes (scenario 7+): every VIP orders a main and a side. Parts never appear on their own.
-    v_burger_a:  { name: 'Burger Deluxe',       e: '🍔', plate: 'M',  ing: { bread: 1, meat: 2, cheese: 1 }, sp: { pepper: 1 },           cook: 2, part: true },
-    v_burger_b:  { name: 'Fries',               e: '🍟', plate: 'S',  ing: { veg: 2 },                      sp: { salt: 1 },             cook: 1, part: true },
-    v_pasta_a:   { name: 'Lasagne al Forno',    e: '🥘', plate: 'L',  ing: { pasta: 2, meat: 1, cheese: 1 }, sp: { herbs: 1 },           cook: 3, part: true },
-    v_pasta_b:   { name: 'Garlic Bread',        e: '🥖', plate: 'S',  ing: { bread: 1 },                    sp: { herbs: 1 },            cook: 1, part: true },
-    v_steak_a:   { name: 'Ribeye Steak',        e: '🍖', plate: 'L',  ing: { meat: 2 },                     sp: { salt: 1, pepper: 1 },  cook: 2, part: true },
-    v_steak_b:   { name: 'Baked Potato',        e: '🥔', plate: 'S',  ing: { veg: 1, cheese: 1 },           sp: { salt: 1 },             cook: 2, part: true },
-    v_bali_a:    { name: 'Nasi Goreng Special', e: '🍛', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },   sp: { chili: 1 },            cook: 2, part: true },
-    v_bali_b:    { name: 'Sate Lilit',          e: '🍢', plate: 'S',  ing: { meat: 1 },                     sp: { curry: 1 },            cook: 1, part: true },
-    v_pizza_a:   { name: 'Pizza Grande',        e: '🍕', plate: 'XL', ing: { bread: 2, cheese: 2, meat: 1 }, sp: { herbs: 1 },           cook: 2, part: true },
-    v_pizza_b:   { name: 'Caprese',             e: '🍅', plate: 'S',  ing: { cheese: 1, salad: 1 },         sp: { pepper: 1 },           cook: 0, part: true },
-    v_curry_a:   { name: 'Butter Chicken',      e: '🍛', plate: 'L',  ing: { meat: 1, veg: 1 },             sp: { curry: 2 },            cook: 2, part: true },
-    v_curry_b:   { name: 'Naan',                e: '🫓', plate: 'S',  ing: { bread: 1 },                    sp: { salt: 1 },             cook: 1, part: true },
-    v_taco_a:    { name: 'Taco Platter',        e: '🌮', plate: 'L',  ing: { bread: 2, meat: 1, veg: 1 },   sp: { chili: 1 },            cook: 1, part: true },
-    v_taco_b:    { name: 'Guacamole',           e: '🥑', plate: 'S',  ing: { veg: 1, salad: 1 },            sp: { salt: 1 },             cook: 0, part: true },
-    v_brunch_a:  { name: 'Pancake Stack',       e: '🥞', plate: 'M',  ing: { bread: 2, cheese: 1 },         sp: { salt: 1 },             cook: 2, part: true },
-    v_brunch_b:  { name: 'Fruit Salad',         e: '🍓', plate: 'S',  ing: { salad: 1, veg: 1 },            sp: {},                      cook: 0, part: true },
-    v_schnitzel_a: { name: 'Wiener Schnitzel',  e: '🍖', plate: 'XL', ing: { meat: 1, bread: 1 },           sp: { salt: 1, pepper: 1 },  cook: 2, part: true },
-    v_schnitzel_b: { name: 'Potato Salad',      e: '🥔', plate: 'M',  ing: { veg: 2, salad: 1 },            sp: { herbs: 1 },            cook: 1, part: true },
-    v_ramen_a:   { name: 'Tonkotsu Ramen',      e: '🍜', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },   sp: { salt: 1, chili: 1 },   cook: 3, part: true },
-    v_ramen_b:   { name: 'Gyoza',               e: '🥟', plate: 'S',  ing: { pasta: 1, meat: 1 },           sp: {},                      cook: 2, part: true },
-    v_bbq_a:     { name: 'Grilled Ribs',        e: '🍖', plate: 'XL', ing: { meat: 2, veg: 1 },             sp: { curry: 1, chili: 1 },  cook: 3, part: true },
-    v_bbq_b:     { name: 'Corn on the Cob',     e: '🌽', plate: 'S',  ing: { veg: 1 },                      sp: { salt: 1 },             cook: 1, part: true },
-    v_cheese_a:  { name: 'Cheese Fondue',       e: '🫕', plate: 'M',  ing: { cheese: 3, bread: 1 },         sp: { pepper: 1 },           cook: 2, part: true },
-    v_cheese_b:  { name: 'Pickle Salad',        e: '🥒', plate: 'S',  ing: { salad: 1, veg: 1 },            sp: { salt: 1 },             cook: 0, part: true },
+    v_burger_a:  { name: 'Wagyu Smash Burger',       e: '🍔', art: 'toast', plate: 'M',  ing: { bread: 1, meat: 2, cheese: 1 }, sp: { pepper: 1 },           cook: 2, part: true },
+    v_burger_b:  { name: 'Truffle Fries',               e: '🍟', art: 'skewers', plate: 'S',  ing: { veg: 2 },                      sp: { salt: 1 },             cook: 1, part: true },
+    v_pasta_a:   { name: 'Zucchini Lasagne Deluxe',    e: '🥘', art: 'noodles', plate: 'L',  ing: { pasta: 2, meat: 1, cheese: 1 }, sp: { herbs: 1 },           cook: 3, part: true },
+    v_pasta_b:   { name: 'Garlic Sourdough',        e: '🥖', art: 'toast', plate: 'S',  ing: { bread: 1 },                    sp: { herbs: 1 },            cook: 1, part: true },
+    v_steak_a:   { name: 'Dry-aged Ribeye',        e: '🍖', art: 'skewers', plate: 'L',  ing: { meat: 2 },                     sp: { salt: 1, pepper: 1 },  cook: 2, part: true },
+    v_steak_b:   { name: 'Loaded Sweet Potato',        e: '🥔', art: 'soup', plate: 'S',  ing: { veg: 1, cheese: 1 },           sp: { salt: 1 },             cook: 2, part: true },
+    v_bali_a:    { name: 'Nasi Goreng Special', e: '🍛', art: 'noodles', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },   sp: { chili: 1 },            cook: 2, part: true },
+    v_bali_b:    { name: 'Sate Lilit',          e: '🍢', art: 'skewers', plate: 'S',  ing: { meat: 1 },                     sp: { curry: 1 },            cook: 1, part: true },
+    v_pizza_a:   { name: 'Sourdough Pizza Grande',        e: '🍕', art: 'toast', plate: 'XL', ing: { bread: 2, cheese: 2, meat: 1 }, sp: { herbs: 1 },           cook: 2, part: true },
+    v_pizza_b:   { name: 'Vegan Burrata',             e: '🍅', art: 'greens', plate: 'S',  ing: { cheese: 1, salad: 1 },         sp: { pepper: 1 },           cook: 0, part: true },
+    v_curry_a:   { name: 'Butter Chicken',      e: '🍛', art: 'soup', plate: 'L',  ing: { meat: 1, veg: 1 },             sp: { curry: 2 },            cook: 2, part: true },
+    v_curry_b:   { name: 'GF Naan',                e: '🫓', art: 'toast', plate: 'S',  ing: { bread: 1 },                    sp: { salt: 1 },             cook: 1, part: true },
+    v_taco_a:    { name: 'Taco Platter',        e: '🌮', art: 'toast', plate: 'L',  ing: { bread: 2, meat: 1, veg: 1 },   sp: { chili: 1 },            cook: 1, part: true },
+    v_taco_b:    { name: 'Guacamole',           e: '🥑', art: 'greens', plate: 'S',  ing: { veg: 1, salad: 1 },            sp: { salt: 1 },             cook: 0, part: true },
+    v_brunch_a:  { name: 'Protein Pancake Stack',       e: '🥞', art: 'toast', plate: 'M',  ing: { bread: 2, cheese: 1 },         sp: { salt: 1 },             cook: 2, part: true },
+    v_brunch_b:  { name: 'Acai Bowl',         e: '🫐', art: 'greens', plate: 'S',  ing: { salad: 1, veg: 1 },            sp: {},                      cook: 0, part: true },
+    v_schnitzel_a: { name: 'Cauliflower Schnitzel',  e: '🍖', art: 'skewers', plate: 'XL', ing: { meat: 1, bread: 1 },           sp: { salt: 1, pepper: 1 },  cook: 2, part: true },
+    v_schnitzel_b: { name: 'Potato Salad',      e: '🥔', art: 'greens', plate: 'M',  ing: { veg: 2, salad: 1 },            sp: { herbs: 1 },            cook: 1, part: true },
+    v_ramen_a:   { name: 'Bone Broth Ramen Deluxe',      e: '🍜', art: 'noodles', plate: 'L',  ing: { pasta: 1, meat: 1, veg: 1 },   sp: { salt: 1, chili: 1 },   cook: 3, part: true },
+    v_ramen_b:   { name: 'Gyoza',               e: '🥟', art: 'noodles', plate: 'S',  ing: { pasta: 1, meat: 1 },           sp: {},                      cook: 2, part: true },
+    v_bbq_a:     { name: 'Grilled Ribs',        e: '🍖', art: 'skewers', plate: 'XL', ing: { meat: 2, veg: 1 },             sp: { curry: 1, chili: 1 },  cook: 3, part: true },
+    v_bbq_b:     { name: 'Corn on the Cob',     e: '🌽', art: 'greens', plate: 'S',  ing: { veg: 1 },                      sp: { salt: 1 },             cook: 1, part: true },
+    v_cheese_a:  { name: 'Cashew Fondue',       e: '🫕', art: 'soup', plate: 'M',  ing: { cheese: 3, bread: 1 },         sp: { pepper: 1 },           cook: 2, part: true },
+    v_cheese_b:  { name: 'Pickle Salad',        e: '🥒', art: 'greens', plate: 'S',  ing: { salad: 1, veg: 1 },            sp: { salt: 1 },             cook: 0, part: true },
     // VIP patrons (the cards in the deck)
-    vip_burger:   { name: 'Royal Burger Menu', e: '👑', vip: true, parts: ['v_burger_a', 'v_burger_b'], c: 10 },
-    vip_pasta:    { name: 'Pasta Feast',       e: '👑', vip: true, parts: ['v_pasta_a', 'v_pasta_b'], c: 11 },
-    vip_steak:    { name: 'Steakhouse Dinner', e: '👑', vip: true, parts: ['v_steak_a', 'v_steak_b'], c: 11 },
+    vip_burger:   { name: 'Wagyu Burger Reel', e: '👑', vip: true, parts: ['v_burger_a', 'v_burger_b'], c: 10 },
+    vip_pasta:    { name: 'Pasta Shoot',       e: '👑', vip: true, parts: ['v_pasta_a', 'v_pasta_b'], c: 11 },
+    vip_steak:    { name: 'Steakhouse Reel', e: '👑', vip: true, parts: ['v_steak_a', 'v_steak_b'], c: 11 },
     vip_bali:     { name: 'Bali Feast',        e: '👑', vip: true, parts: ['v_bali_a', 'v_bali_b'], c: 10 },
-    vip_pizza:    { name: 'Pizza Party',       e: '👑', vip: true, parts: ['v_pizza_a', 'v_pizza_b'], c: 11 },
+    vip_pizza:    { name: 'Pizza Live',       e: '👑', vip: true, parts: ['v_pizza_a', 'v_pizza_b'], c: 11 },
     vip_curry:    { name: 'Curry Night',       e: '👑', vip: true, parts: ['v_curry_a', 'v_curry_b'], c: 10 },
-    vip_taco:     { name: 'Taco Fiesta',       e: '👑', vip: true, parts: ['v_taco_a', 'v_taco_b'], c: 9 },
-    vip_brunch:   { name: 'Sunday Brunch',     e: '👑', vip: true, parts: ['v_brunch_a', 'v_brunch_b'], c: 9 },
-    vip_schnitzel:{ name: 'Schnitzel Deluxe',  e: '👑', vip: true, parts: ['v_schnitzel_a', 'v_schnitzel_b'], c: 12 },
+    vip_taco:     { name: 'Taco Tuesday',       e: '👑', vip: true, parts: ['v_taco_a', 'v_taco_b'], c: 9 },
+    vip_brunch:   { name: 'Brunch Reel',     e: '👑', vip: true, parts: ['v_brunch_a', 'v_brunch_b'], c: 9 },
+    vip_schnitzel:{ name: 'Cauli Schnitzel Set',  e: '👑', vip: true, parts: ['v_schnitzel_a', 'v_schnitzel_b'], c: 12 },
     vip_ramen:    { name: 'Ramen Bar',         e: '👑', vip: true, parts: ['v_ramen_a', 'v_ramen_b'], c: 12 },
-    vip_bbq:      { name: 'BBQ Plate',         e: '👑', vip: true, parts: ['v_bbq_a', 'v_bbq_b'], c: 12 },
-    vip_cheese:   { name: 'Cheese Lover',      e: '👑', vip: true, parts: ['v_cheese_a', 'v_cheese_b'], c: 10 },
+    vip_bbq:      { name: 'Beach BBQ',         e: '👑', vip: true, parts: ['v_bbq_a', 'v_bbq_b'], c: 12 },
+    vip_cheese:   { name: 'Fondue Date Night',      e: '👑', vip: true, parts: ['v_cheese_a', 'v_cheese_b'], c: 10 },
   };
   Object.values(DISHES).forEach(d => { d.sp = d.sp || {}; d.ing = d.ing || {}; });
   const keysWhere = f => Object.keys(DISHES).filter(k => f(DISHES[k]));
@@ -793,46 +793,46 @@ safe-buffer/index.js:
     vip: false, awards: false, strike: false, office: false, temps: 0, officeCards: false, locked: false, broken: false,
     setbacks: false, mission: 0 };
   const S = (base, extra) => Object.assign({}, base, extra);
-  const S3 = S(F, { name: 'Cleaning up' });
-  const S5 = S(S3, { name: 'Spoiled ingredients', shop: true, shifts: 2, challenging: true, salary: true, pantry: true });
-  const S6 = S(S5, { name: 'The press', rep: true, service: true, throwOut: true });
-  const S7 = S(S6, { name: 'The first star', vip: true, awards: true, strike: true, office: true, shifts: 4 });
-  const S8 = S(S7, { name: 'Setbacks', temps: 1, officeCards: true, locked: true, broken: true, setbacks: true });
+  const S3 = S(F, { name: 'Bowls pile up' });
+  const S5 = S(S3, { name: 'Payday', shop: true, shifts: 2, challenging: true, salary: true, pantry: true });
+  const S6 = S(S5, { name: 'Google reviews', rep: true, service: true, throwOut: true });
+  const S7 = S(S6, { name: 'Influencers', vip: true, awards: true, strike: true, office: true, shifts: 4 });
+  const S8 = S(S7, { name: 'Things break in Bali', temps: 1, officeCards: true, locked: true, broken: true, setbacks: true });
   const SCEN = {
-    1: S(F, { name: 'Your first restaurant', timers: 1, normal: 270, spices: false, sink: false, money: false, bigger: false, fix: true, discard: false }),
-    2: S(F, { name: 'The first week', sink: false, money: false, discard: false }),
+    1: S(F, { name: 'Soft opening', timers: 1, normal: 270, spices: false, sink: false, money: false, bigger: false, fix: true, discard: false }),
+    2: S(F, { name: 'First week in Canggu', sink: false, money: false, discard: false }),
     3: S3,
-    4: S(S3, { name: 'The big rush', shop: true, shifts: 2, challenging: true }),
+    4: S(S3, { name: 'Brunch rush', shop: true, shifts: 2, challenging: true }),
     5: S5, 6: S6, 7: S7, 8: S8,
-    9: S(S8, { name: 'Mission: Equality', mission: 1 }),
-    10: S(S8, { name: 'Mission: Striking workers', mission: 2 }),
-    11: S(S8, { name: 'Mission: Kitchen rush', mission: 3 }),
-    12: S(S8, { name: 'Mission: Empty storage rooms', mission: 4 }),
-    13: S(S8, { name: 'Mission: Special challenge', mission: 5 }),
+    9: S(S8, { name: 'Mission: Brunch for everyone', mission: 1 }),
+    10: S(S8, { name: 'Mission: The swell is pumping', mission: 2 }),
+    11: S(S8, { name: 'Mission: Saturday in Canggu', mission: 3 }),
+    12: S(S8, { name: 'Mission: Nyepi eve', mission: 4 }),
+    13: S(S8, { name: 'Mission: Second location', mission: 5 }),
   };
 
   // Awards (scenario 7+). The rulebook's award cards aren't printed, so these are our own.
   const AWARDS = {
-    time:   { e: '⏱️', n: 'Extra time',     d: '+30 seconds every shift' },
+    time:   { e: '⏱️', n: 'Island time',    d: '+30 seconds every shift' },
     sink:   { e: '🫧', n: 'Dishwasher',     d: 'wash up to 5 plates per visit' },
-    bulk:   { e: '🚚', n: 'Wholesale card', d: 'the van brings 7 ingredients instead of 5' },
-    tips:   { e: '💰', n: 'Big tips',       d: 'serving early earns 2 coins' },
-    garden: { e: '🪴', n: 'Herb garden',    d: '+1 of every spice when won' },
-    seats:  { e: '🪑', n: 'Busy reception', d: 'seat up to 3 guests at once' },
-    quick:  { e: '⚡', n: 'Fast hands',     d: 'sand timers run 5 seconds shorter' },
-    drinks: { e: '🍹', n: 'Cocktail bar',   d: 'every new guest buys 2 drinks' },
+    bulk:   { e: '🛵', n: 'Organic co-op card', d: 'a scooter run brings 7 ingredients instead of 5' },
+    tips:   { e: '💰', n: 'Nomad tippers',  d: 'serving early earns 2 coins' },
+    garden: { e: '🪴', n: 'Superfood garden', d: '+1 of every superfood when won' },
+    seats:  { e: '🪑', n: 'Beanbag seating', d: 'seat up to 3 guests at once' },
+    quick:  { e: '⚡', n: 'Barista-trained crew', d: 'sand timers run 5 seconds shorter' },
+    drinks: { e: '🍹', n: 'Kombucha on tap', d: 'every new guest buys 2 kombuchas' },
   };
   const AWARD_AT = { 2: [3, 6, 9], 3: [4, 8, 12], 4: [5, 10, 15] };
   // Office cards (scenario 8+). Costs are our own; the rulebook leaves them to the cards.
   const OFFICE = {
-    locksmith:  { e: '🔑', n: 'Call the locksmith',  d: 'unlocks storage room 2', cost: 3 },
-    technician: { e: '🔧', n: 'Call the technician', d: 'repairs the broken stove', cost: 3 },
-    temp:       { e: '🤍', n: 'Hire a temp',         d: 'a second white sand timer anyone can use (salary 3 per shift)', cost: 4 },
-    plates:     { e: '🍽️', n: 'Buy new plates',      d: 'one clean plate of every size', cost: 3 },
+    locksmith:  { e: '🔑', n: 'Call the locksmith',  d: 'unlocks Fridge B', cost: 3 },
+    technician: { e: '🔧', n: 'Call Pak Made the fixer', d: 'repairs the broken stove', cost: 3 },
+    temp:       { e: '🤍', n: 'Hire a casual',       d: 'a second white sand timer anyone can use (wages 3 per shift)', cost: 4 },
+    plates:     { e: '🍽️', n: 'Buy new bowls',       d: 'one clean bowl of every size', cost: 3 },
   };
   const LATE_PAY = 3;
 
-  const AREA_NAME = { reception: 'Reception', dining: 'Dining room', storA: 'Storage room 1', storB: 'Storage room 2', storC: 'Storage room 3', stove: 'Stove', green: 'Greenhouse', sink: 'Sink', van: 'Van', office: 'Office' };
+  const AREA_NAME = { reception: 'Front desk', dining: 'Dining room', storA: 'Fridge A', storB: 'Fridge B', storC: 'Bakery shelf', stove: 'Stove', green: 'Superfood bar', sink: 'Sink', van: 'Scooter run', office: 'Office' };
   const ROOM_OF = { storA: 'A', storB: 'B', storC: 'C' };
   const PANTRY_INGS = ['bread', 'pasta'];
   const SUPPLY = { cheese:15, meat:24, bread:15, salad:15, veg:24, pasta:15, salt:12, pepper:12, herbs:12, curry:10, chili:10 };
@@ -907,7 +907,7 @@ safe-buffer/index.js:
     if (g.payroll) out.push(g.coins > 1 ? `pay all salaries and end with ${g.coins} coins` : 'pay all salaries');
     else if (g.coins) out.push(`end with ${g.coins} coins`);
     if (g.rep) out.push(`reach ${g.rep} reputation`);
-    if (g.noStrike) out.push('no chef on strike at the end');
+    if (g.noStrike) out.push('no crew out surfing at the end');
     return out.join(', ');
   }
 
@@ -1286,8 +1286,8 @@ safe-buffer/index.js:
         const van = a.area === 'van';
         if (!slots || (!van && (a.idx < 0 || a.idx >= slots.length))) throw new Error('No such space.');
         if (van && s.coins < 1) throw new Error('The office has no coins left to go shopping.');
-        if (s.locked[ROOM_OF[a.area]]) throw new Error('This storage room is locked — call the locksmith from the office.');
-        if (s.broken && s.broken.area === a.area && s.broken.idx === a.idx) throw new Error('This stove is broken — call the technician from the office.');
+        if (s.locked[ROOM_OF[a.area]]) throw new Error('Fridge B is locked — call the locksmith from the office.');
+        if (s.broken && s.broken.area === a.area && s.broken.idx === a.idx) throw new Error('This stove is broken — call Pak Made the fixer from the office.');
         const occ = van ? null : slots[a.idx];
         const mine = occ && (occ.pid === pid || ownersFor(s, pid).includes(occ.pid));
         if (occ && !mine) throw new Error('Someone else is working there.');
@@ -1296,7 +1296,7 @@ safe-buffer/index.js:
         const pick = occ ? { owner: occ.pid, t: occ.t, w: s.workers[occ.pid][occ.t] } : pickTimer(s, pid, a.area, van ? -1 : a.idx, now);
         if (!pick) {
           const n = s.workers[pid].filter((w, t) => !s.off[pid][t]).length;
-          if (!n) throw new Error('All your sand timers are on strike.');
+          if (!n) throw new Error('All your crew are out surfing until they are paid.');
           throw new Error(`${n > 1 ? 'Your timers are' : 'Your timer is'} still running (${Math.ceil(workerLeft(s, pid, now) / 1000)} s).`);
         }
         const { owner, t, w } = pick;
@@ -1327,7 +1327,7 @@ safe-buffer/index.js:
         if (s.open[pid]) s.open[pid].worker = { owner, t, start: now };
         // Canggu: a chef in any storage room takes in a waiting delivery.
         if (ROOM_OF[a.area]) (s.moments || []).forEach(m => {
-          if (m.kind === 'delivery' && m.state === 'live' && now <= m.until) { m.by = pid; endMoment(s, m, true, now); s.errs[pid] = { msg: `🧊 Delivery in! +${DELIVERY_N} ${ING_INFO[m.ing].n} in storage 1.`, t: now, info: true }; }
+          if (m.kind === 'delivery' && m.state === 'live' && now <= m.until) { m.by = pid; endMoment(s, m, true, now); s.errs[pid] = { msg: `🧊 Delivery in! +${DELIVERY_N} ${ING_INFO[m.ing].n} in Fridge A.`, t: now, info: true }; }
         });
         return;
       }
@@ -1365,7 +1365,7 @@ safe-buffer/index.js:
         return;
       }
       case 'seat': {
-        needOpen('reception', 'Put a timer at the reception first.');
+        needOpen('reception', 'Send a chef to the front desk first.');
         const empty = s.seats.filter(x => !x.reserved && !x.dish).length;
         const k = seatPatrons(s, has(s, 'seats') ? 3 : 2, { by: pid });
         s.open[pid] = null;
@@ -1375,7 +1375,7 @@ safe-buffer/index.js:
       }
       case 'throwOut': {
         // Scenario 6+: send 1–2 waiting guests away; new guests take their seats but, having seen that, order no drinks.
-        needOpen('reception', 'Put a timer at the reception first.');
+        needOpen('reception', 'Send a chef to the front desk first.');
         const seats = Array.from(new Set(a.seats || []));
         if (seats.length < 1 || seats.length > 2) throw new Error('Pick one or two guests.');
         if (seats.some(i => !s.seats[i] || !s.seats[i].dish)) throw new Error('Nobody sits there.');
@@ -1467,9 +1467,9 @@ safe-buffer/index.js:
         return;
       }
       case 'takeIng': {
-        const op = needOpen('storage', 'Put a timer in a storage room first.');
+        const op = needOpen('storage', 'Send a chef to a fridge first.');
         const room = s.storage[op.room];
-        if (!ING.includes(a.ing) || !(room[a.ing] > 0)) throw new Error('None left in this storage room.');
+        if (!ING.includes(a.ing) || !(room[a.ing] > 0)) throw new Error('None left in this fridge.');
         const o = unlocked(teamOrder(s, pid, a.order));
         if (!cfg.fix && o.row > 0) throw new Error('This meal is already cooking — no more ingredients.');
         if (strict && !needsIng(o, a.ing)) throw new Error(`${DISHES[o.dish].name} doesn't need more ${ING_INFO[a.ing].n.toLowerCase()}.`);
@@ -1481,8 +1481,8 @@ safe-buffer/index.js:
         return;
       }
       case 'takeSpice': {
-        needOpen('spice', 'Put a timer in the greenhouse first.');
-        if (!SPICES.includes(a.spice) || !(s.bag[a.spice] > 0)) throw new Error('That spice has run out.');
+        needOpen('spice', 'Send a chef to the superfood bar first.');
+        if (!SPICES.includes(a.spice) || !(s.bag[a.spice] > 0)) throw new Error('That superfood has run out.');
         const o = unlocked(teamOrder(s, pid, a.order));
         if (strict && !needsSp(o, a.spice)) throw new Error(`${DISHES[o.dish].name} doesn't need more ${SP_INFO[a.spice].n.toLowerCase()}.`);
         s.bag[a.spice]--;
@@ -1492,7 +1492,7 @@ safe-buffer/index.js:
         return;
       }
       case 'buy': {
-        const op = needOpen('shop', 'Put a timer at the van first.');
+        const op = needOpen('shop', 'Send a chef on a scooter run first.');
         if (s.coins < 1) throw new Error('The office has no coins left.');
         if (a.kind === 'ing') {
           if (!ING.includes(a.ing)) throw new Error('Pick an ingredient.');
@@ -1504,13 +1504,13 @@ safe-buffer/index.js:
           if (!entries.length || entries.some(([, v]) => !Number.isInteger(v) || v < 0) || entries.reduce((sum, [, v]) => sum + v, 0) !== n) throw new Error(`Allocate all ${n} ingredients to storage.`);
           for (const [r, count] of entries) {
             if (!s.storage[r] || !roomIngs(s, r).includes(a.ing)) throw new Error(`${ING_INFO[a.ing].n} can't go in that storage room.`);
-            if (count && s.locked[r]) throw new Error('That storage room is locked.');
+            if (count && s.locked[r]) throw new Error('That fridge is locked.');
           }
           entries.forEach(([r, count]) => { s.storage[r][a.ing] += count; });
           feed(s, now, pid, 'buy', { ing: a.ing, n, allocation });
         } else if (a.kind === 'cheap' || a.kind === 'pricey') {
           const allowed = a.kind === 'cheap' ? CHEAP : PRICEY, k = a.kind === 'cheap' ? 3 : 2;
-          if (!Array.isArray(a.spices) || a.spices.length !== k || !a.spices.every(x => allowed.includes(x))) throw new Error(`Pick ${k} ${a.kind === 'cheap' ? 'cheap' : 'expensive'} spices.`);
+          if (!Array.isArray(a.spices) || a.spices.length !== k || !a.spices.every(x => allowed.includes(x))) throw new Error(`Pick ${k} ${a.kind === 'cheap' ? 'cheap' : 'expensive'} superfoods.`);
           for (const item of allowed) if (a.spices.filter(x=>x===item).length>supplyCount(s,item)) throw new Error(`Not enough ${SP_INFO[item].n.toLowerCase()} remain in the supply.`);
           a.spices.forEach(x => { s.bag[x]++; });
           feed(s, now, pid, 'buy', { spices: a.spices.slice() });
@@ -1648,7 +1648,7 @@ safe-buffer/index.js:
   const MOMENT_INFO = {
     birthday:   { e: '🎂', n: 'Birthday table' },
     delivery:   { e: '🧊', n: 'Melting delivery' },
-    influencer: { e: '📸', n: 'Influencer' },
+    influencer: { e: '📸', n: 'Photo shoot' },
   };
   function planMoments(s) {
     s.moments = [];
@@ -2081,8 +2081,8 @@ safe-buffer/index.js:
   const DEV = new URLSearchParams(location.search).has('dev');
   const COLORS = { red: '#a94b3e', yellow: '#c18c25', blue: '#3d7090', green: '#517752' };
   const COLOR_NAMES = Object.keys(COLORS);
-  const WORDS = ['MANGO', 'PIZZA', 'TACO', 'NOODLE', 'WAFFLE', 'BAGEL', 'MUFFIN', 'SALSA', 'PANCAKE', 'COOKIE',
-    'LEMON', 'PEPPER', 'CARROT', 'TOAST', 'DUMPLING', 'SATE', 'PAPAYA', 'BANANA', 'CREPE', 'PRETZEL'];
+  const WORDS = ['MATCHA', 'ACAI', 'KOMBUCHA', 'SMOOTHIE', 'COCONUT', 'SAMBAL', 'TEMPEH', 'KALE', 'SURF', 'SWELL',
+    'MANGO', 'PAPAYA', 'GOJI', 'CHIA', 'TURMERIC', 'SATE', 'CANANG', 'BATU', 'BERAWA', 'ECHO'];
 
   const LS = {
     get(k, d) { try { const v = localStorage.getItem('cg:' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
@@ -2456,7 +2456,7 @@ safe-buffer/index.js:
   function asset(key, extra='') { if (key === 'pasta') return `<span aria-hidden="true" class="asset art-pasta pasta-art ${extra}"></span>`; // loose penne cut from the sprite sheet (../assets/pasta.png): the tied bundle was hard to recognise
     const [x,y,w,h]=ART[key]||ART.plate;return `<span aria-hidden="true" class="asset art-${key} ${extra}" style="background-size:${1536/w*100}% ${1024/h*100}%;background-position:${x/(1536-w)*100}% ${y/(1024-h)*100}%"></span>`; }
   function chef(color) { return asset(color, 'chef'); }
-  function dishArt(d) { const n=d.name.toLowerCase();const k=/soup|curry|stew|dhal|risotto/.test(n)?'soup':/salad|bowl/.test(n)?'greens':/sandwich|toast|burger|bread|bagel|croissant|pizza|quiche|hot dog|burrito|wrap/.test(n)?'toast':/sate|steak|meat|kebab|chicken|schnitzel|ribs|pork|fish|lamb/.test(n)?'skewers':d.ing.pasta?'noodles':d.ing.meat?'skewers':d.ing.salad?'greens':d.ing.bread||d.ing.cheese?'toast':'soup';return `<span class="dish-art">${asset(k)}</span>`; }
+  function dishArt(d) { const n=d.name.toLowerCase();const k=d.art?d.art:/soup|curry|stew|dhal|risotto/.test(n)?'soup':/salad|bowl/.test(n)?'greens':/sandwich|toast|burger|bread|bagel|croissant|pizza|quiche|hot dog|burrito|wrap/.test(n)?'toast':/sate|steak|meat|kebab|chicken|schnitzel|ribs|pork|fish|lamb/.test(n)?'skewers':d.ing.pasta?'noodles':d.ing.meat?'skewers':d.ing.salad?'greens':d.ing.bread||d.ing.cheese?'toast':'soup';return `<span class="dish-art">${asset(k)}</span>`; }
   function nextNeed(g,o) { const d=E.DISHES[o.dish];if(!E.plateOk(g,o))return `Get plate ${d.plate}`;const i=E.ING.find(k=>(o.ing[k]||0)<(d.ing[k]||0));if(i)return `Get ${E.ING_INFO[i].n.toLowerCase()}`;const sp=E.SPICES.find(k=>(o.sp[k]||0)<(d.sp[k]||0));if(sp)return `Add ${E.SP_INFO[sp].n.toLowerCase()}`;if(o.row<d.cook)return 'Visit stove';if(o.row>d.cook)return 'Overcooked';return E.checkOrder(g,o).length?'Check portions':'Ready to serve'; }
   function checklist(g,d,o) { return `<div class="recipe-list"><small>ON PLATE / RECIPE</small>${[...E.ING.filter(i=>d.ing[i]||(o.ing||{})[i]),...E.SPICES.filter(i=>d.sp[i]||(o.sp||{})[i])].map(i=>{const spice=E.SPICES.includes(i), need=(spice?d.sp:d.ing)[i]||0, have=((spice?o.sp:o.ing)||{})[i]||0, info=(spice?E.SP_INFO:E.ING_INFO)[i];const state=g.settings.strict?(have===need?'complete':have>need?'excess':'missing'):'unchecked';return `<div class="recipe-line ${state} ${ui.pick?.order===o.id&&ui.pick?.item===i&&Date.now()-ui.pick.at<1600?'just-picked':''}">${asset(i)}<span>${info.n}</span><b aria-label="${have} on plate, ${need} in recipe">${have} / ${need}</b></div>`}).join('')}</div>`; }
   // Board and ticket labels use the first word of a spice ("Curry & mustard" → "Curry") so they stay on one line.
@@ -2761,19 +2761,19 @@ safe-buffer/index.js:
   }
 
   const SCEN_BLURB = {
-    1: 'Seat friends, take orders, fetch ingredients, cook. One chef each.',
-    2: 'New: spices from the greenhouse, two chefs each, and plates one size bigger are fine. Mistakes can no longer be put back.',
-    3: 'New: wash dirty plates at the sink and earn coins. Botched meals go in the bin.',
-    4: 'New: two shifts, shopping at the van, and 18 demanding ⭐ guests who pay more.',
-    5: 'New: bread and pasta get their own storage room, and the chefs want a salary after every shift.',
-    6: 'New: reputation. Serve meals early for a tip 🛎️, and throw guests out at the reception.',
-    7: 'New: VIP guests 👑 who order two dishes, awards 🏆, four shifts, and unpaid timers go on strike.',
-    8: 'New: a locked storage room, a broken stove, a shared temp 🤍, and the office to fix it all.',
+    1: 'Friends drop by for the soft opening. Take orders, fetch ingredients, cook. One chef each.',
+    2: 'New: the superfood bar, two chefs each, and a bowl one size bigger is fine. Mistakes stay on the plate.',
+    3: 'New: wash the dirty bowls at the sink, earn coins and kombucha money. Botched meals go in the bin.',
+    4: 'New: two shifts, scooter runs to the organic shop, and 18 demanding ⭐ guests (gluten-free, oat milk…) who pay more.',
+    5: 'New: sourdough and GF pasta live on the bakery shelf, and the crew wants wages after every shift.',
+    6: 'New: Google reviews ⭐. Serve meals early for a tip 🛎️, and turn guests away at the front desk.',
+    7: 'New: influencers 👑 who order two dishes for the photo, awards 🏆, four shifts, and unpaid staff go surfing.',
+    8: 'New: Fridge B is locked, a stove is broken, a casual helper 🤍, and the office to sort it all out.',
     9: 'Every chef serves guests early in every one of the four shifts.',
-    10: 'Every chef starts with one chef on strike.',
-    11: 'Ordinary, ⭐ and 👑 guests for every chef — and coins.',
-    12: 'Storage rooms and the spice bag start empty, and there is no locksmith.',
-    13: 'Lots of coins and lots of reputation.',
+    10: 'The swell is pumping: every chef starts with one crew member out surfing.',
+    11: 'Saturday: ordinary, ⭐ and 👑 guests for every chef — and coins.',
+    12: 'Nyepi eve: the fridges and the superfood bar start empty, and nobody can unlock Fridge B.',
+    13: 'Opening a second place: lots of coins and lots of reviews.',
   };
   const RESTAURANTS = [1, 2, 3, 4, 5, 6, 7, 8], MISSIONS = [9, 10, 11, 12, 13];
   const DUO_RULES = 'a shared helper chef 🤝 for whoever has no free chef, you may put ingredients and spices on and cook your partner\'s meals, and each van trip allows two purchases.';
@@ -2823,7 +2823,7 @@ safe-buffer/index.js:
         <p class="note levelnote">${esc((E.LEVELS[S.level] || E.LEVELS.normal).d)}.</p>
         ${DEV ? `<div class="setrow"><span>Sand timer</span>${seg('workerSec', [3, 20, 25, 30, 35, 40], ['3 s', '20 s', '25 s', '30 s', '35 s', '40 s'])}</div>` : ''}
         <div class="setrow"><span>Shift length</span>${seg('shiftSec', shiftVals, shiftVals.map(shiftLbl))}</div>
-        ${L.players.length === 2 ? `<h2>Extras <small>not in the rulebook</small></h2><div class="setrow"><span>Two-chef helpers</span>${seg('duo', [false, true], ['Off — rulebook', 'On'])}</div>${S.duo ? `<p class="note duonote">🤝 ${DUO_RULES}</p>` : ''}` : ''}
+        ${L.players.length === 2 ? `<h2>Extras <small>optional</small></h2><div class="setrow"><span>Two-chef helpers</span>${seg('duo', [false, true], ['Off', 'On'])}</div>${S.duo ? `<p class="note duonote">🤝 ${DUO_RULES}</p>` : ''}` : ''}
         ${host ? `<button class="btn big" data-a="newgame" ${L.players.length ? '' : 'disabled'}>Set the tables</button>` : '<p class="note">The host starts the game.</p>'}
       </section>
       <div class="lobbylinks"><button class="link" data-a="help">How to play</button><button class="link" data-a="leave">Leave</button></div>
@@ -2899,7 +2899,7 @@ safe-buffer/index.js:
       const active = op && op.type === 'storage' && op.room === key;
       const locked = g.locked && g.locked[key];
       return `<section class="area store st${num} ${active ? 'active' : ''} ${locked ? 'locked' : ''}">
-        <div class="ahead"><h3>${num===3?'Dry Store':'Storage '+key}${locked ? ' 🔒' : ''}</h3><div class="spots">${g.spaces[area].map((_, i) => spot(g, area, i)).join('')}</div></div>
+        <div class="ahead"><h3>${num===3?'Bakery shelf':'Fridge '+key}${locked ? ' 🔒' : ''}</h3><div class="spots">${g.spaces[area].map((_, i) => spot(g, area, i)).join('')}</div></div>
         <div class="ings">${E.roomIngs(g, key).map(i => `<button class="ing ${active && g.storage[key][i] ? 'glow' : ''} ${stockCls(g.storage[key][i])}" data-a="${!g.storage[key][i] && !locked ? 'shout' : 'takeIng'}" data-room="${key}" data-ing="${i}" ${locked ? 'disabled' : ''} aria-label="${E.ING_INFO[i].n}: ${g.storage[key][i]} in storage ${key}"><span class="heap">${asset(i)}${g.storage[key][i] ? '' : '<span class="empty-tag">empty</span>'}</span><span class="stock-label">${E.ING_INFO[i].n}<b>${g.storage[key][i]}</b></span></button>`).join('')}</div>
         ${locked ? '<div class="lockmsg">Locked · unlock in Office</div>' : ''}
       </section>`;
@@ -2908,7 +2908,7 @@ safe-buffer/index.js:
     const dormant=(cls,name,n)=>`<section class="area ${cls} dormant"><h3>${name}</h3><span class="later">Opens in restaurant ${n}</span></section>`;
     const greenActive = op && op.type === 'spice';
     const green = cfg.spices ? `<section class="area green ${greenActive ? 'active' : ''}">
-        <div class="gh"><div class="ahead"><h3>Spices</h3><div class="spots">${g.spaces.green.map((_, i) => spot(g, 'green', i)).join('')}</div></div>
+        <div class="gh"><div class="ahead"><h3>Superfoods</h3><div class="spots">${g.spaces.green.map((_, i) => spot(g, 'green', i)).join('')}</div></div>
         <div class="spices">${E.SPICES.map(i => `<button class="ing spice ${greenActive && g.bag[i] ? 'glow' : ''} ${stockCls(g.bag[i])}" data-a="${g.bag[i] ? 'takeSpice' : 'shout'}" data-spice="${i}" aria-label="${E.SP_INFO[i].n}: ${g.bag[i]} portions"><span class="heap">${asset(i)}${g.bag[i] ? '' : '<span class="empty-tag">empty</span>'}</span><span class="stock-label"><span class="nm">${shortName(E.SP_INFO[i].n)}</span><b>${g.bag[i]}</b></span></button>`).join('')}</div></div></section>` : dormant('green','Spices',2);
 
     const washActive = op && op.type === 'wash';
@@ -2921,7 +2921,7 @@ safe-buffer/index.js:
       return `<span class="vt ${SHARED.includes(x.pid) ? 'tempw' : ''}" style="--c:${colorOf(p.color)}" data-wstart="${x.start}">${chef(p.color)}<span class="ini">${esc(x.pid === 'temp' ? 'T' : x.pid === 'helper' ? 'H' : p.name.slice(0, 1).toUpperCase())}</span><em class="sec"></em></span>`;
     };
     // The van and the office have no room on the board, so they live in the top bar where every chef can reach them.
-    const van = cfg.shop ? `<div class="vanbar ${op && op.type === 'shop' ? 'active' : ''}"><button class="vanbtn" data-a="place" data-area="van" data-idx="0" ${g.coins < 1 ? 'disabled' : ''} aria-label="Van: go shopping for 1 coin">🚐 <span>Shop<small>1 🪙</small></span></button><div class="vts">${g.spaces.van.map(ring).join('')}</div></div>` : '';
+    const van = cfg.shop ? `<div class="vanbar ${op && op.type === 'shop' ? 'active' : ''}"><button class="vanbtn" data-a="place" data-area="van" data-idx="0" ${g.coins < 1 ? 'disabled' : ''} aria-label="Scooter run: buy for 1 coin">🚐 <span>Ride<small>1 🪙</small></span></button><div class="vts">${g.spaces.van.map(ring).join('')}</div></div>` : '';
     const office = cfg.office ? `<div class="vanbar officebar ${op && op.type === 'office' ? 'active' : ''}" title="Office">${spot(g, 'office', 0)}<small>Office</small></div>` : '';
     const sharedRing = owner => g.workers[owner].map((w, t) => g.off[owner][t] ? '<span class="vt tempw strike">⛔</span>' : w ? ring({ pid: owner, start: w.start }) : `<span class="vt tempw"><span class="ini">${owner === 'helper' ? 'H' : 'T'}</span></span>`).join('');
     const temps = (g.workers.helper ? `<div class="tempbar" title="Helper — two-chef rule: either chef can use it when their own timers are busy">🤝<small>Helper</small> ${sharedRing('helper')}</div>` : '')
@@ -2941,19 +2941,19 @@ safe-buffer/index.js:
     }
     else if (recOpen) {
       const n = ui.throwSel.length;
-      prompt = !recPick ? '🚪 Reception: seat new guests or send guests away.' : n ? `👋 Send ${n} guest${n > 1 ? 's' : ''} away? New guests take the seat${n > 1 ? 's' : ''} but buy no drinks.` : '👋 Tap 1 or 2 waiting guests to send away.';
+      prompt = !recPick ? '🚪 Front desk: seat new guests or turn guests away.' : n ? `👋 Send ${n} guest${n > 1 ? 's' : ''} away? New guests take the seat${n > 1 ? 's' : ''} but buy no kombucha.` : '👋 Tap 1 or 2 waiting guests to send away.';
       promptBtn = !recPick ? '' : `<button class="btn" data-a="throwOut" ${n ? '' : 'disabled'}>Send away${n ? ' ' + n : ''}</button><button class="btn ghost" data-a="recBack">Back</button>`;
     }
     else if (op && op.type === 'storage') { prompt = selO ? `📦 Tap ingredients for ${forWhom(selO)} ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to fill that one.' : ''}${helpHint}` : `📦 Take an order first. Ingredients only go on ${g.duo ? 'your team\'s' : 'your own'} plates.${helpHint}`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
-    else if (op && op.type === 'spice') { prompt = selO ? `🌿 Tap spices for ${forWhom(selO)} ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to season that one.' : ''}${helpHint}` : `🌿 Take an order first. Spices only go on ${g.duo ? 'your team\'s' : 'your own'} plates.${helpHint}`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
-    else if (op && op.type === 'shop') { prompt = op.left > 1 ? '🚐 Choose what to buy — two purchases this trip, 1 coin each.' : '🚐 Choose what to buy for 1 coin.'; promptBtn = '<button class="btn ghost" data-a="done">Done shopping</button>'; }
+    else if (op && op.type === 'spice') { prompt = selO ? `🍵 Tap superfoods for ${forWhom(selO)} ${E.DISHES[selO.dish].name}.${liveOrders.length > 1 ? ' Tap another ticket to season that one.' : ''}${helpHint}` : `🍵 Take an order first. Superfoods only go on ${g.duo ? 'your team\'s' : 'your own'} plates.${helpHint}`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
+    else if (op && op.type === 'shop') { prompt = op.left > 1 ? '🛵 Choose what to buy — two purchases this trip, 1 coin each.' : '🛵 Choose what to buy for 1 coin.'; promptBtn = '<button class="btn ghost" data-a="done">Done shopping</button>'; }
     else if (op && op.type === 'office') { prompt = '🏢 Choose what to do in the office.'; promptBtn = '<button class="btn ghost" data-a="done">Nothing</button>'; }
     else if (g.phase === 'between') prompt = 'Shift break. Plan the next shift together.';
     else if (op && op.type === 'wash') { prompt = `🧽 Tap dirty plates in the sink to wash them (${op.left} more).`; promptBtn = '<button class="btn" data-a="done">Done</button>'; }
     else if (op && op.type === 'cook') { prompt = liveOrders.length ? `🔥 Tap “Cook +1” on a meal.${g.duo ? ' You can also cook for your partner from their row.' : ''}` : g.duo ? '🔥 Tap your partner\'s row to cook one of their meals.' : '🔥 You have nothing to cook yet.'; promptBtn = '<button class="btn ghost" data-a="done">Skip</button>'; }
     else if (g.phase === 'grace') prompt = 'Time is up! Waiting for the others to finish.';
     else if (now < g.shiftStart) prompt = 'Get ready…';
-    else if (!nTimers && !g.workers.temp) prompt = 'All your chefs are on strike — a late payment in the office brings one back.';
+    else if (!nTimers && !g.workers.temp) prompt = 'All your crew are out surfing — a late payment in the office brings one back.';
     else prompt = ready ? (nTimers > 1 ? 'You have a free chef. Tap an available station.' : 'A chef is ready. Tap an available station.') : 'Your chefs are working. Plan your next move.';
     if (g.phase === 'grace' && op) prompt = `⏰ Time is up! <b class="grace-left" data-gend="${E.graceDeadline(g, op)}"></b> to finish: ` + prompt;
     if (platePrompt && meP && g.phase !== 'results') prompt += platePrompt;
@@ -2987,17 +2987,17 @@ safe-buffer/index.js:
       ${momentBar(g, now)}
       <div class="main overview ${liveOrders.length>4?'many-orders':''}">
         <div class="plan-scroll" aria-label="Pan and zoom the kitchen"><div class="plan-stage"><div class="board scen-${Math.min(g.settings.scenario, 8)}" tabindex="0" aria-label="Kitchen floor plan. Scroll to see all rooms.">${pingLayer(g, now)}
-          <section class="area reception ${recOpen ? 'active' : ''}"><h3>Reception</h3><div class="rc"><div class="spots">${spot(g, 'reception', 0)}</div>
+          <section class="area reception ${recOpen ? 'active' : ''}"><h3>Front desk</h3><div class="rc"><div class="spots">${spot(g, 'reception', 0)}</div>
             <div class="queue"><div class="stack" style="--n:${Math.min(guestsLeft, 4)}"></div><p>${guestsLeft ? `${guestsLeft} waiting` : 'Nobody outside'}</p></div></div></section>
           <section class="area dining"><h3><button class="room-link" data-a="guests">Dining · view orders ↗</button></h3><div class="seats">${seats}</div><div class="spots">${g.spaces.dining.map((_, i) => spot(g, 'dining', i)).join('')}</div></section>
           ${green}
           ${room('storA', 'A', 1)}
           ${room('storB', 'B', 2)}
-          ${g.storage.C ? room('storC', 'C', 3) : dormant('st3','Dry Store',5)}
+          ${g.storage.C ? room('storC', 'C', 3) : dormant('st3','Bakery shelf',5)}
           <section class="area stove ${op && op.type === 'cook' ? 'active' : ''}"><h3>Stove</h3>${Array.from({length:6-g.spaces.stove.length},(_,i)=>`<span class="unused-hob" style="left:${55+(i+g.spaces.stove.length)*150}px">Closed</span>`).join('')}<div class="spots">${g.spaces.stove.map((_, i) => spot(g, 'stove', i)).join('')}</div></section>
           <section class="area cupboard ${plateGlow ? 'active' : ''}"><h3>Plates</h3><div class="plates" data-a="plateMenu" role="button" aria-label="Open the clean plates"><span class="tray-title">Clean plates</span>${E.PLATES.map(sz => `<button class="pbtn clean ${plateGlow && g.cupboard[sz] ? 'glow' : ''} ${stockCls(g.cupboard[sz])}" data-a="plateMenu" data-size="${sz}" aria-label="${g.cupboard[sz]} clean ${E.PLATE_NAME[sz]} plates">${plateBadge(sz, 'big cleanp')}<b>×${g.cupboard[sz]}</b></button>`).join('')}</div></section>
           ${sink}
-          ${cfg.shop?`<section class="area market"><h3>Shop</h3>${van}<small>1 coin · 5 food / 3 spices / 2 premium</small></section>`:dormant('market','Shop',4)}
+          ${cfg.shop?`<section class="area market"><h3>Scooter run</h3>${van}<small>1 coin · 5 food / 3 superfoods / 2 premium</small></section>`:dormant('market','Shop',4)}
           ${cfg.office?`<section class="area office"><h3>Office</h3>${office}<small>Repairs · unlock · hire</small></section>`:dormant('office','Office',7)}
         </div></div></div>
         <aside class="kitchen">
@@ -3062,8 +3062,8 @@ safe-buffer/index.js:
   }
 
   // Shopping: pick one of three kinds of purchase (tabs), then the item(s), then where it goes.
-  // Storage A and B carry colours (purple, teal) on the plan and here, so the split is easy to follow.
-  const ROOM_LABEL = { A: 'Storage A', B: 'Storage B', C: 'Dry Store' };
+  // Fridge A and B carry colours (purple, teal) on the plan and here, so the split is easy to follow.
+  const ROOM_LABEL = { A: 'Fridge A', B: 'Fridge B', C: 'Bakery shelf' };
   // Small menus for the plate trays: the plan keeps showing every count, the menu has buttons
   // big enough for a finger.
   function renderPlateMenu(g, live) {
@@ -3100,7 +3100,7 @@ safe-buffer/index.js:
       <p class="note">Your chef is at the door. Choose one:</p>
       <div class="rec-opts">
         <button class="rec-opt seat" data-a="seatGuests" ${k ? '' : 'disabled'}><span class="ro-ic">🪑</span><span class="ro-t"><b>${k ? `Seat ${k} new guest${k > 1 ? 's' : ''}` : 'Seat new guests'}</b><small>${k ? `They sit at the empty tables${drinks ? ` and buy drinks: +${drinks} 🪙` : ''}.` : why}</small></span></button>
-        <button class="rec-opt away" data-a="recAway" ${waiting ? '' : 'disabled'}><span class="ro-ic">👋</span><span class="ro-t"><b>Send guests away</b><small>${waiting ? 'Pick 1 or 2 waiting guests whose meals you don\'t want. New guests take their seats, but buy no drinks.' : 'Nobody is waiting at the tables.'}</small></span></button>
+        <button class="rec-opt away" data-a="recAway" ${waiting ? '' : 'disabled'}><span class="ro-ic">👋</span><span class="ro-t"><b>Send guests away</b><small>${waiting ? 'Pick 1 or 2 waiting guests whose meals you don\'t want. New guests take their seats, but buy no kombucha.' : 'Nobody is waiting at the tables.'}</small></span></button>
       </div>
       ${k || waiting ? '' : '<button class="btn ghost" data-a="done">Close</button>'}
     </div></div>`;
@@ -3143,10 +3143,10 @@ safe-buffer/index.js:
         <button class="btn big buybtn" data-a="buySp" data-kind="${tab}" ${picks.length === k ? '' : 'disabled'}>${picks.length === k ? `Buy these ${k} · 1 coin` : `Tap ${k - picks.length} more spice${k - picks.length > 1 ? 's' : ''}`}</button>`;
     } else body = '<p class="note shop-start">Tap what you want to buy.</p>';
     return `<div class="sheet shopsheet"><div class="card shop">
-      <h2>🚐 Shopping <small class="badge">${left > 1 ? '2 purchases this trip' : '1 purchase'} · office has ${g.coins} 🪙</small></h2>
+      <h2>🛵 Scooter run <small class="badge">${left > 1 ? '2 purchases this trip' : '1 purchase'} · office has ${g.coins} 🪙</small></h2>
       <p class="note">One purchase costs 1 coin. Choose one of the three:</p>
       <div class="shopgrid">
-        ${grp('ing', `${n} of one ingredient`, 'into Storage A and B', E.ING.map(ingBtn).join(''))}
+        ${grp('ing', `${n} of one ingredient`, 'into Fridge A and B', E.ING.map(ingBtn).join(''))}
         <div class="sg-pair">
           ${grp('cheap', '3 cheap spices', 'any mix', E.CHEAP.map(i => spBtn('cheap', i)).join(''))}
           ${grp('pricey', '2 expensive spices', 'any mix', E.PRICEY.map(i => spBtn('pricey', i)).join(''))}
@@ -3260,7 +3260,7 @@ safe-buffer/index.js:
     const who = pid => esc((playerOf(g, pid) || { name: '?' }).name);
     const rows = live.map(m => {
       const I = E.MOMENT_INFO[m.kind];
-      if (m.kind === 'delivery') return `<div class="mom live"><b>${I.e} Delivery at the back door!</b><span>Send any chef to a storage room — <b class="mleft" data-mend="${m.until}"></b> before it melts.</span></div>`;
+      if (m.kind === 'delivery') return `<div class="mom live"><b>${I.e} Acai delivery at the back door!</b><span>Send any chef to a fridge — <b class="mleft" data-mend="${m.until}"></b> before it melts.</span></div>`;
       const parts = E.momentOrders(g, m);
       const list = parts.map(o => `<span class="mpart ${o.servedAt != null ? 'done' : ''}">${who(o.pid)} · ${esc(E.DISHES[o.dish].name)}${o.servedAt != null ? ' ✓' : ''}</span>`).join('');
       const mine = parts.filter(o => o.pid === me.pid && o.servedAt == null);
@@ -3273,11 +3273,11 @@ safe-buffer/index.js:
       }
       const before = now < m.slotStart;
       const clock = before ? `Filming starts in <b class="mleft" data-mend="${m.slotStart}"></b>` : `Filming now — <b class="mleft" data-mend="${m.slotEnd}"></b> left`;
-      return `<div class="mom live ${before ? '' : 'hot'}"><b>${I.e} Influencer video</b><span>${clock}. Both items within ${win} s of each other.</span><div class="mparts">${list}</div>${btns}</div>`;
+      return `<div class="mom live ${before ? '' : 'hot'}"><b>${I.e} Photo shoot</b><span>${clock}. Both items within ${win} s of each other.</span><div class="mparts">${list}</div>${btns}</div>`;
     }).join('');
     const done = recent.map(m => {
       const I = E.MOMENT_INFO[m.kind];
-      const gain = m.kind === 'delivery' ? `+${m.gain} ${esc(E.ING_INFO[m.ing].n)} in storage 1` : m.tip ? `+${m.tip} coin tip` : 'nicely done';
+      const gain = m.kind === 'delivery' ? `+${m.gain} ${esc(E.ING_INFO[m.ing].n)} in Fridge A` : m.tip ? `+${m.tip} coin tip` : 'nicely done';
       return `<div class="mom ${m.state}"><b>${I.e} ${I.n}: ${m.state === 'met' ? 'made it!' : 'missed'}</b><span>${m.state === 'met' ? gain : esc(m.why || '')}${m.repLoss ? ' · −1 reputation' : ''}</span></div>`;
     }).join('');
     return `<div class="moments" role="status">${pings}${rows}${done}</div>`;
@@ -3323,8 +3323,8 @@ safe-buffer/index.js:
     const op = g.open[pid];
     if (op) {
       return {
-        order: 'is in the dining room', reception: 'is at the reception', storage: `is fetching ingredients in storage ${ROOM_NO[op.room]}`,
-        spice: 'is picking spices', cook: 'is at the stove', wash: 'is washing plates', shop: 'is shopping at the van', office: 'is in the office',
+        order: 'is in the dining room', reception: 'is at the front desk', storage: `is fetching ingredients from ${ROOM_LABEL[op.room] || 'a fridge'}`,
+        spice: 'is at the superfood bar', cook: 'is at the stove', wash: 'is washing plates', shop: 'is on a scooter run', office: 'is in the office',
       }[op.type] || '';
     }
     if (g.phase !== 'play' || now < g.shiftStart) return '';
@@ -3379,7 +3379,7 @@ safe-buffer/index.js:
     const money = E.cfgOf(g).money;
     const forTxt = () => f.for ? `${esc(whoOf(g, f.for).name)}'s ` : '';
     const txt = {
-      seat: () => `seated ${f.n} guest${f.n > 1 ? 's' : ''}${money ? ` (+${f.n * (E.has(g, 'drinks') ? 2 : 1)} 🪙 drinks)` : ''}`,
+      seat: () => `seated ${f.n} guest${f.n > 1 ? 's' : ''}${money ? ` (+${f.n * (E.has(g, 'drinks') ? 2 : 1)} 🪙 kombucha)` : ''}`,
       throw: () => `sent away ${f.n} guest${f.n > 1 ? 's' : ''}`,
       order: () => `took the order: ${dn(f.dish)}`,
       serve: () => `served ${dn(f.dish)} early (+${f.tip} 🪙 tip)`,
@@ -3421,13 +3421,13 @@ safe-buffer/index.js:
     const rows = g.players.map(p => ({ p, c: chefs[p.id] }));
     const name = p => `<td class="who">${dot(p.color)}${esc(p.name)}</td>`;
     if (!cfg.money) {
-      return `<table class="score"><thead><tr><th></th><th>Served ✓</th><th>${last ? 'Not served' : 'Still cooking'}</th><th>Mistakes</th>${g.duo ? '<th title="Ingredients, spices and cooking steps for the partner">🤝 Helped</th>' : ''}</tr></thead><tbody>
+      return `<table class="score"><thead><tr><th></th><th>Served ✓</th><th>${last ? 'Not served' : 'Still cooking'}</th><th>Mistakes</th>${g.duo ? '<th title="Ingredients, superfoods and cooking steps for the partner">🤝 Helped</th>' : ''}</tr></thead><tbody>
         ${rows.map(({ p, c }) => `<tr>${name(p)}<td><b>${c.served}</b></td><td>${c.waiting || '·'}</td><td>${(c.mistakes + c.binned) || '·'}</td>${g.duo ? `<td>${c.helped || '·'}</td>` : ''}</tr>`).join('')}
       </tbody></table>`;
     }
     const spent = c => c.shop + c.office;
     const best = Math.max.apply(null, rows.map(r => r.c.net));
-    return `<table class="score"><thead><tr><th></th><th>Served</th><th title="Price of served meals">🍽️ Meals</th><th title="Drinks of guests they seated">🥤 Drinks</th>${cfg.service ? '<th title="Tips for serving early">🛎️ Tips</th>' : ''}${cfg.shop || cfg.office ? '<th title="Van and office">🛒 Spent</th>' : ''}<th title="Free drinks for guests they didn't serve">😕 Free drinks</th><th>= Coins</th>${cfg.rep ? '<th>⭐</th>' : ''}${g.duo ? '<th title="Ingredients, spices and cooking steps for the partner">🤝 Helped</th>' : ''}</tr></thead><tbody>
+    return `<table class="score"><thead><tr><th></th><th>Served</th><th title="Price of served meals">🍽️ Meals</th><th title="Drinks of guests they seated">🥤 Drinks</th>${cfg.service ? '<th title="Tips for serving early">🛎️ Tips</th>' : ''}${cfg.shop || cfg.office ? '<th title="Van and office">🛒 Spent</th>' : ''}<th title="Free drinks for guests they didn't serve">😕 Free drinks</th><th>= Coins</th>${cfg.rep ? '<th>⭐</th>' : ''}${g.duo ? '<th title="Ingredients, superfoods and cooking steps for the partner">🤝 Helped</th>' : ''}</tr></thead><tbody>
       ${rows.map(({ p, c }) => `<tr class="${c.net === best && best > 0 ? 'top' : ''}">${name(p)}<td><b>${c.served}</b>${c.mistakes || c.binned ? `<small class="neg"> ${c.mistakes + c.binned}✗</small>` : ''}</td><td>${num(c.meals, 1)}</td><td>${num(c.drinks, 1)}</td>${cfg.service ? `<td>${num(c.tips, 1)}</td>` : ''}${cfg.shop || cfg.office ? `<td>${num(spent(c), -1)}</td>` : ''}<td>${num(c.freeDrinks, -1)}</td><td class="net ${c.net < 0 ? 'neg' : ''}"><b>${c.net > 0 ? '+' : c.net < 0 ? '−' : ''}${Math.abs(c.net)}</b></td>${cfg.rep ? `<td>${c.repGain ? `<span class="pos">+${c.repGain}</span>` : ''}${c.repLoss ? ` <span class="neg">−${c.repLoss}</span>` : ''}${!c.repGain && !c.repLoss ? '<span class="zero">·</span>' : ''}</td>` : ''}${g.duo ? `<td>${c.helped || '<span class="zero">·</span>'}</td>` : ''}</tr>`).join('')}
     </tbody></table>`;
   }
@@ -3487,19 +3487,19 @@ safe-buffer/index.js:
     const cfg = E.cfgOf(g);
     const salary = activeTimers(g) * E.SALARY_PER_TIMER;
     const extra = {
-      1: 'Seat friends, take their orders, grab the right plate, fetch ingredients and cook.',
-      2: 'New: spices come from the greenhouse 🌿 and can be added even while a meal cooks. A plate one size bigger is fine. Each player now controls two chefs. Wrong ingredients can no longer be put back.',
-      3: 'New: most plates start dirty — wash up to 3 per visit at the sink 🧽. A botched meal can go in the bin 🗑️: its plate goes to the sink and the guest waits for a fresh one. Every new guest buys a drink (+1 coin), served meals pay their price, every guest you took an order from but didn\'t serve gets a free drink (−1).',
-      4: 'New: storage rooms and the spice bag start nearly empty — send a timer to the van 🚐 (top bar) to buy 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin. ⭐ guests are demanding: more to prepare, better pay. Between shifts, served meals pay, unfinished ones keep cooking, and mistakes are thrown away.',
-      5: `New: bread and pasta live only in storage room 3. After every shift the chefs take a salary of ${E.SALARY_PER_TIMER} coins per chef — ${salary} coins for the team. If the office can't pay, the restaurant closes.`,
-      6: 'New: reputation ⭐. A served ⭐ guest gives +1, a ⭐ guest left waiting at the end of a shift costs −1 (no free drink). In the dining room you can now serve a finished meal early 🛎️ for a tip (+1 coin) — but if it turns out wrong, reputation drops by 1 more. At the reception you can throw 1 or 2 waiting guests out; the new guests buy no drinks.',
-      7: 'New: VIP guests 👑 order two dishes and only pay when both are right (+2 reputation; −2 if left unfinished). Reputation wins awards 🏆 that help until the end of the game. Four shifts. Timers you can\'t pay go on strike — bring them back with a late payment in the office 🏢 (on the plan).',
-      8: 'New: storage room 2 is locked and one stove is broken. A shared temp 🤍 jumps in when your own timers are busy (salary 3 per shift). The office 🏢 can call the locksmith or the technician, hire a second temp or buy plates.',
+      1: 'Soft opening: seat your friends, take their orders, grab the right bowl, fetch ingredients and cook.',
+      2: 'New: superfoods come from the superfood bar 🍵 and can go on even while a meal cooks. A bowl one size bigger is fine. Each player now runs two chefs. Wrong ingredients stay on the plate.',
+      3: 'New: most bowls start dirty — wash up to 3 per visit at the sink 🧽. A botched meal can go in the bin 🗑️: its bowl goes to the sink and the guest waits for a fresh one. Every new guest buys a kombucha (+1 coin), served meals pay their price, and every guest you took an order from but didn\'t serve gets a free kombucha (−1).',
+      4: 'New: the fridges and the superfood bar start nearly empty — send a chef on a scooter run 🛵 to buy 5 of one ingredient, 3 cheap superfoods or 2 premium ones for 1 coin. ⭐ guests are demanding: more to prepare, better pay. Between shifts, served meals pay, unfinished ones keep cooking, and mistakes are thrown away.',
+      5: `New: sourdough and GF pasta live only on the bakery shelf. After every shift the crew takes wages of ${E.SALARY_PER_TIMER} coins per chef — ${salary} coins for the team. If the office can't pay, the café closes.`,
+      6: 'New: Google reviews ⭐. A served ⭐ guest gives +1, a ⭐ guest still waiting at the end of a shift costs −1 (no free kombucha). In the dining room you can serve a finished meal early 🛎️ for a tip (+1 coin) — but if it turns out wrong, you lose 1 more. At the front desk you can turn 1 or 2 waiting guests away; the new guests buy no kombucha.',
+      7: 'New: influencers 👑 order two dishes and only pay when both are right (+2 reviews; −2 if left unfinished). Good reviews win awards 🏆 that help until the end of the game. Four shifts. Staff you can\'t pay go surfing — bring them back with a late payment in the office 🏢 (on the plan).',
+      8: 'New: Fridge B is locked and one stove is broken. A casual helper 🤍 jumps in when your own chefs are busy (wages 3 per shift). The office 🏢 can call the locksmith or Pak Made the fixer, hire a second casual or buy bowls.',
     }[n] || `Master chef mission with all the rules of restaurant 8. ${SCEN_BLURB[n]}`;
     return `<div class="sheet readysheet"><div class="card">
       <h2>${scenTitle(n)}</h2>
       <p>${extra}</p>
-      ${g.duo ? `<p>🤝 <b>Two-chef helpers (extra, not in the rulebook):</b> ${DUO_RULES}</p>` : ''}
+      ${g.duo ? `<p>🤝 <b>Two-chef helpers (optional extra):</b> ${DUO_RULES}</p>` : ''}
       <p><b>Goal:</b> ${E.goalText(g.goal, g.players.length === 1)}. ${cfg.shifts > 1 ? `${cfg.shifts} shifts of ${t}.` : `${t} on the clock.`} Each player controls ${cfg.timers === 1 ? 'one chef' : 'two chefs'}; each visit keeps a chef busy for ${g.settings.workerSec} seconds.${g.settings.strict ? ' Practice mode gives live hints and blocks meal mistakes.' : ' Recipe mistakes are allowed during play and explained when the shift ends.'}</p>
       ${host ? '<button class="btn big" data-a="startShift">Start the shift</button>' : `<p class="note">Waiting for ${esc(hostP ? hostP.name : 'the host')} to start the shift.</p>`}
       <button class="link" data-a="help">How to play</button>
@@ -3544,30 +3544,30 @@ safe-buffer/index.js:
       <h3>New in the Canggu edition</h3>
       <ul>
         <li><b>Difficulty</b> — Chill (40 s timers, practice hints, no team moments), Normal, Hectic and Full Canggu (20 s timers, challenge goals, more team moments).</li>
-        <li><b>Cancel a chef</b> — tap your own working chef, or a free circle while all your chefs are busy, to cancel one at once. Cooking and washing from that visit are lost; ingredients and spices stay on the plates.</li>
+        <li><b>Cancel a chef</b> — tap your own working chef, or a free circle while all your chefs are busy, to cancel one at once. Cooking and washing from that visit are lost; ingredients and superfoods stay on the plates.</li>
         <li><b>📡 Pings</b> — press and hold anywhere on the plan to ping that spot on every iPad. Tap an empty shelf to call for that ingredient. Answer a call with <b>On it!</b> so nobody else runs. An unanswered call turns red after 3 s; three quick pings mean panic.</li>
         <li><b>🎂 Birthday table</b> — one meal on every chef's board. Serve them with the button in the bar at the top; every plate must arrive within the window of the first.</li>
-        <li><b>🧊 Melting delivery</b> — send any chef to a storage room before the countdown ends, or it melts.</li>
-        <li><b>📸 Influencer</b> — her two items land on two chefs' boards. Serve both inside her filming slot, close together.</li>
+        <li><b>🧊 Melting delivery</b> — send any chef to a fridge before the countdown ends, or the acai melts.</li>
+        <li><b>📸 Photo shoot</b> — an influencer books a filming slot; her bowl and her matcha land on two chefs' boards. Serve both inside the slot, close together.</li>
         <li>A missed team moment: the guests leave without paying (−1 reputation once reputation exists). A met one pays a tip once money exists.</li>
       </ul>
       <h3>The basics</h3>
       <p>Everyone plays at the same time. Tap a free circle to put a chef there and do that action straight away. The circle stays occupied until the chef finishes and moves elsewhere. Numbered green circles are free; apron-coloured rings are occupied. Locked and broken spaces are marked. Use My chefs to take a finished chef off the floor and free their space.</p>
       <ul>
-        <li><b>🚪 Reception</b> seats up to 2 new guests at free tables. From restaurant 6 a menu lets you instead send 1 or 2 waiting guests away; their replacements buy no drinks. If you choose nothing, new guests are seated when your chef moves on.</li>
-        <li><b>📝 Dining room</b> lets you take one guest's order — or, from restaurant 6, serve one of your meals early for a tip 🛎️. Plates come from the cupboard: free, any time.</li>
-        <li><b>📦 Storage room</b> puts ingredients on your own plates. Take all you need from that room, then tap Done.</li>
+        <li><b>🚪 Front desk</b> seats up to 2 new guests at free tables. From restaurant 6 a menu lets you instead turn 1 or 2 waiting guests away; their replacements buy no kombucha. If you choose nothing, new guests are seated when your chef moves on.</li>
+        <li><b>📝 Dining room</b> lets you take one guest's order — or, from restaurant 6, serve one of your meals early for a tip 🛎️. Bowls and plates come from the shelf: free, any time.</li>
+        <li><b>📦 Fridge</b> puts ingredients on your own plates. Take all you need from that fridge, then tap Done. An empty shelf is a button: tap it to call for that ingredient.</li>
         <li><b>🔥 Stove</b> cooks one meal one step. 🍳2 means two stove visits. Too many visits overcook it.</li>
         <li><b>Set aside</b> on your ticket (tap twice) puts a meal aside, unchecked, in the set-aside row, so your other tickets stay in view. Tap its card and Back to my orders to work on it again. It is still checked when the shift ends, and from restaurant 6 you can serve it early 🛎️ from the Ready row while your timer is in the dining room.</li>
-        <li><b>🌿 Greenhouse</b> (from restaurant 2) puts spices on your plates — even on a meal that is already cooking.</li>
-        <li><b>🧽 Sink</b> (from restaurant 3) washes up to 3 dirty plates.</li>
-        <li><b>🚐 Shop</b> (from restaurant 4, on the floor plan) buys 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin.</li>
-        <li><b>🤝 Two-chef helpers</b> (an extra, not in the rulebook; switch it on in the lobby when two chefs play): a shared helper chef (top bar) that either chef can use when their own timers are busy; you may put ingredients and spices on, and cook, your partner's meals — tap their row; and each van trip allows two purchases. The helper is paid first and is the last to go on strike.</li>
-        <li><b>🏢 Office</b> (from restaurant 7, on the floor plan) pays a timer back from strike for 3 coins, and from restaurant 8 calls the locksmith, the technician, hires a temp or buys plates.</li>
+        <li><b>🍵 Superfood bar</b> (from restaurant 2) puts coconut, chia, matcha, turmeric and goji on your plates — even on a meal that is already cooking.</li>
+        <li><b>🧽 Sink</b> (from restaurant 3) washes up to 3 dirty bowls.</li>
+        <li><b>🛵 Scooter run</b> (from restaurant 4, on the floor plan) buys 5 of one ingredient, 3 cheap superfoods or 2 premium ones for 1 coin.</li>
+        <li><b>🤝 Two-chef helpers</b> (an optional extra; switch it on in the lobby when two chefs play): a shared helper chef (top bar) that either chef can use when their own timers are busy; you may put ingredients and superfoods on, and cook, your partner's meals — tap their row; and each scooter run allows two purchases. The helper is paid first and is the last to go on strike.</li>
+        <li><b>🏢 Office</b> (from restaurant 7, on the floor plan) brings a surfing crew member back for 3 coins, and from restaurant 8 calls the locksmith or Pak Made the fixer, hires a casual or buys bowls.</li>
       </ul>
-      <p>Meals are checked when a shift ends: right plate (from restaurant 2, one size bigger is fine), exactly the right ingredients and spices, and the right cooking. ⭐ guests are demanding, 👑 VIP guests order two dishes and only pay if both are right.</p>
-      <p>Restaurant 1 forgives mistakes: tap a wrong ingredient twice to put it back. From restaurant 3 on you can bin a botched meal 🗑️. From restaurant 4, games have several shifts: served meals pay, unfinished meals carry over, mistakes are thrown away. From restaurant 5 the chefs take a salary after every shift; from restaurant 7 unpaid timers go on strike.</p>
-      <p>In standard play, you check the recipe yourself during the rush. The shift report lists every missing or extra ingredient, spice, plate and cooking mistake. Choose Practice: live hints before starting for immediate help. When time expires, finish actions already started, then tap Done or Skip; new visits are closed.</p><p class="note">Based on Kitchen Rush Revised Edition. This Bali adaptation has its own recipes, awards and office prices; solo and two-chef helpers are extras. The optional event deck is not included.</p><button class="btn" data-a="closeHelp">Got it</button>
+      <p>Meals are checked when a shift ends: right plate (from restaurant 2, one size bigger is fine), exactly the right ingredients and superfoods, and the right cooking. ⭐ guests are demanding (gluten-free, oat milk only, extra protein), 👑 influencers order two dishes and only pay if both are right.</p>
+      <p>Restaurant 1 forgives mistakes: tap a wrong ingredient twice to put it back. From restaurant 3 on you can bin a botched meal 🗑️. From restaurant 4, games have several shifts: served meals pay, unfinished meals carry over, mistakes are thrown away. From restaurant 5 the crew takes wages after every shift; from restaurant 7 unpaid staff go surfing until you pay them.</p>
+      <p>In standard play, you check the recipe yourself during the rush. The shift report lists every missing or extra ingredient, superfood, plate and cooking mistake. Choose Practice: live hints before starting for immediate help. When time expires, finish actions already started, then tap Done or Skip; new visits are closed.</p><p class="note">Canggu Kitchen: a real-time co-op cooking game set in a Bali health-food café. Solo play and two-chef helpers are extras.</p><button class="btn" data-a="closeHelp">Got it</button>
     </div></div>`;
   }
 
