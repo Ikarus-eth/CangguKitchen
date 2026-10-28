@@ -619,7 +619,7 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 
 </style>
 <link rel="stylesheet" href="design.css?v=20261027-rules">
-<link rel="stylesheet" href="reference.css?v=20261028-ui4">
+<link rel="stylesheet" href="reference.css?v=20261028-ui6">
 </head>
 <body>
 <div id="app"></div>
@@ -1229,6 +1229,7 @@ safe-buffer/index.js:
     const pid = a.pid;
     const cfg = cfgOf(s);
     const strict = !!s.settings.strict;
+    if (s.paused && !HOST_ONLY.includes(a.type)) throw new Error('The game is paused until everyone is back.');
     if (!HOST_ONLY.includes(a.type) && !s.players.some(p => p.id === pid)) throw new Error('You are watching this round.');
     const AREAS_OF = { storage: ['storA', 'storB', 'storC'], spice: ['green'], order: ['dining'], cook: ['stove'], wash: ['sink'], shop: ['van'], office: ['office'], reception: ['reception'] };
     const needOpen = (type, msg) => {
@@ -1556,8 +1557,30 @@ safe-buffer/index.js:
     const end = s.shiftEnd || 0;
     return Math.max(end + GRACE_MIN, op && op.worker ? op.worker.start + workerMs(s) : 0);
   }
+  // A chef's iPad lost the connection: the host stops the clock for up to PAUSE_MS. On resume
+  // every stored time moves forward by the pause, so shift clock and sand timers carry on
+  // exactly where they stopped.
+  const PAUSE_MS = 60000;
+  function pause(s, who, now) {
+    if (s.paused || !(s.phase === 'play' || s.phase === 'grace')) return false;
+    s.paused = { at: now, until: now + PAUSE_MS, who: who.slice() };
+    return true;
+  }
+  function resume(s, now) {
+    if (!s.paused) return false;
+    const d = Math.max(0, now - s.paused.at);
+    if (s.shiftStart) s.shiftStart += d;
+    if (s.shiftEnd) s.shiftEnd += d;
+    Object.keys(s.workers).forEach(k => s.workers[k].forEach(w => { if (w) w.start += d; }));
+    Object.keys(s.spaces).forEach(k => s.spaces[k].forEach(x => { if (x && x.start != null) x.start += d; }));
+    Object.keys(s.open).forEach(k => { const op = s.open[k]; if (op && op.worker) op.worker.start += d; });
+    s.pausedMs = (s.pausedMs || 0) + d;
+    s.paused = null;
+    return true;
+  }
   function tick(s, now) {
     let changed = false;
+    if (s.paused) { if (now < s.paused.until) return false; resume(s, now); changed = true; }
     if (s.phase === 'play' && now >= s.shiftEnd) {
       s.phase = 'grace';
       s.graceEnd = null; // Finish existing actions; the rulebook sets no extra time limit.
@@ -1728,7 +1751,7 @@ safe-buffer/index.js:
     MAX_ROW, SCEN, AREA_NAME, ROOM_OF, HOST_ONLY, SALARY_PER_TIMER, AWARDS, AWARD_AT, OFFICE, LATE_PAY,
     layout, goalOf, goalText, newGame, apply, tick, endShift, finish, checkOrder, plateOk, needsIng, needsSp, ingComplete,
     isMistake, tally, roomIngs, guests, goalChecks, onStrike, kindOf, has, supplyCount,
-    workerReady, workerLeft, timerReady, workerMs, cfgOf, graceDeadline,
+    workerReady, workerLeft, timerReady, workerMs, cfgOf, graceDeadline, pause, resume, PAUSE_MS,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -1787,11 +1810,12 @@ safe-buffer/index.js:
   }
 
   function host(room, onAction, onStatus) {
-    const tS = `${PREFIX}/${room}/s`, tA = `${PREFIX}/${room}/a`;
-    let last = null;
+    const tS = `${PREFIX}/${room}/s`, tA = `${PREFIX}/${room}/a`, tG = `${PREFIX}/games/${room}`;
+    let last = null, card = null;
     const L = links(onStatus, c => {
       c.subscribe(tA, { qos: 1 });
       if (last !== null) c.publish(tS, last, { qos: 0, retain: true });
+      if (card !== null) c.publish(tG, card, { qos: 0, retain: true });
     }, (topic, buf) => {
       if (topic !== tA) return;
       try { onAction(JSON.parse(buf.toString())); } catch (e) { /* ignore junk */ }
@@ -1799,6 +1823,8 @@ safe-buffer/index.js:
     return {
       publish(obj) { last = JSON.stringify(obj); L.up().forEach(l => l.c.publish(tS, last, { qos: 0, retain: true })); },
       clear() { last = ''; L.up().forEach(l => l.c.publish(tS, '', { qos: 0, retain: true })); },
+      // A short card on a shared topic, so iPads on the start screen can list running games.
+      announce(obj) { card = obj ? JSON.stringify(obj) : ''; L.up().forEach(l => l.c.publish(tG, card, { qos: 0, retain: true })); },
       online: () => L.up().length > 0,
       refresh: L.refresh,
       close: L.close,
@@ -1833,7 +1859,19 @@ safe-buffer/index.js:
     };
   }
 
-  root.Net = { host, join };
+  // Start screen: listen for the game cards of all hosts. onGame(card) gets every card; an empty
+  // retained message (a closed game) arrives as { room, gone: true }.
+  function scan(onGame) {
+    const tG = `${PREFIX}/games/+`;
+    const L = links(null, c => c.subscribe(tG, { qos: 0 }), (topic, buf) => {
+      const room = topic.split('/').pop();
+      if (!buf.length) { onGame({ room, gone: true }); return; }
+      try { const o = JSON.parse(buf.toString()); if (o && o.room === room) onGame(o); } catch (e) { /* ignore junk */ }
+    });
+    return { close: L.close };
+  }
+
+  root.Net = { host, join, scan };
 })(window);
 
 </script>
@@ -1948,7 +1986,7 @@ safe-buffer/index.js:
     render();
     keepAwake();
     netStatus = 'reconnecting';
-    net = E_NET.host(room, onRemoteAct, st => { const was = netStatus; netStatus = st; renderStatus(); if (st === 'online' && was !== 'online') publish(); });
+    net = E_NET.host(room, onRemoteAct, st => { const was = netStatus; netStatus = st; renderStatus(); if (st === 'online' && was !== 'online') { publish(); announce(true); } });
     const mine = net;
     setTimeout(() => { if (net === mine && !net.online()) toast('No connection to the game relay yet. Check the Wi-Fi; it keeps trying.', 'err'); }, 10000);
   }
@@ -1958,13 +1996,38 @@ safe-buffer/index.js:
   const acks = [];          // ids of the latest guest actions the host has handled
   const seen = {};          // pid -> last time the host heard from that iPad
   function publish() { if (net && role === 'host') net.publish(Object.assign({}, wrap, { now: Date.now(), hs: hostSession, acks: acks.slice(-60), seen: Object.assign({}, seen, { [me.pid]: Date.now() }) })); }
-  function changed() { wrap.rev++; saveHost(); publish(); render(); }
+  function changed() { wrap.rev++; saveHost(); publish(); announce(false); render(); }
+  // Game card for the start screens of the other iPads (shows the code, so nobody has to remember it).
+  let lastCard = 0, lastCardKey = '';
+  function announce(force) {
+    if (!net || role !== 'host' || !net.announce || !wrap) return;
+    const g = game(), ps = g ? g.players : wrap.lobby.players, phase = g ? g.phase : 'lobby';
+    const key = phase + ps.map(p => p.id + p.name).join();
+    if (!force && key === lastCardKey && Date.now() - lastCard < 10000) return;
+    lastCard = Date.now(); lastCardKey = key;
+    net.announce({ room, host: me.name, names: ps.map(p => p.name), pids: ps.map(p => p.id), phase, scen: g ? g.settings.scenario : wrap.lobby.settings.scenario, at: Date.now() });
+  }
+  // A guest iPad that goes quiet (asleep, out of Wi-Fi, reloading) pauses the game for up to a
+  // minute. Each disconnect pauses once; the chef has to be heard from again to pause again.
+  const QUIET_MS = 12000, hostSince = Date.now(), pauseSpent = {};
+  function watchGuests() {
+    const g = game();
+    if (role !== 'host' || !g || g.phase === 'ready' || g.phase === 'between' || g.phase === 'results') return;
+    const now = Date.now(), last = id => seen[id] || hostSince;
+    if (g.paused) {
+      if (g.paused.who.every(id => now - last(id) < 4000)) { E.resume(g, now); toast('▶ Everyone is back — the game goes on.'); changed(); }
+      return;
+    }
+    const gone = g.players.filter(p => p.id !== me.pid && now - last(p.id) > QUIET_MS && !pauseSpent[p.id]).map(p => p.id);
+    if (gone.length && E.pause(g, gone, now)) { gone.forEach(id => { pauseSpent[id] = true; }); changed(); }
+  }
+  setInterval(watchGuests, 1000);
 
   const seenAids = new Set(), seenOrder = [];
   function onRemoteAct(a) {
     if (!a || !a.type || !wrap || role !== 'host') return;
-    if (a.pid) seen[a.pid] = Date.now();
-    if (a.type === 'ping') return;
+    if (a.pid) { seen[a.pid] = Date.now(); delete pauseSpent[a.pid]; }
+    if (a.type === 'ping') { watchGuests(); return; }
     if (E.HOST_ONLY.includes(a.type)) return;
     if (a.aid) { // every relay delivers a copy; never apply an action twice
       if (seenAids.has(a.aid)) return;
@@ -2012,7 +2075,7 @@ safe-buffer/index.js:
     }
   }
   setInterval(hostTick, 250);
-  setInterval(() => { if (role === 'host') publish(); }, 2000);
+  setInterval(() => { if (role === 'host') { publish(); announce(false); } }, 2000);
   setInterval(() => { if (role === 'host' && wrap && !wrap.game && !ui.menu && !ui.help) render(); }, 3000); // lobby: who is connected
 
   // ---------- guest ----------
@@ -2382,6 +2445,7 @@ safe-buffer/index.js:
         <label class="fld">Your name<input id="nm" maxlength="14" value="${esc(me.name)}" placeholder="Your name" autocomplete="off"></label>
         <div class="chef-roster" role="group" aria-label="Choose your chef">${['blue','yellow','red','green'].map(c=>`<button class="chef-choice ${me.color===c?'chosen':''}" style="--c:${COLORS[c]}" data-a="color" data-c="${c}" aria-pressed="${me.color===c}" aria-label="Choose ${looks[c][0]}, ${looks[c][1]}"><span class="chef-stage">${chef(c)}</span><b>${looks[c][0]}</b><small>${looks[c][1]}</small><span class="choice-check">${me.color===c?'✓':''}</span></button>`).join('')}</div>
         <div class="welcome-actions"><button class="btn big" data-a="host">Open a restaurant <span>→</span></button><button class="btn ghost" data-a="campaign">Play solo</button></div>
+        <div id="games">${gamesHtml()}</div>
         <div class="join-box"><label for="code">Joining friends?</label><div><input id="code" class="codein" maxlength="12" placeholder="Room code" autocapitalize="characters" autocomplete="off" value="${esc(ui.code!=null?ui.code:canRejoin?gsaved.room:'')}"><button class="btn ghost" data-a="join">Join their kitchen</button></div></div>
         ${canResume?`<button class="link" data-a="resume">Continue restaurant ${esc(saved.room)}</button>`:''}
         <div class="welcome-footer"><span>1–4 players · 13 restaurants & missions</span><button class="link" data-a="help">How to play</button></div>
@@ -2389,7 +2453,32 @@ safe-buffer/index.js:
 
   }
 
+  // Running games, heard from the hosts' game cards while this iPad shows the start screen.
+  // Listed: games still in the lobby, and games this chef plays in (to rejoin without the code).
+  let scanNet = null;
+  const cards = {};
+  function syncScanner() {
+    const want = (ui.screen === 'home' || !role) && !!window.Net && !!window.Net.scan;
+    if (want && !scanNet) scanNet = window.Net.scan(c => { if (c.gone) delete cards[c.room]; else cards[c.room] = c; paintGames(); });
+    if (!want && scanNet) { scanNet.close(); scanNet = null; }
+  }
+  function liveGames() {
+    const now = Date.now();
+    return Object.values(cards).filter(c => Math.abs(now - c.at) < 45000 && c.phase !== 'results' && (c.phase === 'lobby' || (c.pids || []).includes(me.pid)))
+      .sort((a, b) => ((b.pids || []).includes(me.pid) - (a.pids || []).includes(me.pid)) || b.at - a.at).slice(0, 6);
+  }
+  function gamesHtml() {
+    const list = liveGames();
+    if (!list.length) return '';
+    const phaseTxt = c => c.phase === 'lobby' ? 'waiting in the lobby' : c.phase === 'between' ? `restaurant ${c.scen}, shift break` : `restaurant ${c.scen}, playing`;
+    return `<div class="games-box"><span class="eyebrow">GAMES RUNNING NOW</span>${list.map(c => { const mine = (c.pids || []).includes(me.pid);
+      return `<button class="game-row ${mine ? 'mine' : ''}" data-a="joinGame" data-room="${esc(c.room)}"><span class="gm-t"><b>${mine ? 'Rejoin ' : ''}${esc(c.host || 'Chef')}’s kitchen</b><small>${esc(phaseTxt(c))} · ${esc((c.names || []).join(', '))}</small></span><span class="gm-code">${esc(c.room)}</span></button>`; }).join('')}</div>`;
+  }
+  function paintGames() { const el = document.getElementById('games'); if (el) { const h = gamesHtml(); if (el.innerHTML !== h) el.innerHTML = h; } }
+  setInterval(() => { if (scanNet) paintGames(); }, 5000);
+
   // ---------- solo campaign ----------
+  const SOLO_ALL_OPEN = true; // Ikarus 2026-10-28: every solo level open for now; false brings back unlocking by wins
   const CAMP_KEY = () => 'kc-campaign-' + me.pid;
   const camp = () => LS.get(CAMP_KEY(), { unlocked: 1, done: {} });
   function campaignResult(g) {
@@ -2426,7 +2515,7 @@ safe-buffer/index.js:
   function renderCampaign() {
     const c = camp(), S = wrap.lobby.settings, n = S.scenario || 1;
     const all = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-    const open = k => k <= 8 ? k <= c.unlocked : c.unlocked > 8;
+    const open = k => SOLO_ALL_OPEN || (k <= 8 ? k <= c.unlocked : c.unlocked > 8);
     const wonCount = [1, 2, 3, 4, 5, 6, 7, 8].filter(k => c.done[k] && c.done[k].won).length;
     const card = k => {
       const d = c.done[k] || {};
@@ -2442,7 +2531,7 @@ safe-buffer/index.js:
       <section class="card">
         <h2>${esc(me.name || 'Chef')}'s solo campaign</h2>
         <div class="cprog"><div style="width:${wonCount / 8 * 100}%"></div></div>
-        <p class="note">${wonCount} of 8 restaurants won${c.unlocked > 8 ? ' — the master chef missions are open' : ''}. Win a restaurant to open the next one.</p>
+        <p class="note">${wonCount} of 8 restaurants won${SOLO_ALL_OPEN ? '. All restaurants and missions are open for now.' : `${c.unlocked > 8 ? ' — the master chef missions are open' : ''}. Win a restaurant to open the next one.`}</p>
         ${ui.soloResume ? '<button class="btn big resumebtn" data-a="soloResume">Continue the game you started</button>' : ''}
         <div class="cgrid">${all.filter(k => k <= 8).map(card).join('')}</div>
         <h2>Master chef missions</h2>
@@ -2551,7 +2640,7 @@ safe-buffer/index.js:
     const cfg = E.cfgOf(g);
     const meP = g.players.find(p => p.id === me.pid);
     const op = meP ? myOpen(g) : null;
-    const now = hostNow();
+    const now = g.paused ? g.paused.at : hostNow();
     const myOrders = g.orders.filter(o => o.pid === me.pid);
     const liveOrders = myOrders.filter(o => !o.served && !o.parked);
     const aside = myOrders.filter(o => o.served || o.parked);
@@ -2656,7 +2745,7 @@ safe-buffer/index.js:
 
     return `<div class="game phase-${g.phase} ${g.settings.strict ? 'strict' : ''}">
       <header class="bar ${cfg.shop ? 'crowded' : ''}">
-        <div class="brand">Canggu Kitchen<small>${esc(wrap.room)}</small></div>
+        <div class="brand">Canggu Kitchen<small>${esc(wrap.room)}</small></div>${role !== 'solo' ? `<span class="roomchip" title="Room code for joining">Code <b>${esc(wrap.room)}</b></span>` : ''}
         <div class="clock" id="clock">${clock}</div>
         ${goalChip(g)}
         ${temps}
@@ -2700,6 +2789,7 @@ safe-buffer/index.js:
       ${ui.seatPeek != null && !(op && op.type === 'order') ? renderSeatPeek(g, ui.seatPeek) : ''}
       ${g.phase === 'results' && ui.results ? renderResults(g) : ''}
       ${g.phase === 'grace' ? `<div class="grace-banner">⏰ Time is up!${op ? ` Finish your action — <b data-gend="${E.graceDeadline(g, op)}"></b> left.` : ' Waiting for the other chefs to finish…'}</div>` : ''}
+      ${g.paused ? `<div class="pause-banner"><b>Game paused</b><span>${esc(g.paused.who.map(id => (playerOf(g, id) || {}).name || 'A chef').join(' and '))} lost the connection. Waiting up to <b data-pend="${g.paused.until}"></b> for ${g.paused.who.length > 1 ? 'them' : 'their iPad'} to come back.</span>${isHost() ? '<button class="btn" data-a="unpause">Go on without them</button>' : ''}</div>` : ''}
       <div class="countdown" id="countdown"></div>
     </div>`;
   }
@@ -3088,6 +3178,7 @@ safe-buffer/index.js:
     const host = isHost(), g = game();
     return `<div class="sheet" data-a="closeMenu"><div class="card menu" data-stop="1">
       <h2>Menu</h2>
+      ${role !== 'solo' && room ? `<p class="menu-code">Room code <b>${esc(room)}</b><small>Other iPads also find this game on their start screen.</small></p>` : ''}
       <button class="btn ghost" data-a="sound">Sound: ${sound ? 'on' : 'off'}</button>
       <button class="btn ghost" data-a="help">How to play</button>
       ${host && g && g.phase === 'play' ? '<button class="btn ghost" data-a="endNow">End the shift now</button>' : ''}
@@ -3142,6 +3233,7 @@ safe-buffer/index.js:
 
     if (focusId) { const el = document.getElementById(focusId); if (el) { el.focus(); try { el.setSelectionRange(caret, caret); } catch (e) { /* not text */ } } }
     renderStatus();
+    syncScanner();
     frame(true);
     const g = game();
     if (g && g.errs && g.errs[me.pid] && g.errs[me.pid].t > seenErr) {
@@ -3164,7 +3256,8 @@ safe-buffer/index.js:
   function frame(once) {
     const g = game();
     if (g) {
-      const now = hostNow();
+      const now = g.paused ? g.paused.at : hostNow(); // a paused game shows frozen timers
+      document.querySelectorAll('[data-pend]').forEach(el => { el.textContent = fmt(Math.max(0, +el.dataset.pend - hostNow())); });
       const dur = E.workerMs(g);
       document.querySelectorAll('[data-wstart]').forEach(el => {
         const left = Math.max(0, +el.dataset.wstart + dur - now);
@@ -3184,7 +3277,7 @@ safe-buffer/index.js:
         const pre = g.shiftStart - now;
         if (cd) { const n = pre > 0 ? Math.ceil(pre / 1000) : 0; cd.textContent = n || ''; cd.className = 'countdown' + (n ? ' on' : ''); if (n !== lastCount) { if (n) SFX.tap(); else if (lastCount) SFX.go(); lastCount = n; } }
         const left = g.shiftEnd - Math.max(now, g.shiftStart);
-        if (clock) { clock.textContent = fmt(left); clock.classList.toggle('hurry', left < 30000); }
+        if (clock) { clock.textContent = fmt(left); clock.classList.toggle('hurry', left < 30000 && !g.paused); clock.classList.toggle('paused', !!g.paused); }
         const sec = Math.ceil(left / 1000);
         if (sec !== lastSec) { if ([60, 30, 10, 5, 4, 3, 2, 1].includes(sec) && pre <= 0) SFX.warn(); lastSec = sec; }
       } else if (clock && g.phase !== 'ready') clock.textContent = g.phase === 'grace' ? 'Time!' : g.phase === 'between' ? 'Break' : 'Done';
@@ -3292,6 +3385,11 @@ safe-buffer/index.js:
       case 'join':
         if (!me.name) { toast('Type your name first.', 'err'); document.getElementById('nm').focus(); return; }
         guestJoin(document.getElementById('code').value); break;
+      case 'unpause': if (isHost() && g && E.resume(g, Date.now())) changed(); break;
+      case 'joinGame':
+        unlockAudio();
+        if (!me.name) { toast('Type your name first.', 'err'); const nm = document.getElementById('nm'); if (nm) nm.focus(); return; }
+        ui.code = t.dataset.room; guestJoin(t.dataset.room); break;
       case 'cancelJoin': cancelJoin(); break;
       case 'help': ui.help = true; ui.menu = false; render(); break;
       case 'closeHelp': ui.help = false; render(); break;
@@ -3306,7 +3404,7 @@ safe-buffer/index.js:
         if (role === 'host' && !confirm('Close the restaurant? The other iPads will lose this game.')) return;
         // Give the last message a moment to leave before the connections close.
         if (role === 'guest' && net) { const n = net; if (!g) n.send({ type: 'leave', pid: me.pid, aid: rid() + rid() }); setTimeout(() => n.close(), 1500); LS.del('kc-guest'); }
-        if (role === 'host' && net) { const n = net; n.clear(); setTimeout(() => n.close(), 1500); LS.del('kc-host'); }
+        if (role === 'host' && net) { const n = net; n.clear(); n.announce(null); setTimeout(() => n.close(), 1500); LS.del('kc-host'); }
         role = null; net = null; wrap = null; authWrap = null; pending = []; ui.joining = false; room = null; offsets = []; ui.menu = false; ui.screen = 'home'; render(); break;
       case 'set': {
         if (!isHost()) return;

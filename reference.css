@@ -612,3 +612,29 @@ button.gcard:active{background:#eef3e3;border-color:#2f6b4f;transform:scale(.98)
 .ticket .plate-pick .ppbtn{min-height:38px;padding:1px 2px;gap:2px}
 .ticket .plate-pick .ppbtn .pl{width:28px!important;height:28px!important}
 .ticket .plate-pick .ppbtn>b{font-size:14px}
+
+/* ---- Claude 2026-10-28: running games on the start screen, room code, pause ---- */
+.games-box{display:grid;gap:8px;margin:14px 0 4px}
+.game-row{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:10px 12px;border:2px solid #b5a07a;border-radius:10px;background:#fffbf0;color:var(--ink);min-height:58px;cursor:pointer}
+.game-row.mine{border:3px solid #23885a;background:#eef6ec}
+.game-row:active{transform:scale(.98)}
+.gm-t{display:flex;flex-direction:column;min-width:0}
+.gm-t b{font:700 17px Georgia}
+.gm-t small{font:13px Georgia;color:#6b6250;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-code{font:700 16px system-ui;letter-spacing:.06em;color:#2f5e46;background:#e4ecd5;padding:4px 10px;border-radius:8px;flex:none}
+.game .bar .roomchip{display:inline-flex;align-items:center;gap:5px;font:12px Georgia;color:#5d543f;background:#efe8d6;border:1px solid #c9b996;border-radius:8px;padding:3px 8px;white-space:nowrap}
+.game .bar .roomchip b{font:700 14px system-ui;letter-spacing:.05em;color:#2c2a22}
+@media(max-width:1150px){.game .bar .roomchip{font-size:0;gap:0;padding:3px 6px}.game .bar .roomchip b{font-size:13px}}
+.menu-code{display:flex;flex-direction:column;align-items:center;gap:2px;margin:0 0 10px;font:15px Georgia}
+.menu-code b{font:700 30px system-ui;letter-spacing:.08em;color:#2f5e46}
+.menu-code small{font:12px Georgia;color:#7a6b52;text-align:center}
+.game .bar .clock.paused{background:#6b6250!important}
+.pause-banner{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 32px);padding:14px 20px;background:#2c2a22f0;color:#fff;border-radius:14px;box-shadow:0 8px 30px #0006;font:16px Georgia;text-align:center}
+.pause-banner>b{font:700 22px Georgia}
+.pause-banner .btn{min-height:40px;background:#fffbf0;color:#2c2a22;border:0}
+.game:has(.pause-banner) .board,.game:has(.pause-banner) .kitchen{filter:grayscale(.5) opacity(.75);pointer-events:none}
+/* Messages sit over the top bar, so they never cover the storage rooms. */
+#toast{top:4px!important;max-width:min(640px,calc(100vw - 24px));padding:10px 18px!important;font:600 16px/24px Georgia!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px #0005}
+#toast.show{transform:translate(-50%,0)!important}
+/* Active meal: green band only (the ▶ character turns into a blue emoji on iPad). */
+.game .mytks .ticket.sel .tk-head .tk-n:before{content:none!important}

@@ -31,6 +31,18 @@ test('Restaurant 6+: a reception left without a choice still seats guests',()=>{
   assert.equal(t.open.p0,null);assert.equal(t.seats.filter(x=>x.dish).length,2);
 });
 
+test('Pause freezes the shift clock and sand timers, resume shifts them forward',()=>{
+  const s=game(6,false,3);visit(s,'storA',0,'p0',5000);
+  const end=s.shiftEnd,w=s.workers.p0.find(Boolean).start,op=s.open.p0.worker.start;
+  assert.ok(E.pause(s,['p1'],6000));
+  assert.match(act(s,'done',{},7000),/paused/);
+  assert.equal(E.tick(s,30000),false);assert.ok(s.paused);
+  assert.ok(E.resume(s,26000));assert.equal(s.paused,null);
+  assert.equal(s.shiftEnd,end+20000);assert.equal(s.workers.p0.find(Boolean).start,w+20000);assert.equal(s.open.p0.worker.start,op+20000);
+  ok(s,'done',{},27000);
+  E.pause(s,['p1'],30000);assert.equal(E.tick(s,30000+E.PAUSE_MS),true);assert.equal(s.paused,null);
+});
+
 test('All 13 scenarios and 1–4 players have the required worker capacities',()=>{
   for(let sc=1;sc<=13;sc++)for(let n=1;n<=4;n++){
     const s=game(sc,false,n),p=Math.max(n,2);
