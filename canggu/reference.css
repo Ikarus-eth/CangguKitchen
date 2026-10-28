@@ -1,0 +1,640 @@
+/* The illustrated room plan is the visual surface. State and hit targets are HTML. */
+:root{--ink:#292c23;--ink-2:#66604f;--paper:#fcf7ec;--heat:#ae653f;--ok:#32715b;--bad:#b14736;--tile:#f3ecdc}
+body{background:#f5efdf;background-image:repeating-linear-gradient(0deg,#9c815407 0 1px,transparent 1px 3px);font-family:Georgia,'Times New Roman',serif;color:var(--ink)}
+button,input,select{font:inherit}button{touch-action:manipulation}.btn{background:#366b54;border-color:#446b52;color:#fff;font-family:Georgia,serif}.btn.ghost{color:var(--ink);background:#f7f0df}
+.asset{background-image:url('../assets/kitchen-sprites-v2.png');clip-path:none;mix-blend-mode:multiply;filter:none!important;pointer-events:none}.asset.chef{mix-blend-mode:multiply}.dish-art{width:100%;height:100%}.dish-art>.asset{width:100%;height:100%}.dish-art>.dish-food{display:none}
+.game .bar{height:53px;min-height:53px;gap:10px;padding:4px 16px;background:#faf5e9;border-bottom:1px solid #ad9b7c;color:var(--ink);flex-wrap:nowrap}.bar .brand{font-size:23px;letter-spacing:.045em;font-weight:600;text-transform:uppercase}.brand small{display:none}.bar .clock{font:600 22px Georgia;min-width:70px;border:0;border-left:1px solid #cabba1;border-radius:0;background:none;padding:0 12px;line-height:33px}.bar .goalchip{background:none!important;border:0!important;border-left:1px solid #cabba1!important;padding:0 10px;font:16px Georgia;box-shadow:none}.bar .goalchip small{font:10px system-ui}.bar .shiftchip{white-space:nowrap}.bar .goalchip>small{max-width:90px}.bar .tempbar{display:none}.bar .team-toggle{font-size:14px;min-height:35px;padding:4px 12px}.plan-tools{display:flex;gap:5px;flex:none}.plan-tools .btn{min-height:35px;padding:4px 11px;font-size:14px}.plan-tools .zoom-btn{font-size:23px;min-width:36px;padding:0}.bar .menu-b{width:35px;height:35px;font-size:20px;flex:none}.bar .net:empty{display:none}
+.game .main{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(250px,1fr) 258px!important;padding:0 8px 8px!important;gap:0;overflow:hidden!important;max-width:none!important;min-width:0;width:100%;margin:0}
+.plan-scroll{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-x pan-y;scrollbar-width:thin;scrollbar-color:#a6926d #eee6d3;position:relative}.plan-stage{position:relative;flex:none;margin:0 auto;min-width:0}
+.game .board[class]{position:absolute;display:block;left:0;top:0;width:1730px!important;height:909px!important;min-width:0!important;min-height:0!important;max-width:none;max-height:none;overflow:visible;padding:0;border:0;border-radius:0;box-shadow:none;background:url('../assets/kitchen-floorplan-v2.png') center/100% 100% no-repeat;transform-origin:0 0;isolation:isolate;gap:0}
+.game .board .area{position:absolute;display:block!important;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:none;overflow:visible;min-width:0;min-height:0;isolation:auto}
+.board .area h3{position:absolute;top:4px;left:12%;right:12%;margin:0;text-align:center;color:#242820;font:600 24px Georgia;line-height:31px;white-space:nowrap;text-shadow:0 1px #fff;z-index:2;background:linear-gradient(90deg,#faf3e000,#faf4e9e6 15%,#faf4e9e6 85%,#faf3e000)}
+.board .area h3 small{font:16px Georgia;color:#70654e}.board .area.active{background:none;box-shadow:none}.board .area.active h3{color:#235d45;background:linear-gradient(90deg,#fbf5e800,#fff4ca 20%,#fff4ca 80%,#fbf5e800)}
+.board .st1{left:40px;top:25px;width:475px;height:325px}.board .st2{left:540px;top:25px;width:370px;height:325px}.board .st3{left:940px;top:25px;width:315px;height:325px}.board .green{left:1280px;top:25px;width:407px;height:325px}
+.board .stove{left:44px;top:369px;width:954px;height:226px}.board .cupboard{left:1022px;top:369px;width:168px;height:226px}.board .sink{left:1212px;top:369px;width:470px;height:226px}
+.board .reception{left:44px;top:616px;width:280px;height:236px}.board .dining{left:345px;top:616px;width:652px;height:236px}.board .market{left:1025px;top:616px;width:380px;height:236px}.board .office{left:1440px;top:616px;width:240px;height:236px}
+.game .board .area .ahead,.game .board .area .gh{display:contents}.game .board .area .ings{position:absolute;top:35px;left:28px;right:35px;height:208px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,66px);gap:3px 10px;margin:0}.game .board .area.st2 .ings{left:16px;right:20px}.game .board .area.st3 .ings{top:42px;left:32px;right:30px;grid-template-columns:1fr!important;grid-template-rows:80px 80px;height:165px}.game .board .ings:has(.ing:nth-child(4):last-child){grid-template-rows:98px 98px}
+.board .ing{background:none;border:0;border-radius:0;box-shadow:none;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;padding:0;position:relative;color:#201c15}.board .ing .heap{height:42px;display:block;mix-blend-mode:multiply}.board .ing .heap .asset{width:75px;height:45px}.board .ings:has(.ing:nth-child(4):last-child) .ing .heap{height:62px}.board .ings:has(.ing:nth-child(4):last-child) .ing .heap .asset{width:90px;height:63px}.board .ing .stock-label{min-width:90px;width:auto;background:#fcf6e9ef;box-shadow:0 1px 2px #35281660;display:flex;align-items:center;justify-content:center;gap:6px;flex-direction:row;padding:1px 6px;font:16px Georgia;line-height:19px;white-space:nowrap}.board .ing b{font:600 21px Georgia}.board .ing:disabled{opacity:.78}.board .ing:disabled .heap{filter:saturate(.65)}.board .ing.glow{background:#e7bc5835;outline:2px solid #51805b;border-radius:5px;box-shadow:none}.board .ing:focus-visible{outline:3px solid #3d775e}
+.game .board .area .spices{position:absolute;top:37px;left:30px;right:26px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.board .spices .ing .heap{height:65px}.board .spices .ing .heap .asset{width:60px;height:65px}.board .spices .ing .stock-label{min-width:0;width:100%;flex-direction:column;gap:0;font-size:14px;white-space:normal;text-align:center;box-shadow:0 1px 3px #4c311555;line-height:16px}.board .spices .ing b{font-size:23px;line-height:27px}.board .spices .ing{justify-content:flex-start}.board .area.store.locked{background:none;filter:none}.board .store.locked .ings{opacity:.8}.board .lockmsg{position:absolute;bottom:4px;left:35px;right:35px;padding:2px!important;font:14px Georgia!important;background:#f6eddde8!important;color:#6b4f31;border:1px solid #a28e65;border-radius:3px;z-index:2}
+.game .board .area .spots{position:absolute;display:flex;justify-content:space-evenly;align-items:center;flex-wrap:nowrap;gap:0;padding:0!important;margin:0;bottom:7px;left:45px;right:45px;height:73px;min-height:0}
+.game .board .area .spot{position:relative;width:72px!important;height:72px!important;min-width:72px!important;min-height:72px!important;border:1.5px dashed #776f5460;background:transparent;box-shadow:none;font:18px Georgia;overflow:visible;flex:none}.game .board .spot.taken{border:0;background:transparent!important;box-shadow:none}.game .board .spot.taken:after{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*360deg),#7772 0);mask:radial-gradient(transparent 64%,black 66%);pointer-events:none}.game .board .spot .slot-number{font-size:16px;opacity:.7;position:absolute;bottom:-16px;left:0;right:0;text-align:center}.game .board .spot .chef{position:absolute;width:76px;height:88px;left:-2px;top:-17px;z-index:1}.game .board .spot .ini{width:20px!important;height:18px!important;bottom:-10px;left:15px;border:0;background:#fbf5e7dd;color:#463a26;font:12px Georgia;z-index:2;border-radius:2px}.game .board .spot .sec{font:12px Georgia;right:10px;bottom:-12px;background:#f6eedbd9;color:#544d37;z-index:2}.game .board .spot:before{display:none!important}.game .board .spot.broken{font-size:0;border:0}.game .board .spot.broken:after{content:'×';position:absolute;left:-15px;top:-137px;font:130px Georgia;color:#ab4d33;text-shadow:0 1px 2px #fbebca}
+.game .board .stove .spots{left:35px;right:26px;bottom:18px;justify-content:flex-start;gap:78px}.game .board .stove .spot{width:72px!important}.hob-pan{position:absolute!important;width:118px!important;height:118px!important;left:-22px;top:-132px;z-index:2;mix-blend-mode:multiply}.board .stove .spots:has(.spot:nth-child(4):last-child){gap:78px}.board .stove .spot:not(.taken):hover{background:#f2dca749}
+.board .st3 .spots{left:35px;right:35px;bottom:22px!important}.board .green .spots{left:80px;right:65px;bottom:24px!important}.board .sink .spots{left:0;right:180px;bottom:11px!important}.board .sink h3{left:0;right:35%;top:0}.board .sink .plates{position:absolute;right:2px;top:45px;bottom:7px;width:150px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;background:#f8f1dfd9;padding:5px;border:1px solid #9b8159;border-radius:3px}.board .pbtn{border:0;background:transparent;min-height:0;min-width:0;padding:1px;display:flex;align-items:center;gap:4px;justify-content:center;color:#32291f}.board .pbtn b{font:600 20px Georgia}.board .pbtn .pl{width:51px!important;height:51px!important}.board .pbtn .pl>b{font:700 15px Georgia}.board .pbtn.glow{background:#fff0b6aa;outline:2px solid #749068;border-radius:3px}.board .cupboard h3{font-size:20px;left:0;right:0;top:1px}.board .cupboard .plates{position:absolute;top:43px;left:5px;right:5px;bottom:4px;display:grid;grid-template-columns:1fr;grid-template-rows:repeat(4,1fr);gap:0;background:#f6efdfb9}.board .cupboard .pbtn{justify-content:space-around}.board .cupboard .pl{width:41px!important;height:41px!important}.board .sink .pbtn .pl{width:44px!important;height:44px!important}.board .sink .pbtn b{font-size:17px}
+.board .reception .spots{left:110px!important;right:18px!important;bottom:57px!important}.board .queue{position:absolute;bottom:5px;right:13px;margin:0;background:#f9f1deeb;padding:3px 8px;border:1px solid #ac9469}.board .queue .stack{display:none}.board .queue p{font:17px Georgia;color:#342b20}.board .dining .spots{bottom:9px!important;left:3px!important;right:1px!important;justify-content:space-around}.board .dining .seats{display:grid;position:absolute;left:5px;right:5px;top:36px;height:134px;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:6px 14px;margin:0}.board .dining .seat{height:64px;min-height:0!important;background:transparent!important;border:0;box-shadow:none!important;border-radius:3px;padding:1px;overflow:visible;position:relative;display:block;text-align:center}.board .dining .seat.empty{pointer-events:none}.board .dining .seat.reserved{font:13px Georgia;color:#7e6e50;display:flex;align-items:center;justify-content:center}.board .seat.guest .mt-top{background:#fbf4e7ef;border:1px solid #b9a482;border-radius:2px;padding:2px 3px;position:relative;z-index:2;min-height:24px;display:flex;gap:3px;align-items:center}.board .dining .mt-n{font:16px Georgia;line-height:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.board .dining .mt-e{display:none}.board .dining .coin{font-size:13px}.board .dining .mt-r{position:relative;background:#fbf4e7e8;font-size:11px;padding:1px 3px;z-index:2;justify-content:center;gap:2px;flex-wrap:nowrap}.board .dining .mt-i .asset{width:20px;height:20px}.board .dining .mt-i small{font:12px Georgia}.board .dining .mt-i{display:flex;align-items:center}.board .dining .pl{width:25px!important;height:25px!important}.board .seat .diner{position:absolute;width:50px;height:55px;left:-22px;top:0;z-index:3;pointer-events:none}.board .seat:nth-child(n+4) .diner{left:auto;right:-22px;transform:scaleX(-1)}.board .seat.glow{outline:3px solid #53865a;outline-offset:2px}.board .vipseat{color:#715531}.board .seat.picked{outline:3px solid #ad4d36}
+.board .market .vanbar{position:absolute;top:75px;left:50px;right:20px;bottom:23px;display:flex;align-items:center;gap:10px;justify-content:center;padding:0;border:0;background:none}.board .market .vanbtn{background:#faf3dfed!important;border:1px solid #8c7956!important;border-radius:50%;width:72px;height:72px;font:19px Georgia!important;box-shadow:0 2px 4px #5e4e3020}.board .market .vanbtn>span>small{font:15px Georgia}.board .market .vts{display:flex;flex-wrap:wrap;gap:7px;width:196px;max-height:136px}.board .market .vt{width:55px!important;height:55px!important;background:none!important;border:0;position:relative}.board .market .vt .chef{width:56px;height:64px}.board .market .vt .sec{font:11px Georgia;background:#fbf3df;color:#403923}.board .market>small{position:absolute;bottom:0;left:12px;right:12px;font:17px Georgia;background:#faf3e0ef;text-align:center;border:1px solid #ad946f;border-radius:2px;color:#4f402c}.board .office .officebar{position:absolute;left:40px;right:35px;bottom:32px;display:flex;justify-content:center}.board .office>small{position:absolute;bottom:0;left:9px;right:9px;font:16px Georgia;background:#faf3e5e3;padding:3px;text-align:center}.board .officebar>small{display:none}.board .dormant{background:#eee8d8b8!important;backdrop-filter:saturate(.3);border:1px solid #baab8b!important}.board .dormant .later{position:absolute;left:10px;right:10px;top:48%;font:18px Georgia;text-align:center;color:#665c47;background:#faf4e5de;padding:7px}
+/* Order cards borrow the reference's dish / recipe composition. */
+.game .kitchen{display:flex;flex-direction:column;min-width:0;min-height:0;max-height:none;overflow:hidden;padding:0 10px 6px;background:#faf5e9;border:0;border-radius:0;gap:3px}.order-heading{height:29px;min-height:29px;display:flex;align-items:center;justify-content:space-between}.order-heading h2{font:600 20px Georgia;text-transform:uppercase;letter-spacing:.035em}.order-heading h2 i{font-style:normal;color:#ac9b7c;margin:0 12px}.order-heading h2 small{font:18px Georgia}.order-heading>span{font:12px Georgia;display:flex;align-items:center;gap:5px}.order-heading>span .chef{width:20px;height:23px}.game .me{min-height:23px;height:23px;flex:none;background:none;border:0;padding:0;overflow:visible;gap:5px}.game .me .glasses{display:none}.game .me .prompt{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:1}.game .me .prompt p{font:12px Georgia;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.game .me .prompt .hint{display:none}.game .me .prompt .btn{min-height:23px;height:23px;padding:1px 12px;font:12px Georgia;white-space:nowrap}.game .mytks{display:flex;gap:10px;min-height:0;overflow:auto;align-items:stretch;padding:1px;flex:1}.game .ticket{position:relative;display:grid;grid-template-columns:135px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:6px;flex:0 0 calc((100% - 20px)/3);min-width:360px;max-width:none;padding:8px 8px 6px;overflow:auto;border:1px solid #c9bba1;border-radius:6px;background:#fcf7ec;box-shadow:inset 0 0 0 2px #f0e8d7;align-content:start}.game .ticket.sel{border:1px solid #9b885f;box-shadow:inset 0 0 0 2px #ede0bd}.ticket .tk-head{grid-column:2;grid-row:1;display:flex;gap:4px;align-items:center;padding:0 0 3px}.ticket .tk-n{font:600 17px Georgia;line-height:20px;flex:1}.ticket .coin{font:11px Georgia;white-space:nowrap}.ticket .meal-art{grid-column:1;grid-row:1/3;align-self:center;width:135px;height:135px;mix-blend-mode:multiply}.ticket-details{grid-column:2;min-width:0}.ticket .plate-requirement{display:flex;align-items:center;gap:4px;font:11px Georgia;background:#f3eadb70;border:1px solid #dfd1b7;border-radius:4px;margin:0 0 3px;padding:1px 3px;color:#393e2c;min-height:23px}.plate-requirement>.asset{width:20px;height:20px}.plate-requirement>b{margin-left:auto;color:#4e856c;font:20px Georgia}.plate-requirement.missing>b{color:#927c59}.ticket .recipe-list{display:grid;grid-template-columns:1fr;gap:0}.ticket .recipe-list>small{display:none}.ticket .recipe-line{display:flex;gap:4px;align-items:center;border:0;font:11px Georgia;min-height:21px}.ticket .recipe-line>.asset{width:26px;height:23px}.ticket .recipe-line>span:not(.asset){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ticket .recipe-line b{font:600 12px Georgia;white-space:nowrap;color:#9e4435}.ticket .recipe-line.complete b{color:#34755b}.ticket .recipe-line i{display:none}.ticket .cook-status{display:flex;align-items:center;gap:6px;padding-top:3px;font:11px Georgia}.cook-status>span>b{display:inline;margin-left:3px;font-weight:500}.cook-ring{width:24px;height:24px;border-radius:50%;background:conic-gradient(#42836d calc(var(--progress)*360deg),#d4d9ce 0);position:relative;flex:none}.cook-ring:after{content:'';position:absolute;inset:5px;background:#fcf7ec;border-radius:50%}.cook-ring.over{background:#b3523a}.ticket-actions{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}.next-need{font:11px Georgia;color:#a34430;background:#f5dbce;padding:4px 7px;border-radius:3px;max-width:100%}.next-need.ready{color:#fff;background:#36755e;text-transform:uppercase;font-size:10px;letter-spacing:.03em}.ticket .parkbtn{min-height:27px;padding:2px 8px;font:11px Georgia;background:#f6efdf;color:#384a36;border:1px solid #9aab8a;border-radius:3px;white-space:nowrap}.ticket .cookbtn{font:11px Georgia;padding:3px 7px;min-height:27px;flex:none}.ticket .bin{font-size:11px;padding:2px;position:static}.ticket .vipband{grid-column:1/-1;grid-row:auto;background:#ede0c4;color:#5e4c2c;border:0;font:11px Georgia;padding:2px 5px;margin:-3px 0 4px;border-radius:3px}.ticket.vipt{grid-template-rows:auto auto 1fr}.ticket.vipt .tk-head{grid-row:2}.ticket.vipt .meal-art{grid-row:2/4}.return-row{display:flex;gap:2px;align-items:center;flex-wrap:wrap;font:9px Georgia}.return-row small{width:100%}.return-row .chip{border:0;background:none;padding:0;min-width:20px}.return-row .asset{width:22px;height:22px}.ticket .shelf{min-width:110px}.shelf .dish-art{width:35px;height:35px}.empty-k{background:#f9f4e9;border:1px dashed #c5b697;display:flex;align-items:center;justify-content:center;font:16px Georgia;color:#80745d}.sheet .ticket{min-width:0;max-width:none;flex:none;grid-template-columns:145px minmax(0,1fr)}.sheet .ticket .meal-art{width:145px;height:145px}.sheet .card{background:#fbf6e9;border-color:#af9b75;box-shadow:0 10px 40px #3c301d40}.sheet .recipe-line{font-size:14px}.sheet .recipe-line b{font-size:14px}.sheet .recipe-line>.asset{width:30px;height:30px}.sheet .ticket-actions{margin-top:9px}.sheet .btn{font-family:Georgia}.sheet .shoprow .asset{width:55px;height:55px}.sheet .sbtn{border-color:#aa9167;border-width:1px;border-radius:4px;background:#fffbf0;box-shadow:0 2px 4px #3c2d2220}.sheet .obtn{background:#f7efde;border:1px solid #b5a07a;box-shadow:none}.sheet .card h2{font-family:Georgia}.sheet{background:#3c322f60;backdrop-filter:blur(2px)}
+@media(min-height:950px){.game .main{grid-template-rows:minmax(300px,1fr) 265px!important}.ticket .recipe-line{min-height:23px}}
+@media(max-width:1150px){.game .bar{gap:5px;padding:4px 8px}.bar .brand{font-size:18px;letter-spacing:0}.bar .goalchip{font-size:13px;padding:0 6px}.bar .goalchip small{font-size:9px}.bar .clock{font-size:20px;min-width:57px;padding:0 7px}.bar .team-toggle,.plan-tools .btn{font-size:12px;padding:3px 7px}.plan-tools .zoom-btn{font-size:21px;min-width:32px}.game .ticket{min-width:355px}.game .main{grid-template-rows:minmax(220px,1fr) 258px!important}}
+@media(max-width:800px){.bar .brand{font-size:15px}.bar .goalchip{font-size:11px;padding:0 3px}.bar .goalchip small{display:none}.bar .shiftchip small{display:inline}.plan-tools .btn[data-a=fitPlan]{font-size:0;width:32px}.plan-tools .btn[data-a=fitPlan]:after{content:'⌖';font-size:22px}.game .kitchen{padding:0 3px 5px}.order-heading h2{font-size:16px}.game .ticket{min-width:340px}.game .main{grid-template-rows:minmax(250px,1fr) 275px!important}.game .bar{position:static}.bar .net.bad{position:absolute;top:53px;right:5px;z-index:4}.game .me .prompt p{font-size:11px}}
+@media(max-width:560px){.bar .brand{display:none}.bar .goalchip{font-size:12px}.bar .team-toggle{margin-left:auto}.bar .clock{font-size:19px;min-width:50px}.game .main{padding:0 3px 3px!important}.game .mytks{min-height:0!important}.game .kitchen{min-height:0!important}.game .bar{flex-wrap:nowrap!important}.game .ticket{min-width:320px;grid-template-columns:110px minmax(0,1fr)}.ticket .meal-art{width:110px;height:110px}.order-heading>span{display:none}}
+/* A welcome screen built from the same kitchen, food and people. */
+.home.welcome{display:grid;grid-template-columns:1fr 1.1fr;max-width:1180px;min-height:760px;width:calc(100% - 64px);margin:4vh auto;padding:0;border:1px solid #c7b38c;background:#fbf5e7;box-shadow:0 15px 65px #5b482424;border-radius:10px;overflow:hidden}.home.welcome:before{display:none}.welcome-art{position:relative;min-height:760px;overflow:hidden;background:#e9e0c9}.welcome-heading{position:relative;z-index:2;text-align:center;padding:40px 20px 0}.eyebrow{font:10px system-ui;letter-spacing:.22em;color:#7c6e50}.welcome-heading h1{font:72px/.95 Georgia;letter-spacing:-.045em;font-weight:400;margin:18px 0}.welcome-heading h1 em{font-weight:400;color:#386349}.welcome-heading p{font:17px/1.5 Georgia;color:#675c43;margin-top:20px}.welcome-plan{position:absolute;left:-20%;right:-20%;height:340px;top:330px;background:url('../assets/kitchen-floorplan-v2.png') center/cover;transform:rotate(-7deg);border:5px solid #ede1c8;box-shadow:0 12px 20px #3d302238}.welcome-dishes{position:absolute;bottom:46px;left:10px;right:10px;display:flex;justify-content:center;gap:0;z-index:3}.welcome-dishes .asset{width:143px;height:143px;filter:drop-shadow(0 6px 3px #362d2340)!important;mix-blend-mode:multiply}.welcome-dishes .asset:nth-child(2){margin-top:35px}.welcome-caption{position:absolute;bottom:14px;width:100%;text-align:center;font:italic 14px Georgia;color:#6f6145}.welcome-form{padding:45px 38px 28px}.welcome-form h2{font:34px Georgia;letter-spacing:-.03em;margin:14px 0}.welcome-intro{font:15px/1.5 Georgia;color:#7a6b52;max-width:370px;margin-bottom:25px}.welcome-form .fld{font:13px Georgia;gap:7px}.welcome-form .fld input{background:#fffaf0;border:1px solid #bfae8e;border-radius:4px;height:44px;font:18px Georgia;box-shadow:inset 0 1px 3px #89775618}.chef-roster{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:20px 0 25px}.chef-choice{position:relative;border:1px solid #cdbc9b;background:#f5ecdb;border-radius:5px;padding:8px 3px 12px;text-align:center;box-shadow:0 2px 4px #715c2610;display:flex;flex-direction:column;align-items:center}.chef-choice.chosen{border:2px solid #657e59;background:#e5e8d6;padding:7px 2px 11px;box-shadow:0 0 0 2px #5f7f5420}.chef-stage{height:117px;width:100%;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 80%,#bba4793a 0,transparent 65%)}.chef-stage .chef{width:88px;height:110px}.chef-choice>b{font:18px Georgia;margin-top:3px;color:#3d4431}.chef-choice>small{font:9px system-ui;color:#736a54;margin-top:4px;white-space:nowrap}.choice-check{position:absolute;top:5px;right:5px;color:#426c4c;font:16px Georgia}.welcome-actions{display:flex;gap:10px}.welcome-actions .btn.big{flex:1;display:flex;align-items:center;justify-content:space-between;font:17px Georgia;padding:14px 16px}.welcome-actions .btn.big>span{margin-left:10px}.welcome-actions .btn.ghost{font:15px Georgia;padding:12px 17px;white-space:nowrap}.join-box{margin:24px 0 20px;padding-top:20px;border-top:1px solid #d9ccb3}.join-box label{font:14px Georgia;color:#776448}.join-box>div{display:flex;gap:10px;margin-top:9px}.join-box .codein{min-width:0;flex:1;height:44px;font:18px Georgia;letter-spacing:.08em;border:1px solid #c3b18e;background:#fffaf0;border-radius:4px;text-align:left;padding:9px 12px}.join-box .btn{font:14px Georgia;white-space:nowrap}.welcome-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #ded1b6;padding-top:17px;gap:6px}.welcome-footer>span{font:10px system-ui;color:#8b7a5d}.welcome-footer .link{font:12px Georgia;color:#3a624d}.lobby{background:#faf4e6;border:1px solid #b6a281;border-radius:8px;margin:24px auto;padding:25px 30px;box-shadow:0 8px 35px #62532c20}.card{background:#faf5e9;border:1px solid #b7a27d}.logo.small{font-family:Georgia;text-transform:uppercase;font-size:30px;letter-spacing:.03em}.scenario,.camp-step,.campcard{border-color:#c8b799!important;background:#f8f1e1!important}
+@media(max-width:1000px){.home.welcome{width:calc(100% - 28px);grid-template-columns:.8fr 1.2fr}.welcome-form{padding:35px 25px}.welcome-heading h1{font-size:58px}.welcome-art,.home.welcome{min-height:740px}.chef-stage .chef{width:76px;height:98px}.chef-stage{height:105px}.welcome-dishes .asset{width:110px;height:110px}}
+@media(max-width:720px){.home.welcome{display:flex;flex-direction:column;width:calc(100% - 20px);margin:10px auto}.welcome-art{min-height:260px;height:260px}.welcome-heading{padding:20px}.welcome-heading h1{font-size:47px;display:block;margin:9px 0}.welcome-heading h1 br{display:none}.welcome-heading h1 em{margin-left:8px}.welcome-heading p{font-size:13px;line-height:1.3;margin-top:0}.welcome-plan{top:142px;height:260px;left:-8%;right:-8%;transform:rotate(-3deg)}.welcome-dishes{display:none}.welcome-caption{display:none}.welcome-form{padding:25px 22px}.welcome-form h2{font-size:30px}.welcome-intro{margin-bottom:15px}.chef-roster{gap:5px;margin:16px 0 22px}.chef-choice>small{font-size:8px}.welcome-actions .btn.big{font-size:15px;padding:12px}.welcome-actions .btn.ghost{font-size:14px;padding:12px}.welcome-footer>span{font-size:9px}}
+/* Native alpha keeps the pale shirts and food bright on the timber furniture. */
+.asset{background-image:url('../assets/kitchen-sprites-cutout-v2.png');mix-blend-mode:normal!important}.board .ing .heap,.ticket .meal-art,.welcome-dishes .asset{mix-blend-mode:normal!important}.board .ing:disabled{opacity:1}.board .store.locked .ings{opacity:.8}
+.game .board .area.sink .spots{left:0;right:180px;bottom:11px!important}.game .board .area.st3 .spots{left:35px;right:35px;bottom:22px!important}.game .board .area.green .spots{left:80px;right:65px;bottom:24px!important}.game .board .area.dining .spots{left:3px;right:1px;bottom:9px!important}.game .board .area.reception .spots{left:110px!important;right:18px!important;bottom:57px!important}.game .board .pbtn{flex-direction:row}.board .pbtn .pl{flex:none}.board .cupboard .pbtn{min-height:0;height:42px}.board .cupboard .pbtn b{flex:none}.game .board .area.store .spots{bottom:20px}.game .board .spot .slot-number{color:#544938;opacity:.8}
+.game .main{grid-template-rows:minmax(250px,1fr) 285px!important}@media(min-height:950px){.game .main{grid-template-rows:minmax(300px,1fr) 305px!important}}@media(max-width:560px){.game .main{grid-template-rows:minmax(200px,1fr) 280px!important}}
+.game .board .area.stove .spots{left:74px;right:0;bottom:18px;gap:78px;justify-content:flex-start}.hob-pan{top:-113px}
+@media(min-width:801px) and (max-width:1150px){.game .ticket{min-width:320px;grid-template-columns:100px minmax(0,1fr)}.ticket .meal-art{width:100px;height:100px}.ticket .tk-n{font-size:15px}}
+/* Transparent hit slop keeps small overview stations easier to tap. */
+.game .board button.spot:before{display:block!important;content:'';position:absolute;inset:-16px;width:auto;height:auto;background:transparent;border:0;border-radius:50%;box-shadow:none;pointer-events:auto}
+.unused-hob{position:absolute;top:36px;width:113px;height:94px;display:flex;align-items:center;justify-content:center;background:#eee5d0a8;backdrop-filter:grayscale(1);font:15px Georgia;color:#625642;border:1px solid #a09273;border-radius:4px}
+
+/* Action spaces remain legible against the illustrated floor, including at whole-plan scale. */
+.game .board .area .spot{border:4px dashed #63745b;background:#fff9e5d9;box-shadow:0 0 0 3px #fffbf0,0 2px 6px #42392645;opacity:1}
+.game .board .area .spot.free-spot:hover,.game .board .area .spot.free-spot:focus-visible{background:#e4ecd5;border-color:#2e6249;outline:3px solid #2e6249;outline-offset:5px}
+.game .board .area .spot .slot-number{position:static;display:block;font:600 22px Georgia;color:#3c5034;opacity:1;text-align:center}
+.game .board .area .spot.taken{border:3px solid var(--c);background:#fff8e6bf!important;box-shadow:0 0 0 3px #fffbf0,0 2px 5px #3e392b35;opacity:1}
+.game .board .spot.taken:after{inset:-2px;background:conic-gradient(var(--c) calc(var(--p)*360deg),#e7ddc6 0);mask:radial-gradient(transparent 56%,black 59%);z-index:0}
+.game .board .spot.taken.expired{border-style:dashed}
+.game .board .area .spot.unavailable{border:3px solid #93816e;background:repeating-linear-gradient(135deg,#d8c7ac80 0 7px,#f4ead8bc 7px 14px);box-shadow:0 0 0 2px #fff5e2;color:#765c46;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.game .board .area .spot.unavailable .slot-number{font:17px Georgia;color:#66503c}
+.game .board .spot .slot-symbol{font:30px Georgia;line-height:26px}
+.game .board .spot .ini,.game .board .spot .sec{background:#fff8e7;color:#3d382b;font-size:15px;box-shadow:0 1px 3px #42392635}
+.game .board .market .vanbtn{border:4px dashed #63745b!important;box-shadow:0 0 0 3px #fff9e8;min-width:72px;flex:none}
+
+/* The meal name stays outside the scroll area, even for long recipes and VIPs. */
+.game .ticket,.sheet .ticket{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:0;gap:0;isolation:isolate}
+.ticket .tk-head{position:relative;flex:none;min-height:38px;display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f4eddd;border-bottom:1px solid #d8c9ae;z-index:2}
+.ticket .tk-n{display:block;color:#292c23;font:600 17px/1.2 Georgia;overflow:visible;white-space:normal;text-overflow:clip;overflow-wrap:anywhere;min-width:0}
+.ticket .coin{flex:none;font-size:12px}
+.ticket .vipband{position:static;flex:none;margin:0;border-radius:0;padding:3px 9px;font-size:11px}
+.ticket-body{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#a99571 #f3ecdc;padding:7px 9px 10px;align-items:start;flex:1}
+.ticket .ticket-body .meal-art{grid-column:1;grid-row:1;width:112px;height:112px;align-self:start;position:sticky;top:0;margin-top:10px}
+.ticket .ticket-details{grid-column:2;grid-row:1;min-width:0}
+.ticket .recipe-list>small{display:block;grid-column:1/-1;font:8px/1.6 system-ui;letter-spacing:.06em;color:#72654d}
+.ticket .recipe-line.unchecked,.ticket .recipe-line.unchecked b{color:#3c3d30;font-style:normal}
+.ticket .recipe-line b{font-variant-numeric:tabular-nums;font-style:normal}
+.ticket .plate-requirement{font-size:11px;line-height:1.35;align-items:center}
+.plate-requirement small{font-size:10px;color:#766a55}
+.cook-ring.unchecked{background:conic-gradient(#8c7b58 calc(var(--progress)*360deg),#e2d9c6 0)}
+.ticket .ticket-actions{padding-top:3px;gap:6px}
+.ticket .ticket-actions .btn,.ticket .parkbtn,.ticket .bin{min-height:36px}
+.ticket .shelf{flex:none}.shelf .shchip{display:grid;grid-template-columns:38px 1fr;gap:2px 6px;text-align:left;width:100%;height:auto;min-height:58px;padding:5px}
+.shelf .shchip .dish-art{grid-row:1/3}.shelf .shchip>b{font:13px/1.25 Georgia;white-space:normal}.shelf .shchip>small{position:static;font-size:10px}.shelf .shl{font-size:10px;white-space:normal}
+.order-heading .play-mode{font:11px Georgia;color:#70644f;margin-left:auto;margin-right:12px}
+.worker-toggle{display:flex;align-items:center;gap:4px;font:12px Georgia;color:#3e5b42;white-space:nowrap;min-height:29px}.worker-toggle .chef{width:21px;height:25px}
+.worker-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid #d4c6a8;padding:12px 0}.worker-row>.chef{width:42px;height:53px;flex:none}.worker-row>div{flex:1}.worker-row small{display:block;color:#756951;margin-top:5px}.worker-card>.btn{margin-top:20px}
+.delivery-split{display:flex;align-items:center;gap:12px;margin:8px 0}.delivery-split span{flex:1;text-align:center}.shoprooms{padding:10px 0}.shoprooms>p{margin:0 0 6px}
+.glist .meal-errors{padding-left:18px;margin:6px 0 4px;list-style:disc;color:#823c2e}.glist .meal-errors li{font:13px/1.45 Georgia;margin:0;padding:0;border:0;background:none}
+.sheet .ticket-body{overflow:visible;flex:none}.sheet .ticket{margin-bottom:12px}.sheet .recipe-line.unchecked b{color:#3c3d30}
+@media(max-width:1150px){.ticket-body{grid-template-columns:90px minmax(0,1fr);gap:6px}.ticket .ticket-body .meal-art{width:90px;height:90px}.ticket .tk-n{font-size:16px}.order-heading .play-mode{font-size:10px}}
+@media(max-width:800px){.order-heading .play-mode{display:none}.order-heading .worker-toggle{margin-left:auto}.ticket .tk-head{min-height:40px}.worker-row{gap:6px}.worker-row .btn{font-size:12px;padding:8px}.delivery-split{gap:7px}}
+@media(max-width:560px){.game .bar{height:auto;min-height:53px;flex-wrap:wrap!important;padding:5px 7px;gap:4px}.bar .team-toggle{margin-left:0}.game .bar .clock{min-width:48px}.bar .goalchip{padding:0 3px}.order-heading h2{font-size:15px}.order-heading h2 i{margin:0 5px}}
+
+/* ===== 2026-10-27 readability pass (Claude) =====
+   The plan renders at roughly half size on an iPad, so everything drawn on it is sized for that scale. */
+
+/* Stock: rows end above the chefs' heads, so a chef standing in front no longer hides a quantity. */
+.game .board .area.store .ings{top:38px;height:auto;grid-template-rows:repeat(2,88px)!important;gap:4px 10px}
+.game .board .area.store .ings:has(.ing:nth-child(5)){grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.game .board .area.st3 .ings{grid-template-columns:1fr!important;grid-template-rows:84px 84px!important}
+.game .board .area.store .ing .heap,.board .ings:has(.ing:nth-child(4):last-child) .ing .heap{height:52px;position:relative}
+.game .board .area.store .ing .heap .asset,.board .ings:has(.ing:nth-child(4):last-child) .ing .heap .asset{width:78px;height:54px}
+.board .ing .stock-label{min-width:0;padding:1px 8px;gap:7px;font:17px Georgia;line-height:30px;border-radius:4px;border:1px solid #b9a37c}
+.board .ing .stock-label b{font:700 30px Georgia;line-height:30px;color:#1f2a1c}
+.board .ing{transition:transform .12s}
+.board .ing:not(:disabled):active{transform:scale(.92)}
+
+/* Running low and empty are visible at a glance. */
+.board .ing.low .stock-label{background:#fbe3b4f2;border-color:#c48a2c}
+.board .ing.low .stock-label b{color:#a8580e}
+.board .ing.empty .heap .asset{opacity:.25;filter:grayscale(1)!important}
+.board .ing.empty .stock-label{background:#f4cfc6f2;border-color:#b5432f;color:#8e2c1e}
+.board .ing.empty .stock-label b{color:#b5432f}
+.empty-tag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);font:700 19px Georgia;letter-spacing:.06em;text-transform:uppercase;color:#b5432f;border:3px solid #b5432f;border-radius:5px;padding:0 6px;background:#fff8eecc;white-space:nowrap;z-index:2}
+.board .ing:disabled{opacity:1}
+
+/* Spices: a one-line short name and a large number. */
+.board .spices .ing .stock-label{flex-direction:column;gap:0;width:100%;padding:2px 2px 0;white-space:nowrap;line-height:18px}
+.board .spices .ing .stock-label .nm{display:block;font:16px Georgia;line-height:19px;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.board .spices .ing b{font:700 28px Georgia;line-height:30px}
+
+/* Sand timers on the plan: a large seconds badge under every chef. */
+.game .board .spot .sec,.board .market .vt .sec{position:absolute;right:-18px;bottom:-22px;min-width:42px;height:32px;padding:0 6px;border-radius:16px;background:#2c2a22ee;color:#fff;font:700 26px Georgia;line-height:32px;text-align:center;z-index:4;box-shadow:0 1px 3px #0006}
+.game .board .spot .sec:empty,.board .market .vt .sec:empty{display:none}
+.game .board .spot.taken.expired .sec{display:none}
+.game .board .spot .ini{width:28px!important;height:26px!important;left:-12px;bottom:-18px;font:700 18px Georgia;line-height:26px;text-align:center;border-radius:13px;background:var(--c);color:#fff;text-shadow:0 1px 1px #0007;z-index:4}
+.game .board .spot.taken.mine:after{background:conic-gradient(var(--c) calc(var(--p)*360deg),#e7ddc6 0)}
+
+/* Clean plates in the cupboard, dirty plates at the sink. */
+.board .cupboard h3{color:#2c5e45}
+.board .cupboard .plates{background:#fdfbf4ee;border:2px solid #7fa58a;border-radius:4px}
+.board .cupboard .pbtn b{font:700 24px Georgia}
+.board .cupboard .pbtn.empty b{color:#b5432f}
+.board .cupboard .pbtn.empty .pl{opacity:.3}
+.board .pl.cleanp .asset{filter:brightness(1.08) saturate(1.1)!important}
+.board .sink .plates{grid-template-rows:auto 1fr 1fr;background:#e9dccbee;border:2px solid #8a6a45;top:38px}
+.board .sink .tray-title{grid-column:1/-1;font:700 17px Georgia;color:#6b4526;text-align:center;line-height:22px}
+.board .pl.dirtyp{position:relative}
+.board .pl.dirtyp .asset{filter:sepia(.75) saturate(1.4) brightness(.78)!important}
+.board .pl.dirtyp:after{content:'';position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle at 30% 35%,#7a4f22aa 0 14%,transparent 16%),radial-gradient(circle at 68% 60%,#6b4219aa 0 12%,transparent 14%),radial-gradient(circle at 45% 75%,#8a5a2899 0 9%,transparent 11%);pointer-events:none}
+.board .sink .pbtn b{font:700 22px Georgia;color:#5d3b1d}
+.board .sink .pbtn.none{opacity:.35}
+
+/* Guests' orders at the tables: larger names and icons. */
+.board .dining .seats{top:34px;height:122px;gap:4px 8px}
+.board .dining .seat{height:58px}
+.board .seat.guest .mt-top{min-height:28px;padding:1px 5px}
+.board .dining .mt-n{font:600 20px Georgia;line-height:24px}
+.board .dining .coin{font-size:16px}
+.board .dining .mt-r{padding:1px 2px;gap:1px;min-height:28px;align-items:center;display:flex}
+.board .dining .mt-i .asset{width:24px;height:24px}
+.board .dining .mt-i small{font:700 14px Georgia;margin:0 2px 0 -2px}
+.board .dining .pl{width:28px!important;height:28px!important}
+.board .dining .pot{font-size:15px}
+.board .dining .pot b{font:700 15px Georgia}
+
+/* My orders: the whole recipe fits on the card. */
+.order-heading .worker-toggle{min-height:0!important;height:28px;padding:0 6px;display:flex;align-items:center;gap:4px;font:14px Georgia}
+.game .me{height:auto!important;min-height:38px}
+.game .me .prompt p{font:15px Georgia;line-height:18px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.game .me .prompt .btn{min-height:36px!important;height:36px!important;padding:0 18px!important;font:600 16px Georgia!important}
+.game .me .prompt .grace-left{color:#b5432f}
+.ticket-body{grid-template-columns:72px minmax(0,1fr);gap:6px;padding:5px 7px 6px}
+.ticket .ticket-body .meal-art{width:72px;height:72px;margin-top:2px}
+.ticket .tk-head{min-height:32px;padding:4px 9px}
+.ticket .tk-n{font:600 17px Georgia;line-height:21px}
+.ticket .coin{font-size:13px}
+.ticket-details{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:6px;align-items:center}
+.ticket-details>.plate-requirement,.ticket-details>.recipe-list,.ticket-details>.return-row{grid-column:1/-1}
+.ticket .plate-requirement{font:13px Georgia;min-height:26px;padding:1px 5px;border-radius:5px}
+.ticket .plate-requirement.noplate{border-color:#c9a86a;background:#fbefd3}
+.ticket .recipe-list{grid-template-columns:1fr 1fr;column-gap:8px}
+.ticket .recipe-line{font:13px Georgia;min-height:24px;padding:0 3px;border-radius:4px}
+.ticket .recipe-line>.asset{width:24px;height:22px;flex:none}
+.ticket .recipe-line b{font:700 14px Georgia}
+.ticket .cook-status{font:13px Georgia;padding-top:2px}
+.ticket-actions{margin-top:2px;justify-content:flex-end;flex-wrap:nowrap}
+.ticket .parkbtn,.ticket .cookbtn{min-height:32px;font:600 13px Georgia;padding:2px 10px}
+.ticket .bin{font-size:15px;min-height:32px}
+.game .mytks .ticket.sel{border-color:#2f6b4f;box-shadow:inset 0 0 0 3px #2f6b4f}
+.fill-tag{flex:none;background:#2f6b4f;color:#fff;font:600 11px system-ui;text-transform:uppercase;letter-spacing:.04em;padding:3px 7px;border-radius:10px}
+@media(max-width:1150px){.ticket-body{grid-template-columns:58px minmax(0,1fr)}.ticket .ticket-body .meal-art{width:58px;height:58px}}
+
+/* Pick feedback: the item flies to the ticket, the changed line flashes, the shelf shows −1. */
+@keyframes kc-bump{0%{background:#ffd75e;box-shadow:0 0 0 3px #f2b928}55%{background:#ffe9a8;box-shadow:0 0 0 2px #f2b92855}100%{background:transparent;box-shadow:none}}
+.recipe-line.bump,.plate-requirement.bump{animation:kc-bump 1.4s ease-out both}
+.fx-fly{position:fixed;width:54px;height:54px;z-index:1000;pointer-events:none;filter:drop-shadow(0 4px 4px #0005)}
+.fx-fly .asset{display:block;width:100%;height:100%}
+@keyframes kc-rise{0%{opacity:0;transform:translate(-50%,0) scale(.7)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-44px) scale(1)}}
+.fx-minus{position:fixed;z-index:1001;pointer-events:none;font:700 26px Georgia;color:#b5432f;text-shadow:0 0 3px #fff,0 0 6px #fff;animation:kc-rise .9s ease-out forwards}
+
+/* Header chip text stays inside its chip. */
+.bar .goalchip{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.bar .goalchip>small{max-width:86px;white-space:normal;line-height:11px}
+
+/* Long sheets keep their buttons in reach. */
+.sheet .card .rbtns{position:sticky;bottom:-24px;z-index:3;background:linear-gradient(#fbf6e900,#fbf6e9 30%);padding:18px 0 24px;margin:6px 0 -24px}
+.sheet .card.help>.btn:last-child{position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 12px #fbf6e9}
+.sheet .card.shop>.btn.ghost:last-child{position:sticky;bottom:-1px;z-index:3;box-shadow:0 -10px 12px #fbf6e9}
+
+/* Shopping: one tap picks where the delivery goes. */
+.sheet .sbtn.on{outline:3px solid #2f6b4f;background:#e4ecd5}
+.shoprooms .split-q{display:flex;align-items:center;gap:6px;font:600 16px Georgia;margin:8px 0 2px}
+.shoprooms .split-q .asset{width:32px;height:32px}
+.shoprooms .split-now{font:14px Georgia;color:#5d543f;margin:2px 0 6px}
+.split-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px;margin:0 0 12px}
+.split-opt{display:flex;flex-direction:column;gap:2px;padding:7px 8px 6px;border:2px solid #9b8459;border-radius:8px;background:#fffbf0;color:var(--ink);min-height:0;cursor:pointer}
+.split-opt:active{background:#e4ecd5;border-color:#2f6b4f;transform:scale(.97)}
+.so-row{display:flex;justify-content:space-between;align-items:baseline}
+.so-row i{font:italic 14px Georgia;color:#6b5f48}
+.so-row b{font:700 24px Georgia;line-height:26px}
+.split-opt small{font:11px Georgia;color:#7a6b52;text-align:center;border-top:1px dashed #cdbd9c;padding-top:3px;margin-top:2px;white-space:nowrap}
+
+/* Take an order: guests at full size. */
+.orderpick{max-width:820px;width:calc(100% - 32px)}
+.guest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin:8px 0 6px}
+.guest-grid.one{grid-template-columns:1fr}
+.gcard{position:relative;display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px 12px;border:2px solid #b79d70;border-radius:10px;background:#fffbf0;color:var(--ink);min-height:0;box-shadow:0 2px 4px #4c3a1c18}
+button.gcard:active{background:#eef3e3;border-color:#2f6b4f;transform:scale(.98)}
+.gcard.vip{border-color:#b98a2e;background:#fff7e3}
+.bg-part{display:flex;gap:10px;align-items:center}
+.bg-part .dish-art{width:62px;height:62px;flex:none}
+.bg-body{min-width:0}
+.bg-name{font:600 19px Georgia;line-height:22px;padding-right:38px}
+.bg-icons{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:5px}
+.bg-icons .pl{width:34px!important;height:34px!important}
+.gi{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;font-size:22px}
+.gi .asset{width:34px;height:34px}
+.gi b{position:absolute;right:-5px;bottom:-4px;min-width:19px;height:19px;padding:0 3px;border-radius:10px;background:#2c2a22;color:#fff;font:700 12px/19px system-ui;text-align:center}
+.bg-price{position:absolute;top:9px;right:10px;font-size:16px}
+.bg-vip{font:600 15px Georgia;color:#6a4f22}
+.bg-vip small{display:block;font:12px Georgia;color:#7b6a4c}
+.serve-list{display:grid;gap:6px;margin:4px 0}
+.serve-item{display:flex;align-items:center;gap:10px;font:16px Georgia}
+.serve-item .dish-art{width:40px;height:40px;flex:none}
+.serve-item b{flex:1;font-weight:600}
+
+/* Time is up: say it big, with the seconds left to finish. */
+.grace-banner{position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:40;background:#b5432f;color:#fff;font:600 19px Georgia;padding:9px 20px;border-radius:999px;box-shadow:0 4px 14px #0004;pointer-events:none;white-space:nowrap}
+.serve-item>.btn{flex:0 0 auto;width:auto;min-width:0;padding:0 14px;font-size:14px}
+.sheet .shoprooms{display:block;height:auto;flex-wrap:nowrap}
+.split-opts{align-items:start;grid-auto-rows:auto}
+.shoprooms .split-q,.shoprooms .split-now{width:100%}
+.sheet .card.shop>.btn.ghost:last-child{box-shadow:0 0 0 10px #fbf6e9}
+/* Short landscape screens (iPad Safari with toolbars): the start screen fits without scrolling. */
+@media(max-height:820px) and (min-width:721px){.home.welcome{min-height:0;margin:4px auto}.welcome-art{min-height:0}.welcome-heading{padding-top:22px}.welcome-heading h1{font-size:60px;margin:10px 0}.welcome-plan{top:250px}.welcome-form{padding:16px 30px 10px}.welcome-form h2{font-size:28px;margin:6px 0}.welcome-intro{margin-bottom:10px}.chef-roster{margin:10px 0 14px}.chef-stage{height:84px}.chef-stage .chef{width:66px;height:82px}.join-box{margin:14px 0 12px;padding-top:12px}.welcome-footer{padding-top:10px}}
+/* Portrait iPad: the plan takes its natural height and the order tickets use the rest, two per row. */
+@media(orientation:portrait) and (min-width:700px){
+  .game .main{grid-template-rows:calc((100vw - 16px) * .5254 + 10px) minmax(0,1fr)!important}
+  .game .mytks{flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;align-content:flex-start}
+  .game .mytks>.ticket{flex:1 1 calc(50% - 10px);min-width:0}
+  .game .mytks>.shelf{flex:1 1 100%}
+}
+
+/* ===== 2026-10-27 second pass (Claude): layout, plates, tickets, shop ===== */
+:root{--roomA:#7a4a9c;--roomA-bg:#f1e7f7;--roomB:#147d86;--roomB-bg:#e1f2f2;--clean:#2f7a55;--dirty:#7a4b22}
+.asset.pasta-art{background-image:url('../assets/pasta.png')!important;background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important}
+
+/* Storage rooms carry a colour, used again in the shop. */
+.board .st1 h3,.board .st2 h3{color:#fff;text-shadow:0 1px 2px #0006;border-radius:16px;left:22%;right:22%}
+.board .st1 h3{background:var(--roomA)}
+.board .st2 h3{background:var(--roomB)}
+.board .st1 .ing .stock-label{border-color:var(--roomA)}
+.board .st2 .ing .stock-label{border-color:var(--roomB)}
+.board .st1:after,.board .st2:after{content:'';position:absolute;inset:30px 14px 4px;border:4px solid;border-radius:6px;pointer-events:none;opacity:.55}
+.board .st1:after{border-color:var(--roomA)}.board .st2:after{border-color:var(--roomB)}
+.room-A{color:var(--roomA);font-weight:700}.room-B{color:var(--roomB);font-weight:700}.room-C{font-weight:700}
+
+/* Clean plates: white tray, green band. Dirty plates: brown tray, brown band, stained plates. */
+.board .cupboard h3{color:#242820}
+.board .cupboard .plates{top:36px;left:4px;right:4px;bottom:3px;grid-template-rows:30px repeat(4,1fr);background:#fffef9;border:5px solid var(--clean);border-radius:8px;box-shadow:0 0 0 3px #fff,0 3px 8px #0003;padding:0 4px 2px}
+.board .tray-title{grid-column:1/-1;margin:0 -4px;font:700 20px/30px system-ui;letter-spacing:.12em;color:#fff;text-align:center;border-radius:3px 3px 0 0}
+.board .cupboard .tray-title{background:var(--clean)}
+.board .cupboard .tray-title:before{content:'✓ '}
+.board .cupboard .pbtn{height:auto!important}
+.board .cupboard .pbtn b{color:var(--clean)}
+.board .sink .plates{right:2px;top:34px;bottom:4px;width:176px;grid-template-rows:30px 1fr 1fr;background:#d9c2a3;border:5px solid var(--dirty);border-radius:8px;box-shadow:0 0 0 3px #f6ead6,0 3px 8px #0003;padding:0 4px 4px;gap:2px 4px}
+.board .sink .tray-title{background:var(--dirty);font-size:19px}
+.board .sink .tray-title:before{content:'✗ '}
+.board .sink .pbtn b{color:#4d2c10}
+.board .pl.dirtyp .asset{filter:sepia(1) saturate(.9) brightness(.62) contrast(1.1)!important}
+.board .wash-flow{position:absolute;left:26px;right:196px;top:104px;text-align:center;font:700 22px/30px Georgia;color:#fff;background:#3f6f8f;border-radius:16px;letter-spacing:.08em;box-shadow:0 2px 4px #0004;z-index:2}
+.board .sink h3{right:42%}
+
+/* Tickets: recipe items as tokens (filled = on the plate), big counts, clear plate state. */
+.ticket .recipe-list{grid-template-columns:1fr 1fr;column-gap:10px;row-gap:2px}
+.ticket .recipe-line{display:flex;align-items:center;gap:6px;min-height:30px;padding:1px 4px}
+.ticket .recipe-line>.asset{display:none}
+.rtoks{display:flex;flex-wrap:wrap;gap:2px;flex:1;min-width:0}
+.rtok{width:27px;height:27px;border-radius:7px;display:grid;place-items:center;border:2px dashed #b8a98a;background:#f4eee2}
+.rtok .asset{width:22px;height:22px;opacity:.28;filter:grayscale(1)!important}
+.rtok.got{border:2px solid #6c5a36;background:#fff8e2}
+.rtok.got .asset{opacity:1;filter:none!important}
+.rtok.extra{border-style:solid;border-color:#6c5a36}
+.ticket .recipe-line b{font:700 16px Georgia;color:#6b6250;white-space:nowrap}
+.ticket .recipe-line b em{font-style:normal;color:#1f2a1c;font-size:19px}
+.ticket .meal-art{position:relative}
+.ticket .meal-art.no-plate .dish-art{opacity:.45;filter:grayscale(.6)}
+.ticket .meal-art.no-plate:after{content:'no plate';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:700 11px system-ui;color:#7a4b22;background:#fff8ecee;border:2px dashed #b08550;border-radius:10px;padding:1px 5px;white-space:nowrap}
+.ticket .art-plate{position:absolute;right:-6px;bottom:-6px;width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px var(--clean),0 2px 4px #0004;display:grid;place-items:center}
+.ticket .art-plate .pl{width:32px!important;height:32px!important}
+.ticket .art-plate .pl b{font:800 14px system-ui!important;color:#1f2a1c}
+.ticket .plate-requirement{min-height:32px;gap:7px;font-size:13px}
+.ticket .plate-requirement b{font:700 15px Georgia;color:#1f2a1c;margin:0}
+.ticket .plate-requirement.hasplate{background:#e6f1e9;border:2px solid var(--clean)}
+.ticket .plate-requirement.noplate{background:#fff4dc;border:2px dashed #c08a3a}
+.ticket .plate-requirement .pl-on{width:28px!important;height:28px!important;flex:none}
+.ticket .plate-requirement .pl-on b{font:800 12px system-ui!important}
+.pl-empty{width:26px;height:26px;border-radius:50%;border:3px dashed #c08a3a;flex:none}
+
+/* Cooking: a compact button. */
+.ticket .cook-status .cookbtn,.ticket .cook-status .btn{min-height:30px!important;height:30px;padding:0 12px!important;font:600 13px Georgia!important;border-width:1.5px!important;border-radius:15px!important;flex:none}
+
+/* Shop: tabs, then the item, then where it goes. */
+.shoptabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 10px}
+.shoptab{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;align-items:center;column-gap:8px;text-align:left;padding:8px 10px;border:2px solid #b9a682;border-radius:10px;background:#fffbf0;color:var(--ink);min-height:62px}
+.shoptab .asset{grid-row:1/3;width:44px;height:44px}
+.shoptab b{font:600 15px Georgia}
+.shoptab small{font:12px Georgia;color:#7a6b52}
+.shoptab.on{border-color:#2f6b4f;background:#e4ecd5;box-shadow:inset 0 0 0 2px #2f6b4f}
+.shopbody{border-top:1px solid #dccfb4;padding-top:4px}
+.shop .step{font:600 15px Georgia;margin:10px 0 6px;color:#3d3a2c}
+.sheet .shop .sbtn{min-width:86px}
+.sheet .shop .sbtn small{display:block}
+.dsplit{display:block;margin:4px 0 4px}
+.split-ends{display:flex;justify-content:space-between;font:700 16px Georgia}
+.split-ends small{font:400 13px Georgia;margin-left:6px;opacity:.85}
+.ra{color:var(--roomA)}.rb{color:var(--roomB)}
+.split-toks{display:flex;margin:8px 0 0}
+.stok{flex:1;display:grid;place-items:center;background:none;border:0;padding:0;min-height:0}
+.stok .asset{width:46px;height:46px;border-radius:12px;border:3px solid;padding:3px;box-sizing:content-box}
+.stok.ra .asset{border-color:var(--roomA);background-color:var(--roomA-bg)}
+.stok.rb .asset{border-color:var(--roomB);background-color:var(--roomB-bg)}
+.split-range{-webkit-appearance:none;appearance:none;display:block;width:100%;height:18px;border-radius:9px;margin:16px 0 10px;background:linear-gradient(90deg,var(--roomA) 0 var(--p),var(--roomB) var(--p) 100%);outline:none;touch-action:none}
+.split-range::-webkit-slider-thumb{-webkit-appearance:none;width:44px;height:44px;border-radius:50%;background:#fff;border:4px solid #2c2a22;box-shadow:0 2px 6px #0006;cursor:grab}
+.split-range::-moz-range-thumb{width:38px;height:38px;border-radius:50%;background:#fff;border:4px solid #2c2a22}
+.split-sum{display:flex;justify-content:space-between;font:15px Georgia}
+.split-sum b{font:700 20px Georgia}
+.split-help{margin:4px 0 0;font-size:12px}
+.shop .buybtn{width:100%;margin:10px 0 4px;font:600 18px Georgia}
+.shop .buybtn:disabled{opacity:.5}
+.shop .tray .slot .asset{width:100%;height:100%}
+
+/* Landscape iPad: status rail on the left, plan beside it, tickets underneath. */
+@media(orientation:landscape) and (min-width:900px){
+  .game .main{grid-template-columns:184px minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) 226px!important;grid-template-areas:"head plan" "me plan" "tix tix";column-gap:8px!important;row-gap:6px!important;padding:6px 8px 8px!important}
+  .game .plan-scroll{grid-area:plan}
+  .game .kitchen{display:contents}
+  .game .order-heading{grid-area:head;height:auto;min-height:0;flex-direction:column;align-items:stretch;gap:4px;background:#faf5e9;border:1px solid #d6c8ab;border-radius:8px;padding:8px 10px}
+  .order-heading h2{font-size:18px;line-height:1.15}
+  .order-heading h2 i{display:none}
+  .order-heading h2 small{display:inline}
+  .order-heading .play-mode{margin:0;font-size:11px}
+  .order-heading .worker-toggle{justify-content:flex-start}
+  .game .me{grid-area:me;display:flex;flex-direction:column;align-items:stretch;gap:10px;height:auto!important;min-height:0;overflow:auto;background:#faf5e9;border:1px solid #d6c8ab;border-radius:8px;padding:10px}
+  .game .me .glasses{display:flex;gap:10px;justify-content:flex-start}
+  .game .me .glass{width:58px;height:58px;border:3px solid var(--c);background:#fffaf0}
+  .game .me .glass .chef{width:46px;height:54px}
+  .game .me .glass .sec{font:700 16px Georgia;background:#2c2a22;color:#fff;bottom:-8px;right:-10px;padding:1px 7px;border-radius:12px}
+  .game .me .glass.free{background:#e4ecd5}
+  .game .me .prompt{flex-direction:column;align-items:stretch;gap:8px}
+  .game .me .prompt p{-webkit-line-clamp:unset;display:block;font:15px/1.35 Georgia}
+  .game .me .prompt .btn{width:100%;height:44px!important;min-height:44px!important;font-size:17px!important}
+  .game .me .prompt .btn+.btn{margin-left:0}
+  .game .mytks{grid-area:tix;padding:2px}
+  .game .ticket{min-width:330px}
+}
+@media(orientation:landscape) and (min-width:900px) and (min-height:900px){.game .main{grid-template-rows:auto minmax(0,1fr) 250px!important}}
+@media(orientation:portrait) and (min-width:700px){.game .main{grid-template-rows:calc((100vw - 16px) * .513 + 8px) minmax(0,1fr)!important}}
+.board .sink .tray-title,.board .cupboard .tray-title{align-self:stretch;height:30px;line-height:30px;color:#fff;overflow:hidden;white-space:nowrap}
+.board .area.st1 h3,.board .area.st1.active h3{background:var(--roomA);color:#fff}
+.board .area.st2 h3,.board .area.st2.active h3{background:var(--roomB);color:#fff}
+.board .area.st1.active h3,.board .area.st2.active h3{box-shadow:0 0 0 4px #ffd75e}
+.rtok .asset{opacity:.5;filter:none!important}
+.ticket .art-plate{right:2px;bottom:2px;width:30px;height:30px}
+.ticket .art-plate .pl{width:28px!important;height:28px!important}
+.ticket .meal-art.no-plate:after{display:none}
+.ticket .meal-art.no-plate .dish-art{opacity:.75;filter:none}
+.ticket .plate-requirement{overflow:hidden}
+.pl-chip,.ticket .art-plate{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;flex:none;background:radial-gradient(circle,#fff 0 55%,#e9efe9 56% 100%);border:3px solid var(--clean);font:800 13px/1 system-ui;color:#1f2a1c;box-shadow:0 1px 3px #0003}
+.ticket .art-plate{position:absolute;right:0;bottom:0;width:30px;height:30px;font-size:14px}
+.sheet .card.shop>.btn.ghost:last-child{position:static;box-shadow:none;margin-top:8px}
+.dsplit .split-toks,.dsplit .split-ends,.dsplit .split-sum{width:100%}
+.ticket .cook-status{flex-wrap:nowrap;white-space:nowrap;gap:6px;min-width:0}
+.ticket .cook-status>span:not(.cook-ring){white-space:nowrap}
+.ticket .cook-status .cookbtn,.ticket .cook-status .btn{width:auto!important;max-width:none;flex:0 0 auto!important;margin-left:4px}
+.ticket.cookable{box-shadow:inset 0 0 0 2px #c76a2f}
+.ticket-details{grid-template-columns:auto minmax(0,1fr)}
+.ticket .ticket-actions .cookbtn{min-height:32px!important;height:32px;padding:0 12px!important;font:600 14px Georgia!important;border-radius:16px!important;border-width:1.5px!important;width:auto!important;background:#b9572b;border-color:#8e3f1c}
+.ticket .recipe-list>small{display:none}
+.ticket .recipe-line{min-height:29px}
+.ticket .plate-requirement{margin-bottom:4px}
+.board .cupboard .pbtn,.board .sink .pbtn{min-height:0!important;height:100%!important;max-height:100%;align-self:stretch;overflow:visible}
+.board .cupboard .pbtn .pl{width:34px!important;height:34px!important}
+.board .cupboard h3{display:none}.board .cupboard .plates{top:8px}
+
+/* ===== 2026-10-28 third pass (Claude): dining, plates in the linen palette, left rail ===== */
+:root{--roomA:#7b5684;--roomA-bg:#f2eaf3;--roomB:#3c7176;--roomB-bg:#e5f0ee;--clean:#32715b;--dirty:#9a5a33}
+
+/* Dining on the plan: one tidy card per guest, picture and name, no overlap. */
+.board .dining .seats{left:14px;right:14px;top:38px;height:124px;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:6px 10px}
+.board .dining .seat{height:auto!important;display:grid!important;grid-template-columns:50px minmax(0,1fr);align-items:center;gap:6px;padding:2px 8px 2px 3px!important;text-align:left;background:#fbf5e8f2!important;border:1.5px solid #b49d74!important;border-radius:8px;box-shadow:0 2px 4px #4a3a1f33!important;overflow:hidden}
+.board .dining .seat.empty,.board .dining .seat.reserved{background:transparent!important;border:0!important;box-shadow:none!important}
+.board .dining .seat.reserved{display:flex!important;font:16px Georgia;color:#7e6e50}
+.board .dining .seat .sc-art{width:50px;height:50px;display:flex}
+.board .dining .seat .sc-art .dish-art{width:50px;height:50px;flex:none}
+.board .dining .seat .sc-art.vip2 .dish-art{width:30px;height:30px;margin-right:-8px}
+.board .dining .seat .sc-art.vip2{align-items:center}
+.board .dining .seat .sc-name{font:600 20px/1.08 Georgia;color:#2a2a20;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.board .dining .seat.glow{outline:4px solid #e0a83a;outline-offset:1px}
+.board .dining .seat.vipseat{border-color:#b98a2e!important;background:#fff6e0f2!important}
+
+/* Plates in the linen palette: clean on a cream tray with a sage label, dirty on a terracotta one. */
+.board .tray-title{font:italic 600 19px/28px Georgia!important;letter-spacing:.02em;text-transform:none;height:28px!important;background:#faf3e0!important;border-bottom:1px solid #c8b48f;border-radius:4px 4px 0 0}
+.board .cupboard .tray-title{color:var(--clean)!important}
+.board .cupboard .tray-title:before{content:'✦ '}
+.board .sink .tray-title{color:var(--dirty)!important}
+.board .sink .tray-title:before{content:'≈ '}
+.board .cupboard .plates{grid-template-rows:28px repeat(4,1fr);background:#fffdf6;border:3px solid #8fae96;border-radius:6px;box-shadow:0 2px 6px #4a3a1f40;padding:0 4px 2px}
+.board .cupboard .pbtn b{color:#2f5e46}
+.board .sink .plates{grid-template-rows:28px 1fr 1fr;background:#f2e2cf;border:3px solid #c08a64;border-radius:6px;box-shadow:0 2px 6px #4a3a1f40;padding:0 4px 4px}
+.board .sink .pbtn b{color:#7a3f1f}
+.board .sink .pbtn.none{opacity:.45}
+.board .pl.dirtyp .asset{filter:saturate(.85) sepia(.15)!important}
+.board .pl.dirtyp:after{inset:16%;background:radial-gradient(ellipse 22% 16% at 34% 38%,#8a5a2acc 0 60%,transparent 64%),radial-gradient(ellipse 15% 11% at 66% 62%,#7b4d22bb 0 60%,transparent 64%),radial-gradient(circle at 48% 74%,#a0703aaa 0 7%,transparent 9%),radial-gradient(circle at 62% 30%,#b0763a99 0 5%,transparent 7%)}
+.board .wash-flow{font:italic 600 20px/28px Georgia;letter-spacing:.02em;color:#3a3a2c;background:#faf3e0f2;border:1px solid #ad9b7c;box-shadow:0 1px 3px #4a3a1f33;border-radius:15px}
+
+/* Left rail: name, my chefs and instruction, then the guests waiting at a readable size. */
+.guest-rail{display:none}
+@media(orientation:landscape) and (min-width:900px){
+  .game .main{grid-template-columns:minmax(200px,1fr) var(--planw,minmax(0,3fr))!important;grid-template-rows:auto auto minmax(0,1fr) 226px!important;grid-template-areas:"head plan" "me plan" "guests plan" "tix tix"}
+  .game .order-heading{flex-direction:row;flex-wrap:wrap;align-items:baseline;justify-content:space-between;padding:6px 10px;gap:2px 8px}
+  .order-heading h2{font-size:17px}
+  .order-heading .play-mode{display:none}
+  .game .me{overflow:visible;gap:8px;padding:8px 10px}
+  .game .me .glass{width:50px;height:50px}
+  .game .me .glass .chef{width:40px;height:48px}
+  .game .me .prompt p{font-size:14px}
+  .game .me .prompt .btn{height:40px!important;min-height:40px!important}
+  .guest-rail{grid-area:guests;display:flex;flex-direction:column;min-height:0;background:#faf5e9;border:1px solid #d6c8ab;border-radius:8px;padding:6px 6px 4px}
+  .guest-rail h3{font:600 15px Georgia;margin:0 4px 4px;display:flex;justify-content:space-between}
+  .guest-rail h3 small{font:600 13px system-ui;background:#e9dfc8;border-radius:9px;padding:1px 7px}
+  .gr-list{display:flex;flex-direction:column;gap:5px;overflow-y:auto;min-height:0;padding:2px}
+  .gr-row{display:block;text-align:left;padding:5px 6px;border:1.5px solid #c4b08a;border-radius:8px;background:#fffbf0;color:var(--ink);min-height:0;width:100%}
+  .gr-row.glow{border-color:#2f6b4f;box-shadow:0 0 0 2px #2f6b4f33}
+  .gr-row:active{background:#eef3e3}
+  .gr-row.vip{background:#fff6e0;border-color:#b98a2e}
+  .gr-top{display:flex;justify-content:space-between;font:600 14px Georgia;margin-bottom:2px}
+  .gr-part{display:flex;gap:7px;align-items:center}
+  .gr-part+.gr-part{margin-top:3px}
+  .gr-part .dish-art{width:38px;height:38px;flex:none}
+  .gr-part>div{min-width:0}
+  .gr-n{display:block;font:600 14px/1.15 Georgia;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gr-n .coin{font-size:11px;font-weight:400}
+  .gr-i{display:flex;flex-wrap:wrap;gap:3px 4px;align-items:center;margin-top:2px}
+  .gr-i .gi{width:22px;height:22px;font-size:14px}
+  .gr-i .gi .asset{width:22px;height:22px}
+  .gr-i .gi b{min-width:14px;height:14px;font:700 10px/14px system-ui;right:-5px;bottom:-4px}
+  .gr-pl{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px solid #8fae96;background:#fff;font:800 10px system-ui;color:#2f5e46}
+  .gr-hint{font:11px Georgia;color:#7a6b52;margin:4px 4px 0}
+}
+@media(orientation:landscape) and (min-width:900px){.gr-row{flex:none}.gr-list{flex:1}}
+.board .tray-title{font-size:17px!important;white-space:nowrap}
+.board .sink .plates{background:#efdfc6}
+.board .pl.dirtyp:after{inset:12%;background:radial-gradient(ellipse 26% 18% at 34% 40%,#7e4f22d0 0 60%,transparent 66%),radial-gradient(ellipse 18% 13% at 66% 62%,#6f441cc0 0 60%,transparent 66%),radial-gradient(circle at 48% 76%,#9a6a34b0 0 8%,transparent 10%),radial-gradient(circle at 64% 30%,#a8703aa0 0 6%,transparent 8%)}
+/* Portrait iPad: the guest list sits under the tickets, using the free space. */
+@media(orientation:portrait) and (min-width:700px){
+  .guest-rail{display:block;order:3;flex:none;max-height:38%;overflow-y:auto;background:#faf5e9;border:1px solid #d6c8ab;border-radius:8px;padding:6px;margin-top:6px}
+  .game .mytks{order:2;flex:0 1 auto}
+  .guest-rail h3{font:600 15px Georgia;margin:0 4px 4px;display:flex;gap:8px}
+  .guest-rail h3 small{font:600 13px system-ui;background:#e9dfc8;border-radius:9px;padding:1px 7px}
+  .gr-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .gr-row{display:block;text-align:left;padding:5px 6px;border:1.5px solid #c4b08a;border-radius:8px;background:#fffbf0;color:var(--ink);min-height:0;width:100%}
+  .gr-row.glow{border-color:#2f6b4f;box-shadow:0 0 0 2px #2f6b4f33}
+  .gr-row.vip{background:#fff6e0;border-color:#b98a2e}
+  .gr-top{display:flex;justify-content:space-between;font:600 14px Georgia}
+  .gr-part{display:flex;gap:7px;align-items:center}
+  .gr-part .dish-art{width:38px;height:38px;flex:none}
+  .gr-part>div{min-width:0}
+  .gr-n{display:block;font:600 14px/1.15 Georgia;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gr-n .coin{font-size:11px;font-weight:400}
+  .gr-i{display:flex;flex-wrap:wrap;gap:3px 4px;align-items:center;margin-top:2px}
+  .gr-i .gi{width:22px;height:22px;font-size:14px}
+  .gr-i .gi .asset{width:22px;height:22px}
+  .gr-i .gi b{min-width:14px;height:14px;font:700 10px/14px system-ui;right:-5px;bottom:-4px}
+  .gr-pl{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px solid #8fae96;background:#fff;font:800 10px system-ui;color:#2f5e46}
+  .gr-hint{font:11px Georgia;color:#7a6b52;margin:4px 4px 0}
+}
+@media(orientation:portrait) and (min-width:700px){.gr-list{align-items:start}}
+
+/* ---- Claude 2026-10-28, fourth readability pass: clock, selected meal, plates, reception, shop ---- */
+/* Shift clock: a solid pill that reads from across the table; red in the last 30 s. */
+.game .bar .clock{font:700 30px/40px Georgia!important;color:#fff!important;background:#2f5e46!important;border:0!important;border-radius:10px;padding:0 14px!important;min-width:104px!important;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 2px 5px #2f5e4655}
+.game .bar .clock.hurry{background:#b5432f!important;animation:kc-hurry 1s ease-in-out infinite}
+@keyframes kc-hurry{50%{transform:scale(1.07)}}
+@media(max-width:1150px){.game .bar .clock{font-size:26px!important;min-width:88px!important;padding:0 10px!important}}
+@media(max-width:560px){.game .bar .clock{font-size:22px!important;line-height:34px!important;min-width:72px!important}}
+
+/* Selected meal: thick green frame, green header band, raised; the other tickets step back. */
+.game .mytks .ticket.sel{border:0!important;outline:5px solid #23885a;outline-offset:-5px;box-shadow:0 6px 16px #23885a55!important;background:#f3faf3;z-index:1}
+.game .mytks .ticket.sel .tk-head{background:#23885a;color:#fff;margin:-8px -8px 4px -8px;padding:6px 10px 6px 12px;border-radius:5px 5px 0 0}
+.game .mytks .ticket.sel .tk-head .tk-n{color:#fff}
+.game .mytks .ticket.sel .tk-head .tk-n:before{content:'▶ ';font-size:13px;vertical-align:2px}
+.game .mytks .ticket.sel .tk-head .coin{color:#fff}
+.game .mytks:has(.ticket.sel) .ticket:not(.sel){opacity:.72;filter:saturate(.7)}
+.game .mytks .ticket.sel .fill-tag{background:#fff;color:#23885a}
+.game .mytks .ticket.sel .meal-art{mix-blend-mode:normal}
+
+/* Plates on the ticket: four finger-sized buttons under "Take a plate". */
+.plate-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:0 0 5px}
+.ppbtn{display:flex;align-items:center;justify-content:center;gap:3px;min-height:46px;padding:2px 3px;border:2px solid #8fae96;border-radius:8px;background:#fffdf6;color:#2f5e46;cursor:pointer}
+.ppbtn .pl{width:32px!important;height:32px!important;flex:none}
+.ppbtn .pl>b{font:800 12px system-ui!important;color:#1d2a1f}
+.ppbtn>b{font:700 16px Georgia}
+.ppbtn:active{transform:scale(.95);background:#e4ecd5}
+.ppbtn:disabled,.ppbtn.none{opacity:.35;border-style:dashed}
+.ppbtn.big{min-height:64px;min-width:72px;flex-direction:column;gap:0}
+.ppbtn.big .pl{width:42px!important;height:42px!important}
+.ppbtn.big .pl>b{font-size:15px!important}
+.ppbtn.big small{font:11px Georgia;color:#6b6250}
+.ppbtn.dirty{border-color:#a57449;color:#6b3f1d}
+
+/* Plate letters stay readable on every plate: a white disc behind the size. */
+.pl>b{z-index:2}
+.pl.dirtyp>b,.board .pl.dirtyp>b{inset:auto!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%);width:auto;min-width:1.6em;height:1.6em;padding:0 .2em;border-radius:1em;background:#fffdf6;color:#3d2412!important;box-shadow:0 0 0 1.5px #7a4f22;line-height:1.6em;display:block!important;text-align:center}
+.board .sink .plates{overflow:hidden}
+.board .sink .pbtn{min-width:0;overflow:hidden!important}
+.board .sink .pbtn .pl,.board .sink .pbtn .pl.pl-XL,.board .sink .pbtn .pl.big{width:40px!important;height:40px!important}
+.board .sink .pbtn b{font-size:18px!important}
+.board .cupboard .plates,.board .sink .plates{cursor:pointer}
+.board .cupboard .pbtn:disabled,.board .sink .pbtn:disabled{cursor:pointer}
+.board .wash-flow{display:none}
+
+/* Plate and wash menus */
+.platemenu,.washmenu{max-width:600px;width:calc(100vw - 32px)}
+.pm-stock{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
+.pm-s{display:flex;align-items:center;gap:4px;padding:4px 10px 4px 4px;border:1.5px solid #c9b996;border-radius:22px;background:#fffdf6;font:700 17px Georgia}
+.pm-s .pl{width:34px!important;height:34px!important}
+.pm-s .pl>b{font:800 12px system-ui!important}
+.pm-s small{font:400 12px Georgia;color:#7a6b52}
+.pm-s.none{opacity:.45}
+.pm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px;border:1.5px solid #d6c7a6;border-radius:10px;margin:0 0 8px;background:#fffbf0}
+.pm-row.sel{border:3px solid #23885a}
+.pm-dish{display:flex;align-items:center;gap:8px;min-width:0}
+.pm-dish .dish-art{width:48px;height:48px;flex:none}
+.pm-dish b{display:block;font:600 17px Georgia}
+.pm-dish small{font:13px Georgia;color:#7a6b52}
+.pm-btns{display:flex;gap:6px}
+.wm-label{font:600 15px Georgia;color:#6b3f1d;margin:6px 0 4px}
+.wm-label.clean{color:#2f5e46}
+.wm-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.washmenu .btn{margin-top:8px;margin-right:6px}
+@media(max-width:560px){.pm-row{flex-direction:column;align-items:stretch}.pm-btns{justify-content:space-between}.ppbtn.big{min-width:0;flex:1}}
+
+/* Reception choice */
+.reception-card{max-width:560px;width:calc(100vw - 32px)}
+.rec-opts{display:grid;gap:12px;margin:8px 0 6px}
+.rec-opt{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px;border:2px solid #9b8459;border-radius:12px;background:#fffbf0;color:var(--ink);min-height:84px;cursor:pointer}
+.rec-opt.seat{border:3px solid #23885a;background:#eef6ec}
+.rec-opt:active{transform:scale(.98)}
+.rec-opt:disabled{opacity:.45;cursor:default}
+.rec-opt .ro-ic{font-size:36px;flex:none}
+.rec-opt b{display:block;font:700 21px Georgia;margin-bottom:3px}
+.rec-opt small{display:block;font:14px/1.35 Georgia;color:#5d543f}
+.gr-row.throwable{border:2px dashed #b5432f;position:relative}
+.gr-row.picked{background:#f8e1d8;border:3px solid #b5432f}
+.gr-row .outtag{position:absolute;right:6px;top:4px;background:#b5432f;color:#fff;font:700 12px system-ui;padding:2px 7px;border-radius:9px}
+
+/* Shop: all three kinds visible at once */
+.shopgrid{display:grid;gap:8px;margin:4px 0 6px}
+.sg-pair{display:grid;grid-template-columns:3fr 2fr;gap:8px}
+.sgroup{border:1.5px solid #d3c3a1;border-radius:10px;padding:6px 8px 8px;background:#fffdf7}
+.sgroup.on{border:3px solid #23885a;background:#f1f8ef}
+.sgroup.off{opacity:.6}
+.sg-h{display:flex;align-items:baseline;gap:8px;margin:0 0 5px}
+.sg-h b{font:700 16px Georgia}
+.sg-h small{font:12px Georgia;color:#7a6b52}
+.sheet .shopgrid .shoprow{display:flex;gap:6px;flex-wrap:nowrap;margin:0}
+.sheet .shopgrid .sbtn{flex:1;min-width:0!important;position:relative;padding:4px 2px;display:flex;flex-direction:column;align-items:center}
+.sheet .shopgrid .shoprow .asset{width:46px;height:46px}
+.sheet .shopgrid .sbtn small{font:12px Georgia;white-space:nowrap}
+.sheet .shopgrid .sbtn small.left{font-size:11px;color:#7a6b52}
+.sbtn .pickn{position:absolute;top:2px;right:4px;background:#23885a;color:#fff;font:700 13px system-ui;padding:1px 6px;border-radius:9px}
+.shop-start{text-align:center;margin:10px 0}
+.shop .tray{display:flex;align-items:center;gap:8px;margin:6px 0 8px}
+.shop .tray-l{font:600 15px Georgia}
+@media(max-width:600px){.sg-pair{grid-template-columns:1fr}.sheet .shopgrid .shoprow{flex-wrap:wrap}.sheet .shopgrid .sbtn{flex:0 0 calc(33% - 4px)}}
+
+/* Split: one wide track with the items on it and a handle between A and B. */
+.dsplit .split-ends{display:flex;justify-content:space-between;align-items:flex-end;margin:2px 0 6px}
+.dsplit .split-ends>span{display:flex;flex-direction:column;line-height:1.1}
+.dsplit .split-ends .rb{align-items:flex-end}
+.dsplit .sx-room{font:700 16px Georgia}
+.dsplit .split-ends b{font:700 34px Georgia}
+.dsplit .split-ends small{margin:0!important;font:13px Georgia!important}
+.dsplit .ra,.dsplit .ra b{color:var(--roomA)}.dsplit .rb,.dsplit .rb b{color:var(--roomB)}
+.split-track{position:relative;display:flex;align-items:center;height:84px;border-radius:16px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;
+  background:linear-gradient(90deg,var(--roomA-bg,#eadff0) 0 var(--p),var(--roomB-bg,#dbecec) var(--p) 100%);box-shadow:inset 0 0 0 3px #0000,inset 0 0 0 2px #a99a7b}
+.split-track:before{content:'';position:absolute;left:0;top:0;bottom:0;width:var(--p);border-radius:16px 0 0 16px;box-shadow:inset 0 -6px 0 var(--roomA)}
+.split-track:after{content:'';position:absolute;right:0;top:0;bottom:0;width:calc(100% - var(--p));border-radius:0 16px 16px 0;box-shadow:inset 0 -6px 0 var(--roomB)}
+.split-track .stok{flex:1;height:100%;position:relative;z-index:1}
+.split-track .stok .asset{width:50px;height:50px}
+.split-handle{position:absolute;z-index:2;left:var(--p);top:-8px;bottom:-8px;width:30px;transform:translateX(-50%);border-radius:15px;background:#fff;border:3px solid #2c2a22;box-shadow:0 2px 8px #0006;pointer-events:none;display:grid;place-items:center}
+.split-handle i{width:10px;height:30px;border-left:2.5px solid #2c2a22;border-right:2.5px solid #2c2a22}
+.dsplit .split-range{position:absolute;width:1px;height:1px;opacity:0;margin:0;pointer-events:none}
+.dsplit{position:relative}
+.dsplit .split-help{margin:10px 0 0}
+.ticket .plate-requirement.noplate.pick{min-height:20px!important;border:0!important;background:none!important;padding:0 2px!important;margin:0 0 2px!important}
+.ticket .plate-requirement.pick .pl-empty{display:none}
+.ticket .plate-pick .ppbtn{min-height:40px}
+.gr-row .outtag{top:auto;bottom:4px}
+.washmenu .pl.dirtyp{position:relative}
+.washmenu .pl.dirtyp .asset{filter:sepia(.55) saturate(1.2) brightness(.82)!important}
+.washmenu .pl.dirtyp:after{content:'';position:absolute;inset:14%;border-radius:50%;background:radial-gradient(ellipse 26% 18% at 34% 40%,#7e4f22d0 0 60%,transparent 66%),radial-gradient(ellipse 18% 13% at 66% 62%,#6f441cc0 0 60%,transparent 66%);pointer-events:none}
+.plate-pick{grid-template-columns:auto repeat(4,1fr)!important;align-items:center;gap:4px!important;margin:0 0 4px!important}
+.pp-l{display:flex;flex-direction:column;line-height:1.1;padding-right:2px}
+.pp-l b{font:700 14px Georgia;color:#8a5a1c}
+.pp-l small{font:11px Georgia;color:#766a55;white-space:nowrap}
+.ticket .plate-pick .ppbtn{min-height:38px;padding:1px 2px;gap:2px}
+.ticket .plate-pick .ppbtn .pl{width:28px!important;height:28px!important}
+.ticket .plate-pick .ppbtn>b{font-size:14px}
+
+/* ---- Claude 2026-10-28: running games on the start screen, room code, pause ---- */
+.games-box{display:grid;gap:8px;margin:14px 0 4px}
+.game-row{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:10px 12px;border:2px solid #b5a07a;border-radius:10px;background:#fffbf0;color:var(--ink);min-height:58px;cursor:pointer}
+.game-row.mine{border:3px solid #23885a;background:#eef6ec}
+.game-row:active{transform:scale(.98)}
+.gm-t{display:flex;flex-direction:column;min-width:0}
+.gm-t b{font:700 17px Georgia}
+.gm-t small{font:13px Georgia;color:#6b6250;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-code{font:700 16px system-ui;letter-spacing:.06em;color:#2f5e46;background:#e4ecd5;padding:4px 10px;border-radius:8px;flex:none}
+.game .bar .roomchip{display:inline-flex;align-items:center;gap:5px;font:12px Georgia;color:#5d543f;background:#efe8d6;border:1px solid #c9b996;border-radius:8px;padding:3px 8px;white-space:nowrap}
+.game .bar .roomchip b{font:700 14px system-ui;letter-spacing:.05em;color:#2c2a22}
+@media(max-width:1150px){.game .bar .roomchip{font-size:0;gap:0;padding:3px 6px}.game .bar .roomchip b{font-size:13px}}
+.menu-code{display:flex;flex-direction:column;align-items:center;gap:2px;margin:0 0 10px;font:15px Georgia}
+.menu-code b{font:700 30px system-ui;letter-spacing:.08em;color:#2f5e46}
+.menu-code small{font:12px Georgia;color:#7a6b52;text-align:center}
+.game .bar .clock.paused{background:#6b6250!important}
+.pause-banner{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 32px);padding:14px 20px;background:#2c2a22f0;color:#fff;border-radius:14px;box-shadow:0 8px 30px #0006;font:16px Georgia;text-align:center}
+.pause-banner>b{font:700 22px Georgia}
+.pause-banner .btn{min-height:40px;background:#fffbf0;color:#2c2a22;border:0}
+.game:has(.pause-banner) .board,.game:has(.pause-banner) .kitchen{filter:grayscale(.5) opacity(.75);pointer-events:none}
+/* Messages sit over the top bar, so they never cover the storage rooms. */
+#toast{top:4px!important;max-width:min(640px,calc(100vw - 24px));padding:10px 18px!important;font:600 16px/24px Georgia!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px #0005}
+#toast.show{transform:translate(-50%,0)!important}
+/* Active meal: green band only (the ▶ character turns into a blue emoji on iPad). */
+.game .mytks .ticket.sel .tk-head .tk-n:before{content:none!important}

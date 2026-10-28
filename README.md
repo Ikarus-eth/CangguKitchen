@@ -2,6 +2,12 @@
 
 A real-time cooperative kitchen game for 1–4 players, one iPad each, played in the browser. It adapts the eight scenarios and five Master Chef missions of Kitchen Rush Revised Edition, with its own dishes and artwork. See [the rules review](RULES-REVIEW.md) for verified mechanics and remaining differences.
 
+## Canggu edition (beta)
+
+`canggu/` holds the Canggu edition, the version heading for the App Store: https://ikarus-eth.github.io/CangguKitchen/canggu/. It started as a copy of this game and changes on its own; the game at the root stays as it is. It uses its own relay topic (`canggukitchen1`) and its own saved settings (`cg:` keys), so games of the two versions never mix.
+
+New so far: difficulty presets (Chill, Normal, Hectic, Full Canggu), cancelling a working chef, radar pings with "On it!" claims, and three team moments (birthday table, melting delivery, influencer). Tests: `node tests/canggu-regression.cjs`, `node tests/canggu-browser.cjs` (static server on :8765), and the shared tests with `KC_HTML=canggu/index.html` or `BASE_URL=http://localhost:8765/canggu/`.
+
 ## Restaurants
 
 1. Your first restaurant — one sand timer each, 8 friends as guests, every chef serves 2 meals. Wrong ingredients can be put back.

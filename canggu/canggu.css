@@ -1,0 +1,55 @@
+/* Canggu edition: team moments, pings and the cancel sheet. Loaded after the shared styles. */
+
+.moments { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px; position: relative; z-index: 30; }
+.mom {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;
+  padding: 7px 12px; border-radius: 12px; font-size: 15px; line-height: 1.25;
+  background: #fff8e8; border: 2px solid #e8b84a; color: #3b2a12;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+.mom > b { font-size: 16px; }
+.mom .btn { padding: 6px 12px; min-height: 36px; font-size: 15px; }
+.mom.live { animation: mom-in .35s ease-out; }
+.mom.hot { background: #ffe9e4; border-color: #e0573c; }
+.mom.met { background: #e9f6e6; border-color: #5fa354; }
+.mom.missed { background: #f8e6e3; border-color: #c0503b; }
+.mom .mleft { font-variant-numeric: tabular-nums; }
+.mparts { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
+.mpart { padding: 2px 8px; border-radius: 999px; background: rgba(0,0,0,.06); font-size: 14px; }
+.mpart.done { background: #cfe9c8; }
+@keyframes mom-in { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* pings: a row in the bar plus a ripple on the plan */
+.pingrow { background: #fff; border-color: var(--c, #555); border-left-width: 8px; }
+.pingrow .onit { color: #2f7a2a; font-style: normal; font-weight: 700; }
+.pingrow em { font-style: normal; opacity: .75; }
+.pingrow.urgent { background: #ffe1db; border-color: #d33a22; animation: ping-shake .4s ease-in-out 2; }
+.pingrow.panic { background: #ffd2c9; border-color: #c4200a; }
+.pingrow.gone, .ping.gone { display: none; }
+@keyframes ping-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.board { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.pings { position: absolute; inset: 0; pointer-events: none; z-index: 40; }
+.ping { position: absolute; width: 0; height: 0; }
+.ping i {
+  position: absolute; left: -100px; top: -100px; width: 200px; height: 200px; border-radius: 50%;
+  border: 9px solid var(--c, #e0573c); opacity: 0; animation: sonar 1.6s ease-out infinite;
+}
+.ping i + i { animation-delay: .8s; }
+.ping b {
+  position: absolute; left: 50%; top: 24px; transform: translateX(-50%); white-space: nowrap;
+  padding: 8px 16px; border-radius: 999px; background: var(--c, #e0573c); color: #fff; font-size: 34px; font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.ping.urgent i { border-color: #d33a22; animation-duration: .9s; }
+.ping.urgent b { background: #d33a22; }
+.ping.panic i { border-width: 10px; animation-duration: .6s; }
+.ping.claimed i { animation: none; opacity: 0; }
+.ping.claimed b { background: #5fa354; }
+@keyframes sonar { 0% { transform: scale(.2); opacity: .9; } 100% { transform: scale(1.6); opacity: 0; } }
+
+/* an empty shelf is a button: tap it to call for that ingredient */
+button.ing.out, button.ing[data-a="shout"] { cursor: pointer; }
+button.ing[data-a="shout"] .empty-tag::after { content: ' · call'; }
+
+.edition-tag { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 999px; background: #2f5d50; color: #fff; font: 600 13px/1.4 system-ui, sans-serif; letter-spacing: .04em; }

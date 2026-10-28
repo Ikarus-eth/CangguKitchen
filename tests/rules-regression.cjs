@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-const source = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+const source = fs.readFileSync(process.env.KC_HTML || path.join(__dirname, '../index.html'), 'utf8');
 const engine = [...source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(x => x[1]).find(x => x.includes('function newGame'));
 const ctx = vm.createContext({}); vm.runInContext(engine, ctx);
 const E = ctx.Engine;

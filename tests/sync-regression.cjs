@@ -2,7 +2,7 @@
 // game, and rejoins from the list without the code. Needs: a static server on :8765 and a local MQTT
 // WebSocket relay on :8898 (e.g. aedes + ws, see tests/local-relay.cjs).
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-const URL='http://localhost:8765/?broker=ws://localhost:8898';
+const URL=(process.env.BASE_URL||'http://localhost:8765/')+'?broker=ws://localhost:8898';
 const out=process.env.QA_OUTPUT||'/tmp/canggu-sync';require('fs').mkdirSync(out,{recursive:true});
 (async()=>{
   const b=await chromium.launch();
@@ -28,7 +28,7 @@ const out=process.env.QA_OUTPUT||'/tmp/canggu-sync';require('fs').mkdirSync(out,
   const c1=await H.locator('#clock').innerText();await w(3000);const c2=await H.locator('#clock').innerText();console.log('clock frozen',c1,c2);
   await H.screenshot({path:out+'/paused.png'});
   G=await gc.newPage();G.on('pageerror',e=>errs.push('G2 '+e.message));
-  await G.addInitScript(()=>{try{localStorage.removeItem('kc-guest')}catch(e){}});
+  await G.addInitScript(()=>{try{localStorage.removeItem('kc-guest');localStorage.removeItem('cg:kc-guest')}catch(e){}});
   await G.goto(URL);await G.waitForSelector('.game-row.mine',{timeout:20000});console.log('rejoin row:',await G.locator('.game-row.mine').innerText());
   await G.screenshot({path:out+'/rejoin.png'});
   await G.locator('.game-row.mine').click();
