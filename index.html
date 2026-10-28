@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, ">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1D2A44">
+<meta name="theme-color" content="#f5efdf">
 <title>Canggu Kitchen · Ink & Linen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -620,6 +620,8 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 </style>
 <link rel="stylesheet" href="design.css?v=20261027-rules">
 <link rel="stylesheet" href="reference.css?v=20261028-ui6">
+<link rel="stylesheet" href="refinement.css?v=20261028-compact">
+<link rel="stylesheet" href="overview.css?v=20261028-overview1">
 </head>
 <body>
 <div id="app"></div>
@@ -1213,7 +1215,7 @@ safe-buffer/index.js:
     return o;
   }
 
-  const HOST_ONLY = ['start', 'endNow', 'nextShift'];
+  const HOST_ONLY = ['start', 'endNow', 'nextShift', 'finishShift'];
 
   function apply(s, a, now) {
     try {
@@ -1541,6 +1543,11 @@ safe-buffer/index.js:
         Object.keys(s.workers).forEach(k => { s.workers[k] = s.workers[k].map(() => null); });
         Object.keys(s.spaces).forEach(k => { s.spaces[k] = k === 'van' ? [] : s.spaces[k].map(() => null); });
         markShiftStart(s);
+        return;
+      }
+      case 'finishShift': {
+        if (s.phase !== 'grace') throw new Error('Finish the timed shift first.');
+        s.open = {};
         return;
       }
       case 'endNow': {
@@ -2178,6 +2185,7 @@ safe-buffer/index.js:
       if (!g) return;
       const err = E.apply(g, a, Date.now());
       if (err) { toast(err, 'err'); return false; }
+      pickedFeedback(a, g);
       changed();
       return true;
     }
@@ -2193,10 +2201,20 @@ safe-buffer/index.js:
       copy.errs = g.errs;
       wrap = Object.assign({}, wrap, { game: copy });
       pending.push({ a, at: Date.now(), t });
+      pickedFeedback(a, copy);
       render();
     }
     net.send(a);
     return true;
+  }
+
+  function pickedFeedback(a,g) {
+    clearTimeout(toastTimer); const previousToast=document.getElementById('toast'); if(previousToast)previousToast.className='';
+    if(!['takeIng','takeSpice','takePlate','wash'].includes(a.type))return;
+    const o=g.orders.find(x=>x.id===a.order), item=a.ing||a.spice;
+    const label=item?(E.ING_INFO[item]||E.SP_INFO[item]).n:`${a.size} plate`;
+    const message=a.type==='wash'?`Washed ${label}. Moved to Clean plates.`:a.type==='takePlate'?`Plate ${a.size} picked for ${E.DISHES[o.dish].name}`:`+1 ${label} → ${E.DISHES[o.dish].name} · ${(a.ing?o.ing:o.sp)[item]} on plate`;
+    ui.pick={order:a.order,item,at:Date.now(),message};SFX.tap();
   }
 
   function onPhaseChange(from, to) {
@@ -2244,7 +2262,7 @@ safe-buffer/index.js:
   function chef(color) { return asset(color, 'chef'); }
   function dishArt(d) { const n=d.name.toLowerCase();const k=/soup|curry|stew|dhal|risotto/.test(n)?'soup':/salad|bowl/.test(n)?'greens':/sandwich|toast|burger|bread|bagel|croissant|pizza|quiche|hot dog|burrito|wrap/.test(n)?'toast':/sate|steak|meat|kebab|chicken|schnitzel|ribs|pork|fish|lamb/.test(n)?'skewers':d.ing.pasta?'noodles':d.ing.meat?'skewers':d.ing.salad?'greens':d.ing.bread||d.ing.cheese?'toast':'soup';return `<span class="dish-art">${asset(k)}</span>`; }
   function nextNeed(g,o) { const d=E.DISHES[o.dish];if(!E.plateOk(g,o))return `Get plate ${d.plate}`;const i=E.ING.find(k=>(o.ing[k]||0)<(d.ing[k]||0));if(i)return `Get ${E.ING_INFO[i].n.toLowerCase()}`;const sp=E.SPICES.find(k=>(o.sp[k]||0)<(d.sp[k]||0));if(sp)return `Add ${E.SP_INFO[sp].n.toLowerCase()}`;if(o.row<d.cook)return 'Visit stove';if(o.row>d.cook)return 'Overcooked';return E.checkOrder(g,o).length?'Check portions':'Ready to serve'; }
-  function checklist(g,d,o) { return `<div class="recipe-list"><small>ON PLATE / RECIPE</small>${[...E.ING.filter(i=>d.ing[i]||(o.ing||{})[i]),...E.SPICES.filter(i=>d.sp[i]||(o.sp||{})[i])].map(i=>{const spice=E.SPICES.includes(i), need=(spice?d.sp:d.ing)[i]||0, have=((spice?o.sp:o.ing)||{})[i]||0, info=(spice?E.SP_INFO:E.ING_INFO)[i];const state=g.settings.strict?(have===need?'complete':have>need?'excess':'missing'):'unchecked';const toks=Array.from({length:Math.max(need,have)},(_,k)=>`<span class="rtok ${k<have?'got':''} ${k>=need?'extra':''}">${asset(i)}</span>`).join('');return `<div class="recipe-line ${state}${bumpCls(o.id,i)}" data-k="${i}" title="${info.n}: ${have} on the plate, recipe ${need}"${bumpStyle(o.id,i)}><span class="rtoks">${toks}</span><b aria-label="${have} on plate, ${need} in recipe"><em>${have}</em>/${need}</b></div>`}).join('')}</div>`; }
+  function checklist(g,d,o) { return `<div class="recipe-list"><small>ON PLATE / RECIPE</small>${[...E.ING.filter(i=>d.ing[i]||(o.ing||{})[i]),...E.SPICES.filter(i=>d.sp[i]||(o.sp||{})[i])].map(i=>{const spice=E.SPICES.includes(i), need=(spice?d.sp:d.ing)[i]||0, have=((spice?o.sp:o.ing)||{})[i]||0, info=(spice?E.SP_INFO:E.ING_INFO)[i];const state=g.settings.strict?(have===need?'complete':have>need?'excess':'missing'):'unchecked';return `<div class="recipe-line ${state} ${ui.pick?.order===o.id&&ui.pick?.item===i&&Date.now()-ui.pick.at<1600?'just-picked':''}">${asset(i)}<span>${info.n}</span><b aria-label="${have} on plate, ${need} in recipe">${have} / ${need}</b></div>`}).join('')}</div>`; }
   // Board and ticket labels use the first word of a spice ("Curry & mustard" → "Curry") so they stay on one line.
   const shortName = n => String(n).split(' & ')[0];
   const stockCls = n => n <= 0 ? 'empty' : n === 1 ? 'low' : '';
@@ -2406,7 +2424,7 @@ safe-buffer/index.js:
     const live = !o.served && !o.parked;
     const armedPark = ui.armedPark && ui.armedPark.order === o.id && Date.now() - ui.armedPark.t < 4000;
     const canPark = live && mine && (g.phase === 'play' || g.phase === 'grace') && hostNow() >= g.shiftStart;
-    const parkBtn = canPark ? `<button class="parkbtn ${armedPark ? 'armed' : ''}" data-a="park" data-order="${o.id}" aria-label="Ready: put this meal aside">${armedPark ? 'Sure? ✓' : '✓ Ready'}</button>` : '';
+    const parkBtn = canPark ? `<button class="parkbtn ${armedPark ? 'armed' : ''}" data-a="park" data-order="${o.id}" aria-label="Set this meal aside, unchecked">${armedPark ? 'Confirm set aside' : 'Set aside'}</button>` : '';
     const canCook = live && op && op.type === 'cook';
     const canServe = live && op && op.type === 'order' && cfg.service;
     const canFill = live && op && (op.type === 'storage' || op.type === 'spice');
@@ -2418,17 +2436,15 @@ safe-buffer/index.js:
     const vip = patron && patron.vip ? `<div class="vipband">👑 ${patron.name} · ${patron.parts.indexOf(o.dish) + 1} of 2${cfg.money ? ` · ${coin(patron.c)}` : ''}</div>` : '';
     const price = !patron && cfg.money ? coin(d.c) : '';
     const cookProgress=d.cook?Math.min(1,o.row/d.cook):1;
-    // Taking a plate needs no timer, so the clean plates are offered right on the ticket.
-    const canPlate = live && mine && !o.plate && (g.phase === 'play' || g.phase === 'grace') && hostNow() >= g.shiftStart;
-    return `<div class="ticket ${sel ? 'sel' : ''} ${canCook ? 'cookable' : ''} ${o.served ? 'served' : ''} ${patron ? 'vipt' : ''}" data-ticket="${o.id}" ${mine && live ? `data-a="sel" data-order="${o.id}"` : ''}>
-      ${vip}<div class="tk-head"><span class="tk-n">${d.ch ? '☆ ' : ''}${d.name}</span>${sel && canFill ? '<span class="fill-tag">Adding here</span>' : ''}${price}</div>
-      <div class="ticket-body" data-scroll="order-${o.id}"><div class="meal-art ${o.plate ? 'has-plate' : 'no-plate'}">${dishArt(d)}${o.plate ? `<span class="art-plate">${o.plate}</span>` : ''}</div>
-      <div class="ticket-details">${canPlate ? `<div class="plate-pick" data-k="plate"><span class="pp-l"><b>Plate?</b><small>recipe ${d.plate}${cfg.bigger&&d.plate!=='XL'?`/${E.PLATES[E.PLATES.indexOf(d.plate)+1]}`:''}</small></span>${E.PLATES.map(sz => `<button class="ppbtn ${g.cupboard[sz] ? '' : 'none'}" data-a="plate" data-order="${o.id}" data-size="${sz}" ${g.cupboard[sz] ? '' : 'disabled'} aria-label="Take a ${E.PLATE_NAME[sz]} plate, ${g.cupboard[sz]} clean">${plateBadge(sz, 'cleanp')}<b>${g.cupboard[sz]}</b></button>`).join('')}</div>` : `<div class="plate-requirement ${g.settings.strict&&!E.plateOk(g,o)?'missing':''}${o.plate?' hasplate':' noplate'}${bumpCls(o.id,'plate')}" data-k="plate"${bumpStyle(o.id,'plate')}>${o.plate ? `<span class="pl-chip">${o.plate}</span>` : '<span class="pl-empty" aria-hidden="true"></span>'}<span>${o.plate ? `<b>Plate ${o.plate}</b> taken` : '<b>No plate yet</b>'} <small>· recipe ${d.plate}${cfg.bigger&&d.plate!=='XL'?` or ${E.PLATES[E.PLATES.indexOf(d.plate)+1]}`:''}</small></span>${g.settings.strict?`<b>${E.plateOk(g,o)?'✓':'○'}</b>`:''}</div>`}
+    return `<div class="ticket ${ui.pick?.order===o.id&&Date.now()-ui.pick.at<1600?'picked-ticket':''} ${sel ? 'sel' : ''} ${canCook ? 'cookable' : ''} ${o.served ? 'served' : ''} ${patron ? 'vipt' : ''}" data-ticket="${o.id}" ${mine && live ? `data-a="sel" data-order="${o.id}"` : ''}>
+      ${vip}<div class="tk-head"><span class="tk-n">${d.ch ? '☆ ' : ''}${d.name}</span>${price}</div>
+      <div class="ticket-body" data-scroll="order-${o.id}"><div class="meal-art">${dishArt(d)}</div>
+      <div class="ticket-details"><div class="plate-requirement ${g.settings.strict&&!E.plateOk(g,o)?'missing':''}">${asset('plate')}<span>Plate: ${o.plate||'none'} <small>· recipe ${d.plate}${cfg.bigger&&d.plate!=='XL'?` or ${E.PLATES[E.PLATES.indexOf(d.plate)+1]}`:''}</small></span>${g.settings.strict?`<b>${E.plateOk(g,o)?'✓':'○'}</b>`:''}</div>
       ${checklist(g,d,o)}
       <div class="cook-status"><span class="cook-ring ${g.settings.strict&&o.row>d.cook?'over':''} ${g.settings.strict?'':'unchecked'}" style="--progress:${cookProgress}"></span><span>Cook <b>${o.row} / ${d.cook}</b></span></div>
-      <div class="ticket-actions">${g.settings.strict?`<span class="next-need ${!E.checkOrder(g,o).length?'ready':''}">${o.served?'Served':o.parked?'Set aside':nextNeed(g,o)}</span>`:''}${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">🔥 Cook +1</button>` : canServe?serveBtn(g,o):parkBtn}${bin}</div>
+      </div></div><div class="ticket-actions">${canCook ? `<button class="btn cookbtn" data-a="cook" data-order="${o.id}">Cook +1</button>` : ''}${g.settings.strict?`<span class="next-need ${!E.checkOrder(g,o).length?'ready':''}">${o.served?'Served':o.parked?'Set aside':nextNeed(g,o)}</span>`:''}${canServe?serveBtn(g,o):parkBtn}${bin}</div>
       ${cfg.fix&&chips?`<div class="return-row"><small>Tap twice to return</small>${chips}</div>`:''}
-      </div></div></div>`;
+      </div>`;
 
   }
 
@@ -2636,8 +2652,26 @@ safe-buffer/index.js:
     return out;
   }
 
+
+  // Read-only, neutral facts in the overview. All choices live in the opened meal/station menu.
+  function orderOverview(g,o) {
+    const d=E.DISHES[o.dish],cfg=E.cfgOf(g);
+    const plateRecipe=d.plate+(cfg.bigger&&d.plate!=='XL'?'/'+E.PLATES[E.PLATES.indexOf(d.plate)+1]:'');
+    const items=[...E.ING.filter(k=>d.ing[k]||o.ing[k]),...E.SPICES.filter(k=>d.sp[k]||o.sp[k])];
+    return `<button class="order-summary ${ui.sel===o.id?'selected':''}" data-a="inspectOrder" data-order="${o.id}" data-ticket="${o.id}" aria-label="Open ${esc(d.name)}, plate ${o.plate||'none'}, cooking ${o.row}"><span class="summary-head"><b>${d.ch?'☆ ':''}${d.name}</b><span>${E.cfgOf(g).money?coin(d.c):''} ↗</span></span><span class="summary-meta"><span>Plate <b>${o.plate||'—'}</b> / ${plateRecipe}</span><span>Cook <b>${o.row}</b> / ${d.cook}</span><small>Have / recipe</small></span><span class="summary-recipe ${items.length>6?'long':''}">${items.map(k=>{const spice=E.SPICES.includes(k),have=(spice?o.sp:o.ing)[k]||0,need=(spice?d.sp:d.ing)[k]||0,info=E.ING_INFO[k]||E.SP_INFO[k];return `<span class="summary-item" data-k="${k}" title="${info.n}: ${have} on plate, ${need} in recipe">${asset(k)}<span>${shortName(info.n)}</span><b>${have}/${need}</b></span>`}).join('')}</span>${o.patron?`<span class="summary-vip">VIP · ${E.DISHES[o.patron].name}</span>`:''}</button>`;
+  }
+  function renderOrderDetail(g,live,selected) {
+    const station=ui.stationOpen&&['storage','spice'].includes(myOpen(g)?.type);
+    const o=station?selected:live.find(x=>x.id===ui.detail);
+    if(!station&&!o)return '';
+    const choices=live.map(x=>`<button class="btn ${x.id===ui.sel?'':'ghost'}" data-a="${station?'sel':'inspectOrder'}" data-order="${x.id}">${E.DISHES[x.dish].name}</button>`).join('');
+    return `<div class="sheet work-sheet"><div class="card work-card ${station?'at-station':''}"><header class="work-head"><div><span class="eyebrow">${station?'Choose ingredients':'Meal details'}</span><h2>${station?'At your station':E.DISHES[o.dish].name}</h2></div><button class="btn ghost" data-a="closeOrder">Back to plan</button></header><nav class="order-switch" aria-label="Select an order">${choices}</nav><div class="work-body">${station?stationTray(g,o):''}<section class="work-recipe">${o?ticket(g,o,o.pid===me.pid):'<p>Take an order in the dining room first.</p>'}</section></div><footer class="work-footer"><span>${g.settings.strict?'Practice · live hints':'Unchecked · meals are scored at shift end'}</span>${o&&!o.plate?'<button class="btn ghost" data-a="plateMenu">Choose plate</button>':''}${!station&&['storage','spice'].includes(myOpen(g)?.type)?'<button class="btn" data-a="openStation">Open station</button>':''}</footer></div></div>`;
+  }
+
   function renderGame(g) {
     const cfg = E.cfgOf(g);
+    const resultKey=`${g.shiftStart}:${g.shift}:${g.phase}`;
+    if(['between','results'].includes(g.phase)&&ui.resultKey!==resultKey){ui.resultKey=resultKey;ui.results=true;ui.menu=false;ui.help=false;ui.workers=false;ui.team=false;ui.peek=null;ui.mate=null;ui.guests=false;ui.plates=false;ui.stations=false;ui.detail=null;ui.stationOpen=false;}
     const meP = g.players.find(p => p.id === me.pid);
     const op = meP ? myOpen(g) : null;
     const now = g.paused ? g.paused.at : hostNow();
@@ -2651,7 +2685,7 @@ safe-buffer/index.js:
     const selO = partnerSel || liveOrders.find(o => o.id === ui.sel);
     const forWhom = o => o.pid === me.pid ? 'your' : `${esc((playerOf(g, o.pid) || {}).name)}'s`;
     const helpHint = g.duo && liveOrders.length + g.orders.filter(o => o.pid !== me.pid).length > 0 ? ' Tap your partner\'s row to help with their meals.' : '';
-    const plateGlow = selO && !selO.plate;
+    const plateGlow = g.settings.strict && selO && !selO.plate;
     const recOpen = op && op.type === 'reception';
     const recPick = recOpen && !!op.worker && ui.recAway === op.worker.start; // choosing guests to send away
     if (!recPick) ui.throwSel = [];
@@ -2747,17 +2781,18 @@ safe-buffer/index.js:
       <header class="bar ${cfg.shop ? 'crowded' : ''}">
         <div class="brand">Canggu Kitchen<small>${esc(wrap.room)}</small></div>${role !== 'solo' ? `<span class="roomchip" title="Room code for joining">Code <b>${esc(wrap.room)}</b></span>` : ''}
         <div class="clock" id="clock">${clock}</div>
-        ${goalChip(g)}
+        ${goalChip(g)}${g.phase==='results'?'<button class="btn" data-a="showResults">Shift results</button>':''}
         ${temps}
-        <button class="btn team-toggle" data-a="team">Team · ${g.players.length}</button><div class="plan-tools"><button class="btn ghost" data-a="fitPlan">Whole plan</button><button class="btn ghost zoom-btn" data-a="zoomOut" aria-label="Zoom out">−</button><button class="btn ghost zoom-btn" data-a="zoomIn" aria-label="Zoom in">+</button></div><div class="who">${g.players.map(p => `<span class="pchip" style="--c:${COLORS[p.color]}" data-wpid="${p.id}">${esc(p.name)}${strikes(p.id) ? ` ⛔${strikes(p.id) > 1 ? strikes(p.id) : ''}` : ''}</span>`).join('')}</div>
+        <button class="btn team-toggle" data-a="team">Team · ${g.players.length}</button><div class="plan-tools"><button class="btn ghost" data-a="stations">Stations</button><button class="btn ghost" data-a="fitPlan">Whole plan</button><button class="btn ghost zoom-btn" data-a="zoomOut" aria-label="Zoom out">−</button><button class="btn ghost zoom-btn" data-a="zoomIn" aria-label="Zoom in">+</button></div><div class="who">${g.players.map(p => `<span class="pchip" style="--c:${COLORS[p.color]}" data-wpid="${p.id}">${esc(p.name)}${strikes(p.id) ? ` ⛔${strikes(p.id) > 1 ? strikes(p.id) : ''}` : ''}</span>`).join('')}</div>
         <div class="net" id="net"></div>
         <button class="menu-b" data-a="menu" aria-label="Menu">☰</button>
       </header>
-      <div class="main">
+      ${g.phase==='grace'?`<div class="shift-finish" role="status"><span><b>Time is up.</b> Finish your current action, then submit. Waiting: ${g.players.filter(p=>g.open[p.id]).map(p=>esc(p.name)).join(', ')||'checking meals…'}</span>${op?'<button class="btn" data-a="done">Finish my shift</button>':''}${isHost()?'<button class="btn ghost" data-a="finishShift">Check everyone’s meals now</button>':''}</div>`:''}
+      <div class="main overview ${liveOrders.length>4?'many-orders':''}">
         <div class="plan-scroll" aria-label="Pan and zoom the kitchen"><div class="plan-stage"><div class="board scen-${Math.min(g.settings.scenario, 8)}" tabindex="0" aria-label="Kitchen floor plan. Scroll to see all rooms.">
           <section class="area reception ${recOpen ? 'active' : ''}"><h3>Reception</h3><div class="rc"><div class="spots">${spot(g, 'reception', 0)}</div>
             <div class="queue"><div class="stack" style="--n:${Math.min(guestsLeft, 4)}"></div><p>${guestsLeft ? `${guestsLeft} waiting` : 'Nobody outside'}</p></div></div></section>
-          <section class="area dining"><h3>Dining</h3><div class="seats">${seats}</div><div class="spots">${g.spaces.dining.map((_, i) => spot(g, 'dining', i)).join('')}</div></section>
+          <section class="area dining"><h3><button class="room-link" data-a="guests">Dining · view orders ↗</button></h3><div class="seats">${seats}</div><div class="spots">${g.spaces.dining.map((_, i) => spot(g, 'dining', i)).join('')}</div></section>
           ${green}
           ${room('storA', 'A', 1)}
           ${room('storB', 'B', 2)}
@@ -2769,13 +2804,14 @@ safe-buffer/index.js:
           ${cfg.office?`<section class="area office"><h3>Office</h3>${office}<small>Repairs · unlock · hire</small></section>`:dormant('office','Office',7)}
         </div></div></div>
         <aside class="kitchen">
-          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> My orders <small>(${liveOrders.length})</small></h2><span class="play-mode">${g.settings.strict?'Practice · live hints':'Meals checked at shift end'}</span><button class="link worker-toggle" data-a="workers">${meP?chef(meP.color):''} My chefs</button></div>${status}${guestRail(g, op)}
-          <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${ticket(g, partnerSel, false)}</div>` : ''}${shelf(g, aside)}${liveOrders.length ? liveOrders.map(o => ticket(g, o, true)).join('') : aside.length ? '<p class="empty-k">All your meals are set aside. Take the next order in the dining room 📝.</p>' : (meP ? '<p class="empty-k">Your order tickets land here. Start at the dining room 📝, or seat more guests at the reception 🚪.</p>' : '')}</div>
+          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> My orders <small>(${liveOrders.length})</small></h2><span class="play-mode">${g.settings.strict?'Practice · live hints':'Meals checked at shift end'}</span>${op&&['storage','spice'].includes(op.type)?`<button class="btn ghost" data-a="openStation">${op.type==='storage'?'Storage '+op.room:'Spices'}</button>`:''}<button class="btn ghost plate-toggle" data-a="plateMenu">Plates</button><button class="link worker-toggle" data-a="workers">${meP?chef(meP.color):''} My chefs</button></div>${status}${ui.pick&&Date.now()-ui.pick.at<2800?`<div class="pick-receipt" role="status">${esc(ui.pick.message)}</div>`:''}
+          <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${orderOverview(g, partnerSel)}</div>` : ''}${shelf(g, aside)}${liveOrders.length ? liveOrders.map(o => orderOverview(g, o)).join('') : aside.length ? '<p class="empty-k">All your meals are set aside. Take the next order in the dining room 📝.</p>' : (meP ? '<p class="empty-k">Your order tickets land here. Start at the dining room 📝, or seat more guests at the reception 🚪.</p>' : '')}</div>
           
         </aside>
       </div>
       ${ui.team?`<div class="sheet" data-a="team"><div class="card team-card" data-stop="1"><h2>The team</h2>${teamPanel(g,now)}${feedPanel(g)}<button class="btn ghost" data-a="team">Back to kitchen</button></div></div>`:''}
-      ${ui.workers?renderWorkers(g,now):''}
+      ${ui.workers?renderWorkers(g,now):''}${ui.stations?renderStations(g):''}${renderOrderDetail(g,liveOrders,selO)}
+      ${ui.guests?renderGuests(g):''}
       ${ui.mate && g.players.some(p => p.id === ui.mate) ? renderMate(g, ui.mate) : ''}
       ${ui.peek && myOrders.some(o => o.id === ui.peek && (o.served || o.parked)) ? `<div class="sheet" data-a="closePeek"><div class="card peekcard" data-stop="1">${ticket(g, myOrders.find(o => o.id === ui.peek), false)}<p class="note">Meal checks happen at shift end.</p>${myOrders.some(o=>o.id===ui.peek&&o.parked&&!o.served)?`<button class="btn" data-a="unpark" data-order="${ui.peek}">Back to my orders</button>`:''}<button class="btn ghost" data-a="closePeek">Close</button></div></div>` : ''}
       ${g.phase === 'ready' ? renderReady(g) : ''}
@@ -2792,6 +2828,40 @@ safe-buffer/index.js:
       ${g.paused ? `<div class="pause-banner"><b>Game paused</b><span>${esc(g.paused.who.map(id => (playerOf(g, id) || {}).name || 'A chef').join(' and '))} lost the connection. Waiting up to <b data-pend="${g.paused.until}"></b> for ${g.paused.who.length > 1 ? 'them' : 'their iPad'} to come back.</span>${isHost() ? '<button class="btn" data-a="unpause">Go on without them</button>' : ''}</div>` : ''}
       <div class="countdown" id="countdown"></div>
     </div>`;
+  }
+
+
+  function stationTray(g, selected) {
+    if(!['play','grace'].includes(g.phase))return '';
+    const op=myOpen(g), type=ui.plates?'plates':op?.type;
+    if(!['storage','spice'].includes(type))return '';
+    const title=type==='plates'?'Clean plates':type==='storage'?`Storage ${op.room}`:type==='spice'?'Spices':'Wash plates';
+    const items=type==='storage'?E.roomIngs(g,op.room):type==='spice'?E.SPICES:E.PLATES;
+    const buttons=items.map(i=>{
+      const plate=type==='plates'||type==='wash';
+      const stock=type==='storage'?g.storage[op.room][i]:type==='spice'?g.bag[i]:type==='wash'?g.dirty[i]:g.cupboard[i];
+      const action=type==='storage'?`data-a="takeIng" data-room="${op.room}" data-ing="${i}"`:type==='spice'?`data-a="takeSpice" data-spice="${i}"`:`data-a="${type==='wash'?'wash':'plate'}" data-size="${i}"`;
+      const name=plate?`Plate ${i}`:(E.ING_INFO[i]||E.SP_INFO[i]).n;
+      return `<button class="tray-item" ${action} ${stock?'':'disabled'} aria-label="${name}, ${stock||0} available">${plate?plateBadge(i):asset(i)}<span>${name}<small>${stock||0} available</small></span></button>`;
+    }).join('');
+    return `<section class="station-tray" aria-label="${title}"><div class="tray-heading"><b>${title}</b><span>${type==='wash'?'Washed plates return to the cupboard':selected?`Taking for ${E.DISHES[selected.dish].name}`:'Select an order below'}</span><button class="btn ghost" data-a="${ui.plates?'closeTray':'done'}">${ui.plates?'Close':'Done'}</button></div><div class="tray-items">${buttons}</div></section>`;
+  }
+  function renderStations(g) {
+    const groups=[['storA','Storage A'],['storB','Storage B'],['storC','Dry store'],['green','Spices'],['stove','Stove'],['sink','Wash'],['reception','Reception'],['dining','Dining'],['office','Office']];
+    return `<div class="sheet"><div class="card station-card"><span class="eyebrow">Choose where to work</span><h2>Kitchen stations</h2><p>Each number is the same space on the plan. Occupied spaces keep their timers.</p><div class="station-list">${groups.filter(([key])=>g.spaces[key]?.length).map(([key,label])=>`<section><h3>${label}</h3><div class="station-spots">${g.spaces[key].map((_,i)=>spot(g,key,i)).join('')}</div></section>`).join('')}</div>${E.cfgOf(g).shop?'<button class="btn ghost" data-a="place" data-area="van" data-idx="0">Visit shop</button>':''}<button class="btn" data-a="stations">Back to kitchen</button></div></div>`;
+  }
+  // Replace decorative emoji in rendered text only; rules, names and accessibility labels stay intact.
+  function inkIcons() {
+    const paths={coin:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/>',star:'<path d="m12 2 3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1Z"/>',lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4m-4 5v3"/>',bin:'<path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/>',plate:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6"/>',shop:'<path d="M3 10h18l-2-7H5ZM5 10v11h14V10M9 21v-7h6v7"/>',office:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2m4 0h2M8 11h2m4 0h2m-6 9v-5h4v5"/>',bell:'<path d="M4 17h16M6 17v-5a6 6 0 0 1 12 0v5M12 3v3M3 21h18"/>',crown:'<path d="m3 5 5 5 4-7 4 7 5-5-2 15H5Z"/>',tool:'<path d="m4 20 9-9m0 0a5 5 0 0 1 5-8l-3 3 3 3 3-3a5 5 0 0 1-8 5Z"/>',drink:'<path d="M6 7h12l-2 14H8ZM12 7l3-5h5"/>',comp:'<path d="M6 7h12l-2 14H8ZM12 7l3-5h5M3 3l18 18"/>',note:'<path d="M5 3h14v18H5ZM8 7h8M8 11h8M8 15h5"/>',fire:'<path d="M12 2c2 6 7 7 7 13a7 7 0 0 1-14 0c0-3 2-6 4-8 0 4 2 5 3 5 2-3 1-7 0-10Z"/>',box:'<path d="m3 7 9-4 9 4v13H3Zm0 0 9 4 9-4M12 11v9"/>'};
+    const map={'🪙':'coin','⭐':'star','🔒':'lock','🗑️':'bin','🍽️':'plate','🚐':'shop','🏢':'office','🛎️':'bell','👑':'crown','🔧':'tool','📝':'note','🔥':'fire','📦':'box','🥤':'drink','😕':'comp','🥡':'box'};
+    const walker=document.createTreeWalker(app,NodeFilter.SHOW_TEXT),nodes=[];let node;
+    while(node=walker.nextNode())if(!node.parentElement.closest('svg,script,style,input,textarea,.welcome-heading,.tk-n,.guest-name')&&Object.keys(map).some(k=>node.textContent.includes(k)))nodes.push(node);
+    for(const node of nodes){const parts=node.textContent.split(/(🪙|⭐|🔒|🗑️|🍽️|🚐|🏢|🛎️|👑|🔧|📝|🔥|📦|🥤|😕|🥡)/u),frag=document.createDocumentFragment();for(const part of parts){if(map[part]){const holder=document.createElement('span');holder.className='ink-icon';holder.setAttribute('aria-hidden','true');holder.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${paths[map[part]]}</svg>`;frag.append(holder);}else frag.append(document.createTextNode(part));}node.replaceWith(frag);}
+  }
+
+  function renderGuests(g) {
+    const op=myOpen(g);
+    return `<div class="sheet"><div class="card guest-card"><h2>Dining room orders</h2><p>Inspect the recipe before taking an order. One dining visit takes one order.</p><div class="guest-orders">${g.seats.map((seat,i)=>{if(!seat.dish)return '';const d=E.DISHES[seat.dish],parts=d.vip?d.parts.map(k=>E.DISHES[k]):[d];return `<section class="guest-order ${ui.guestSeat===i?'selected':''}"><h3>${d.name} ${coin(d.c)}</h3>${parts.map(x=>`<h4>${d.vip?x.name:''}</h4><p>Plate ${x.plate} · Cook ${x.cook}</p><div class="guest-recipe">${[...Object.entries(x.ing),...Object.entries(x.sp||{})].map(([k,n])=>`<span>${asset(k)}${(E.ING_INFO[k]||E.SP_INFO[k]).n}<b>×${n}</b></span>`).join('')}</div>`).join('')}${op?.type==='order'?`<button class="btn" data-a="takeOrder" data-seat="${i}">Take this order</button>`:`<button class="btn ghost" data-a="seatVisit">Send chef to dining</button>`}</section>`}).join('')}</div><button class="btn ghost" data-a="guests">Back to kitchen</button></div></div>`;
   }
 
   // Shopping: pick one of three kinds of purchase (tabs), then the item(s), then where it goes.
@@ -3135,13 +3205,14 @@ safe-buffer/index.js:
     const reps = g.reports || [];
     const multi = reps.length > 1;
     return `<div class="sheet"><div class="card results scorecard ${R.win ? 'won' : 'lost'}">
-      <h2>${head}</h2>
+      <span class="eyebrow">Canggu Kitchen · service ledger</span><h2>${head}</h2>
       <ul class="checks">${checks}</ul>
       <h3 class="sec-h">${multi ? `All ${reps.length} shifts` : 'Who did what'}</h3>
       ${chefTable(g, sumChefs(g, reps), true)}
       ${R.money ? reps.map(r => `<div class="shiftline">${multi ? `<b>Shift ${r.shift}</b> ` : ''}${teamMoney(g, r)}${repLine(r)}${strikeLine(g, r)}</div>`).join('') : ''}
       <p class="sub">${R.served} guest${R.served === 1 ? '' : 's'} served correctly${R.goalAt != null ? ` · goal reached at ${fmt(R.goalAt)}` : ''}${best != null ? ` · best ever ${fmt(best)}` : ''}</p>
-      <div class="gcols">${g.players.map(p => `<div class="gcol" style="--c:${COLORS[p.color]}"><h3>${dot(p.color)}${esc(p.name)}</h3>${reps.some(r => r.orders.some(o => o.pid === p.id)) ? reps.map((r, i) => r.orders.some(o => o.pid === p.id) ? `${multi ? `<div class="gshift">Shift ${r.shift}</div>` : ''}${guestList(g, r, p.id, i === reps.length - 1)}` : '').join('') : '<p class="none">no guests</p>'}</div>`).join('')}</div>
+      <div class="ledger-label">Meal ledger · open a chef to inspect every meal</div>
+      <div class="gcols ledger">${g.players.map(p => { const count=reps.reduce((n,r)=>n+r.orders.filter(o=>o.pid===p.id).length,0);return `<details class="gcol" data-report="${p.id}" ${ui.reportOpen?.[p.id]?'open':''} style="--c:${COLORS[p.color]}"><summary>${dot(p.color)}${esc(p.name)}<span>${count} meal${count===1?'':'s'}</span></summary>${count ? reps.map((r,i)=>r.orders.some(o=>o.pid===p.id)?`${multi?`<div class="gshift">Shift ${r.shift}</div>`:''}${guestList(g,r,p.id,i===reps.length-1)}`:'').join(''):'<p class="none">No meals this shift.</p>'}</details>`;}).join('')}</div>
       <div class="rbtns">
         ${role === 'solo' ? (R.win
           ? `${R.scenario < 13 ? '<button class="btn big" data-a="nextSolo">Next restaurant ▶</button>' : ''}<button class="btn ghost" data-a="again">Play again</button><button class="btn ghost" data-a="lobby">Campaign</button>`
@@ -3155,13 +3226,13 @@ safe-buffer/index.js:
   function renderHelp() {
     return `<div class="sheet" data-a="closeHelp"><div class="card help" data-stop="1">
       <h2>How to play</h2>
-      <p>Everyone plays at the same time. Tap a free circle to put a chef there and do that action straight away. The circle stays occupied until the chef finishes and moves elsewhere. Dashed green circles are free; apron-coloured rings are occupied. Locked and broken spaces are marked. Use My chefs to take a finished chef off the floor and free their space.</p>
+      <p>Everyone plays at the same time. Tap a free circle to put a chef there and do that action straight away. The circle stays occupied until the chef finishes and moves elsewhere. Numbered green circles are free; apron-coloured rings are occupied. Locked and broken spaces are marked. Use My chefs to take a finished chef off the floor and free their space.</p>
       <ul>
         <li><b>🚪 Reception</b> seats up to 2 new guests at free tables. From restaurant 6 a menu lets you instead send 1 or 2 waiting guests away; their replacements buy no drinks. If you choose nothing, new guests are seated when your chef moves on.</li>
         <li><b>📝 Dining room</b> lets you take one guest's order — or, from restaurant 6, serve one of your meals early for a tip 🛎️. Plates come from the cupboard: free, any time.</li>
         <li><b>📦 Storage room</b> puts ingredients on your own plates. Take all you need from that room, then tap Done.</li>
         <li><b>🔥 Stove</b> cooks one meal one step. 🍳2 means two stove visits. Too many visits overcook it.</li>
-        <li><b>✓ Ready</b> on your ticket (tap twice) puts a finished meal aside in the Ready row, so your other tickets stay in view. Tap its card and Back to my orders to work on it again. It is still checked when the shift ends, and from restaurant 6 you can serve it early 🛎️ from the Ready row while your timer is in the dining room.</li>
+        <li><b>Set aside</b> on your ticket (tap twice) puts a meal aside, unchecked, in the set-aside row, so your other tickets stay in view. Tap its card and Back to my orders to work on it again. It is still checked when the shift ends, and from restaurant 6 you can serve it early 🛎️ from the Ready row while your timer is in the dining room.</li>
         <li><b>🌿 Greenhouse</b> (from restaurant 2) puts spices on your plates — even on a meal that is already cooking.</li>
         <li><b>🧽 Sink</b> (from restaurant 3) washes up to 3 dirty plates.</li>
         <li><b>🚐 Shop</b> (from restaurant 4, on the floor plan) buys 5 of one ingredient, 3 cheap spices or 2 expensive spices for 1 coin.</li>
@@ -3202,15 +3273,8 @@ safe-buffer/index.js:
   function fitPlan() {
     const port=document.querySelector('.plan-scroll'),stage=document.querySelector('.plan-stage'),board=document.querySelector('.board');
     if(!port||!stage||!board)return;
-    const main=document.querySelector('.game .main');
-    let fit=Math.min((port.clientWidth-4)/CROP.w,(port.clientHeight-4)/CROP.h);
-    if(main&&matchMedia('(orientation:landscape) and (min-width:900px)').matches){
-      // Landscape: the plan takes what its height allows (rail at least 220 px); the rail gets the rest of the width.
-      const cs=getComputedStyle(main),w=main.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-8;
-      fit=Math.min((port.clientHeight-4)/CROP.h,(w-220)/CROP.w);
-      main.style.setProperty('--planw',`${Math.floor(CROP.w*(ui.planZoom?Math.min(ui.planZoom,fit):fit))+4}px`);
-    } else if(main) main.style.removeProperty('--planw');
-    const scale=ui.planZoom||Math.max(.28,fit);ui.planScale=scale;
+    const fit=Math.min((port.clientWidth-4)/CROP.w,(port.clientHeight-4)/CROP.h);
+    const scale=ui.planZoom||Math.max(.1,fit);ui.planScale=scale;
     stage.style.width=`${CROP.w*scale}px`;stage.style.height=`${CROP.h*scale}px`;
     board.style.transform=`translate(${-CROP.x*scale}px,${-CROP.y*scale}px) scale(${scale})`;
   }
@@ -3228,6 +3292,7 @@ safe-buffer/index.js:
     const caret = focusId && document.activeElement.selectionStart;
     const scrollState = [...app.querySelectorAll('.plan-scroll,.mytks,.kitchen,.ticket-body,.sheet .card')].map((el,i)=>[el.dataset.scroll||el.className,i,el.scrollLeft,el.scrollTop]);
     app.innerHTML = html;
+    inkIcons();
     fitPlan();
     for(const [key,i,x,y] of scrollState){const el=[...app.querySelectorAll('.plan-scroll,.mytks,.kitchen,.ticket-body,.sheet .card')][i];if(el&&(el.dataset.scroll||el.className)===key){el.scrollLeft=x;el.scrollTop=y;}}
 
@@ -3263,7 +3328,7 @@ safe-buffer/index.js:
         const left = Math.max(0, +el.dataset.wstart + dur - now);
         el.style.setProperty('--p', (left / dur).toFixed(3));
         el.classList.toggle('expired', left === 0);
-        const s = el.querySelector('.sec'); if (s) s.textContent = left ? Math.ceil(left / 1000) : '';
+        const s = el.querySelector('.sec'); if (s) s.textContent = left ? Math.ceil(left / 1000)+'s' : '✓';
       });
       document.querySelectorAll('[data-wpid]').forEach(el => {
         const ws = (g.workers[el.dataset.wpid] || []).filter(Boolean);
@@ -3303,6 +3368,8 @@ safe-buffer/index.js:
 
   // ---------- input ----------
   function saveMe() { LS.set('kc-me', me); }
+
+  app.addEventListener('toggle', e => { if(e.target.matches('details[data-report]')) { ui.reportOpen=ui.reportOpen||{}; ui.reportOpen[e.target.dataset.report]=e.target.open; } },true);
 
   // The delivery slider updates in place; a full redraw would drop the finger off the handle.
   function splitUpdate(el) { splitSet(el.closest('.dsplit'), +el.value); }
@@ -3490,13 +3557,18 @@ safe-buffer/index.js:
       }
       case 'endNow': if (isHost() && g && confirm('End the shift now and check the meals?')) { E.apply(g, { type: 'endNow' }, Date.now()); ui.menu = false; changed(); } break;
       case 'log': downloadLog(); break;
+      case 'guests': ui.guests=!ui.guests; render(); break;
+      case 'inspectGuest': ui.guests=true; ui.guestSeat=Number(t.dataset.seat); render(); break;
+      case 'finishShift': if(isHost()&&g&&confirm('Finish all ongoing actions and check everyone’s meals?')){E.apply(g,{type:'finishShift'},Date.now());hostTick();changed();} break;
+      case 'seatVisit': {const idx=g.spaces.dining.findIndex(x=>!x);if(idx<0){toast('All dining spaces are occupied.','err');break;}act({type:'place',area:'dining',idx});break;}
       case 'hideResults': ui.results = false; render(); break;
       case 'showResults': ui.results = true; render(); break;
       case 'place': {
         if (!g) return;
         const area = t.dataset.area, idx = +t.dataset.idx;
         if (area === 'van') ui.shop = { ing: null, cheap: [], pricey: [] };
-        if (act({ type: 'place', area, idx })) SFX.tap();
+        ui.stations=false; ui.plates=false;
+        if (act({ type: 'place', area, idx })) { SFX.tap(); ui.detail=null;ui.stationOpen=['storage','spice'].includes(myOpen(game())?.type);render(); }
         break;
       }
       case 'takeOrder': {
@@ -3507,19 +3579,22 @@ safe-buffer/index.js:
         break;
       }
       case 'closeSeat': ui.seatPeek = null; render(); break;
-      case 'plateMenu': ui.plateMenu = true; render(); break;
+      case 'plateMenu': ui.detail=null;ui.stationOpen=false;ui.plateMenu = true; render(); break;
       case 'closePlates': ui.plateMenu = false; render(); break;
       case 'washMenu': { const op = g && myOpen(g); if (op && op.type === 'wash') ui.washHide = null; else ui.washMenu = true; render(); break; }
       case 'closeWash': ui.washMenu = false; render(); break;
       case 'hideWash': ui.washHide = +t.dataset.start; ui.washMenu = false; render(); break;
       case 'hideOrders': ui.orderHide = +t.dataset.start; render(); break;
       case 'showOrders': ui.orderHide = null; render(); break;
+      case 'stations': ui.stations=!ui.stations; render(); break;
+      case 'plates': ui.plates=!ui.plates; render(); break;
+      case 'closeTray': ui.plates=false; render(); break;
       case 'plate': {
         if (!g) return;
         const mine = g.orders.filter(o => o.pid === me.pid);
         const open = mine.filter(o => !o.parked && !o.served);
-        const target = (t.dataset.order && open.find(o => o.id === +t.dataset.order && !o.plate)) || open.find(o => o.id === ui.sel && !o.plate) || open.find(o => !o.plate);
-        if (!target) { shake(t); toast('All your meals already have a plate.', 'err'); return; }
+        const target = open.find(o => o.id === (t.dataset.order ? +t.dataset.order : ui.sel));
+        if (!target) { shake(t); toast('Select your order before taking a plate.', 'err'); return; }
         { const r = t.getBoundingClientRect(); ui.sel = target.id; ui.bump = { order: target.id, k: 'plate', t: Date.now() };
           picked(t, r, 'plate', target.id, 'plate', act({ type: 'takePlate', order: target.id, size: t.dataset.size })); }
         break;
@@ -3535,6 +3610,9 @@ safe-buffer/index.js:
         break;
       }
       case 'sel': ui.sel = +t.dataset.order; render(); break;
+      case 'inspectOrder': ui.sel=+t.dataset.order;ui.detail=ui.sel;ui.stationOpen=false;render();break;
+      case 'closeOrder': ui.detail=null;ui.stationOpen=false;render();break;
+      case 'openStation': ui.detail=null;ui.stationOpen=true;render();break;
       case 'takeSpice': {
         if (!g) return;
         const op = myOpen(g);

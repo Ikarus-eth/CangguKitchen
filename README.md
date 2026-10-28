@@ -21,7 +21,7 @@ Goals scale with the number of players, as in the board game.
 
 ## Putting meals aside
 
-Tap ✓ Ready twice on a ticket to put the meal aside: it shrinks into the set-aside row beside your tickets. Tap the card, then Back to my orders to resume working on it. It is checked at the end of the shift like every other meal, and from restaurant 6 it can be served early from the Ready row. This is an optional screen aid; it does not certify the meal as correct. In multi-shift games a meal that was not finished at the shift's end comes back as a normal ticket.
+Tap Set aside twice on a ticket to put the meal aside: it shrinks into the set-aside row beside your tickets. Tap the card, then Back to my orders to resume working on it. It is checked at the end of the shift like every other meal, and from restaurant 6 it can be served early from the Ready row. This is an optional screen aid; it does not certify the meal as correct. In multi-shift games a meal that was not finished at the shift's end comes back as a normal ticket.
 
 ## Two-chef helpers (extra)
 
@@ -39,7 +39,7 @@ The standard restaurants use the revised edition as their rules baseline. With e
 
 The game is deployed on GitHub Pages at https://ikarus-eth.github.io/CangguKitchen/.
 
-Pages serves the `main` branch from `/ (root)`. Keep `index.html`, `design.css`, `reference.css`, `.nojekyll`, and `assets/` together. A push to `main` updates the game after GitHub completes its Pages deployment.
+Pages serves the `main` branch from `/ (root)`. Keep `index.html`, `design.css`, `reference.css`, `refinement.css`, `overview.css`, `.nojekyll`, and `assets/` together. A push to `main` updates the game after GitHub completes its Pages deployment.
 
 No build step is required for GitHub Pages. `node build.mjs` also produces a portable `dist/` folder for other static hosts. The `.openai/hosting.json` manifest belongs to the separate Sites preview and is not needed by GitHub Pages.
 
@@ -84,3 +84,19 @@ The host iPad holds the game and shares it through a free public MQTT relay (Hiv
 ## Verification
 
 `node tests/rules-regression.cjs` checks core rules and mistakes. `node tests/run-simulations.cjs` runs 215 simulated games across all scenarios. `tests/browser-regression.cjs` uses Playwright against a static server (`BASE_URL`, default `http://localhost:8765/`) to check scenario capacities, iPad layouts, fixed meal titles, shopping and reports. Set `BROWSER_CHANNEL=chrome` to use installed Chrome.
+
+## Linen interface update (28 October 2026)
+
+Standard play confirms actions, never recipe correctness. Wrong plates, unrelated or excessive ingredients, and overcooking remain possible. The selected order receives your action; taking another plate never silently switches to a different order. Set aside is an unchecked player decision. Practice mode retains its explicit checks.
+
+Use Stations for full-size station buttons with the same occupancy and timers as the plan. Storage, spices and washing open an action tray; Plates opens every stocked plate size without recipe filtering. On landscape iPads the tray sits beside the plan; on narrower screens it sits above the tickets. Recipe titles and action footers stay visible while the recipe scrolls. Pickup receipts confirm the item and destination, without success colours or correctness warnings.
+
+The visual pass unifies typography, icons, stock labels, status controls, panels and results. The service ledger starts with goals and contributions, with expandable per-chef meal details. Gameplay artwork remains decorative; actual inventory and worker capacities still come from the rules engine.
+
+`node tests/refinement-regression.cjs` checks standard/practice separation, explicit plate targeting, neutral feedback, large controls, pinned actions and report disclosure. It uses the same browser environment variables as the existing browser suite.
+
+## Plan-first overview
+
+The full floor plan gets the main screen. Orders appear as compact summaries with plate, cooking and ingredient have/recipe counts. Tap an order to open its full recipe and actions. Storage and spice visits open a work menu with large choices and the selected recipe; Back to plan closes the menu without ending the visit. Reopen it from the Storage/Spices button. Plate, wash, shop and dining controls remain in their dedicated menus.
+
+Landscape iPads reserve 236 pixels for up to four order summaries. Portrait layouts use two columns. Larger order collections use more rows; exceptionally large collections can scroll. Nothing in the overview grades a standard-mode meal. Rejoining games, disconnect pauses and the public version's shop and reception behavior are retained.
