@@ -66,3 +66,23 @@ button.ing[data-a="shout"] .empty-tag::after { content: ' · call'; }
 .seat.grpseat { outline: 4px solid #e0573c; outline-offset: 2px; border-radius: 10px; }
 .grptag { position: absolute; left: 50%; top: 2px; transform: translateX(-50%); white-space: nowrap; padding: 3px 10px; border-radius: 999px; background: #e0573c; color: #fff; font: 700 15px/1.2 system-ui, sans-serif; z-index: 5; }
 .seat.guest { position: relative; }
+
+/* icon-first moments: pictures and numbers, few words (kids read them at a glance) */
+.mom.icons { align-items: center; gap: 8px; padding: 6px 12px; }
+.mom .big { font-size: 30px; line-height: 1; }
+.mom .arrow { font-size: 22px; opacity: .6; }
+.mom.icons > small { font: 700 14px/1 system-ui, sans-serif; text-transform: uppercase; letter-spacing: .04em; opacity: .7; }
+.mom .mleft { font: 800 26px/1 system-ui, sans-serif; min-width: 2.6em; text-align: center; padding: 3px 8px; border-radius: 10px; background: rgba(0,0,0,.07); }
+.mom .mleft.hot { background: #e0573c; color: #fff; }
+.mchips { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.mchip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: #fff; border: 2px solid rgba(0,0,0,.12); font: 700 17px/1.2 system-ui, sans-serif; }
+.mchip.rec { background: #c4200a; color: #fff; border-color: #c4200a; }
+.mom .mpart { position: relative; display: inline-flex; padding: 3px; border-radius: 12px; background: #fff; border: 3px solid var(--c, #bbb); font-size: 20px; }
+.mom .mpart.open { border-style: dashed; border-color: #b8a678; padding: 6px 8px; font-size: 18px; }
+.mom .mpart.done { background: #cfe9c8; }
+.mom .mpart i { position: absolute; right: -6px; top: -8px; font-style: normal; background: #2f7a2a; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.mdish { display: inline-block; width: 40px; height: 40px; }
+.mdish .dish-art, .mdish .asset { display: block; width: 100%; height: 100%; }
+.mdish.sm { width: 30px; height: 30px; vertical-align: middle; }
+.btn.serve-m { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; padding: 4px 12px; }
+.grpchoice .big { font-size: 24px; }

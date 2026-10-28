@@ -58,7 +58,7 @@ const URL = (process.env.BASE_URL || 'http://localhost:8765/') + 'canggu/?dev';
     // Another chef answers "On it!".
     await page.evaluate(() => { const g = __kc.wrap.game; Engine.apply(g, { pid: 'qa1', type: 'claim', ping: g.pings[0].id }, Date.now()); __kc.render(); });
     await w(150);
-    assert.match(await page.locator('.pingrow').innerText(), /Maya is on it/);
+    assert.match(await page.locator('.pingrow').innerText(), /👍 Maya/);
     console.log('PASS long-press ping, ripple and claim');
 
     // An empty shelf calls for that ingredient.

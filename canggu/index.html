@@ -622,7 +622,7 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 <link rel="stylesheet" href="reference.css?v=20261028-ui6">
 <link rel="stylesheet" href="refinement.css?v=20261028-compact">
 <link rel="stylesheet" href="overview.css?v=20261028-overview1">
-<link rel="stylesheet" href="canggu.css?v=20261028-c3">
+<link rel="stylesheet" href="canggu.css?v=20261028-c4">
 </head>
 <body>
 <div id="app"></div>
@@ -1140,17 +1140,53 @@ safe-buffer/index.js:
     else if (s.spaces[w.area]) s.spaces[w.area][w.idx] = null;
   }
 
-  // Canggu cancel: what a visit did that needs the full sand to count.
+  // Canggu cancel: every move made on a visit is logged on its worker (w.log), and cancelling the
+  // visit undoes all of them, newest first, so cancelling never saves time. The front desk, the
+  // scooter run and the office can't be cancelled: their effects reach other chefs at once.
+  const NO_CANCEL = ['reception', 'van', 'office'];
+  const logVisit = (s, op, entry) => { const w = visitOf(s, op); if (w) (w.log = w.log || []).push(entry); };
+  function refundOrder(s, o) {
+    // plate back on the shelf, ingredients back where they came from, superfoods back in the bar
+    if (o.plate) s.cupboard[o.plate]++;
+    (o.src || []).forEach(x => { if (s.storage[x.room]) s.storage[x.room][x.ing] = (s.storage[x.room][x.ing] || 0) + 1; });
+    Object.keys(o.sp || {}).forEach(k => { s.bag[k] = (s.bag[k] || 0) + o.sp[k]; });
+  }
   function undoVisit(s, w) {
     const lost = [];
-    (w.cooked || []).forEach(id => {
-      const o = s.orders.find(x => x.id === id);
-      if (o && !o.served && o.row > 0) { o.row--; lost.push(`cooking on ${DISHES[o.dish].name}`); }
+    (w.log || []).slice().reverse().forEach(x => {
+      if (x.k === 'cook') {
+        const o = s.orders.find(y => y.id === x.order);
+        if (o && !o.served && o.row > 0) { o.row--; lost.push(`a cooking step on ${DISHES[o.dish].name}`); }
+      } else if (x.k === 'wash') {
+        if (s.cupboard[x.size] > 0) { s.cupboard[x.size]--; s.dirty[x.size]++; lost.push(`a washed ${x.size} plate`); }
+      } else if (x.k === 'ing') {
+        const o = s.orders.find(y => y.id === x.order), i = o ? o.src.map(y => y.ing + y.room).lastIndexOf(x.ing + x.room) : -1;
+        if (o && i >= 0 && (o.ing[x.ing] || 0) > 0) { o.src.splice(i, 1); o.ing[x.ing]--; s.storage[x.room][x.ing]++; lost.push(ING_INFO[x.ing].n); }
+      } else if (x.k === 'sp') {
+        const o = s.orders.find(y => y.id === x.order);
+        if (o && (o.sp[x.spice] || 0) > 0) { o.sp[x.spice]--; s.bag[x.spice]++; lost.push(SP_INFO[x.spice].n); }
+      } else if (x.k === 'serve') {
+        x.orders.forEach(id => { const o = s.orders.find(y => y.id === id); if (o) o.served = false; });
+        s.coins = Math.max(0, s.coins - x.tip); s.tipCoins -= x.tip;
+        lost.push('the early serve and its tip');
+      } else if (x.k === 'order') {
+        // the order goes back to the guest: their meal is undone and they wait at a table again
+        const parts = s.orders.filter(o => x.orders.includes(o.id));
+        parts.forEach(o => refundOrder(s, o));
+        s.orders = s.orders.filter(o => !x.orders.includes(o.id));
+        const m = x.moment ? momentOf(s, x.moment) : null;
+        const seat = s.seats[x.seat];
+        if (m && (m.state === 'seated' || m.state === 'queued')) {
+          m.takers = (m.takers || []).filter(p => p !== x.pid);
+          const at = s.seats.find(y => y.group === m.id) || (seat && !seat.dish ? seat : null);
+          if (at) { at.group = m.id; at.parts = [x.dish].concat(at.parts || []); at.dish = at.parts[0]; }
+        } else if (!m) {
+          if (seat && !seat.dish) seat.dish = x.dish; else s.deck.push(x.dish); // back at the table, or first in line outside
+        }
+        lost.push(`the order for ${DISHES[x.dish].name}`);
+      }
     });
-    let washed = 0;
-    (w.washed || []).forEach(size => { if (s.cupboard[size] > 0) { s.cupboard[size]--; s.dirty[size]++; washed++; } });
-    if (washed) lost.push(`${washed} washed plate${washed > 1 ? 's' : ''}`);
-    return lost.join(' and ');
+    return lost.join(', ');
   }
   const visitOf = (s, op) => op && op.worker ? (() => { const w = (s.workers[op.worker.owner] || [])[op.worker.t]; return w && w.start === op.worker.start ? w : null; })() : null;
 
@@ -1350,8 +1386,9 @@ safe-buffer/index.js:
         // washing done on this visit are lost, ingredients and spices already on a plate stay.
         if (!timerReady(s, w, now)) {
           if (!a.cancel) throw new Error('That chef is still working.');
+          if (NO_CANCEL.includes(w.area)) throw new Error(`A ${AREA_NAME[w.area].toLowerCase()} visit can't be cancelled.`);
           const lost = undoVisit(s, w);
-          s.errs[pid] = { msg: lost ? `Cancelled — ${lost} lost.` : 'Cancelled — the chef is free.', t: now, info: true };
+          s.errs[pid] = { msg: lost ? `Cancelled — undone: ${lost}.` : 'Cancelled — the chef is free.', t: now, info: true };
           feed(s, now, pid, 'cancel', { area: w.area });
         }
         settleReception(s, pid, now);
@@ -1406,7 +1443,9 @@ safe-buffer/index.js:
           if (!m) throw new Error('These guests have left.');
           if (s.players.length > 1 && m.takers.includes(pid)) throw new Error('You already took an order here — one per chef. Ping a teammate 📡.');
           const dish = seat.parts.shift();
-          s.orders.push({ id: s.nextOrder++, pid, dish, plate: null, ing: {}, sp: {}, src: [], row: 0, moment: m.id, tag: MOMENT_INFO[m.kind].e });
+          const oid = s.nextOrder++;
+          s.orders.push({ id: oid, pid, dish, plate: null, ing: {}, sp: {}, src: [], row: 0, moment: m.id, tag: MOMENT_INFO[m.kind].e });
+          logVisit(s, s.open[pid], { k: 'order', orders: [oid], seat: a.seat, dish, moment: m.id, pid });
           m.takers.push(pid);
           if (seat.parts.length) seat.dish = seat.parts[0]; else { seat.dish = null; seat.group = null; seat.parts = null; }
           feed(s, now, pid, 'order', { dish });
@@ -1414,10 +1453,12 @@ safe-buffer/index.js:
           return;
         }
         const d = DISHES[seat.dish];
+        const first = s.nextOrder;
         if (d.vip) {
           const group = s.nextOrder;
           d.parts.forEach(part => s.orders.push({ id: s.nextOrder++, pid, dish: part, patron: seat.dish, group, plate: null, ing: {}, sp: {}, src: [], row: 0 }));
         } else s.orders.push({ id: s.nextOrder++, pid, dish: seat.dish, plate: null, ing: {}, sp: {}, src: [], row: 0 });
+        logVisit(s, s.open[pid], { k: 'order', orders: Array.from({ length: s.nextOrder - first }, (_, i) => first + i), seat: a.seat, dish: seat.dish, pid });
         feed(s, now, pid, 'order', { dish: seat.dish });
         seat.dish = null;
         s.open[pid] = null;
@@ -1432,6 +1473,7 @@ safe-buffer/index.js:
         if (strict && parts.some(x => checkOrder(s, x).length)) throw new Error('This meal isn\'t finished yet — serve it when it\'s right.');
         parts.forEach(x => { x.served = true; });
         const tip = has(s, 'tips') ? 2 : 1;
+        logVisit(s, s.open[pid], { k: 'serve', orders: parts.map(x => x.id), tip });
         s.coins += tip; s.tipCoins += tip;
         L(s, pid).tips += tip; L(s, pid).early++;
         feed(s, now, pid, 'serve', { dish: o.patron || o.dish, tip });
@@ -1515,17 +1557,19 @@ safe-buffer/index.js:
         room[a.ing]--;
         o.ing[a.ing] = (o.ing[a.ing] || 0) + 1;
         o.src.push({ ing: a.ing, room: op.room });
+        logVisit(s, op, { k: 'ing', order: o.id, ing: a.ing, room: op.room });
         if (o.pid !== pid) L(s, pid).helped = (L(s, pid).helped || 0) + 1;
         feed(s, now, pid, 'ing', { o: o.id, dish: o.dish, item: a.ing, for: o.pid !== pid ? o.pid : undefined });
         return;
       }
       case 'takeSpice': {
-        needOpen('spice', 'Send a chef to the superfood bar first.');
+        const spOp = needOpen('spice', 'Send a chef to the superfood bar first.');
         if (!SPICES.includes(a.spice) || !(s.bag[a.spice] > 0)) throw new Error('That superfood has run out.');
         const o = unlocked(teamOrder(s, pid, a.order));
         if (strict && !needsSp(o, a.spice)) throw new Error(`${DISHES[o.dish].name} doesn't need more ${SP_INFO[a.spice].n.toLowerCase()}.`);
         s.bag[a.spice]--;
         o.sp[a.spice] = (o.sp[a.spice] || 0) + 1;
+        logVisit(s, spOp, { k: 'sp', order: o.id, spice: a.spice });
         if (o.pid !== pid) L(s, pid).helped = (L(s, pid).helped || 0) + 1;
         feed(s, now, pid, 'spice', { o: o.id, dish: o.dish, item: a.spice, for: o.pid !== pid ? o.pid : undefined });
         return;
@@ -1627,7 +1671,7 @@ safe-buffer/index.js:
           if (o.row >= d.cook) throw new Error(d.cook === 0 ? `${d.name} is served raw — no cooking.` : `${d.name} is done — don't overcook it.`);
         } else if (o.row >= MAX_ROW) throw new Error('It can\'t cook any longer.');
         o.row++;
-        { const vw = visitOf(s, s.open[pid]); if (vw) (vw.cooked = vw.cooked || []).push(o.id); }
+        logVisit(s, s.open[pid], { k: 'cook', order: o.id });
         feed(s, now, pid, 'cook', { dish: o.dish, row: o.row, cook: d.cook, for: o.pid !== pid ? o.pid : undefined });
         if (o.pid !== pid) L(s, pid).helped = (L(s, pid).helped || 0) + 1;
         s.open[pid] = null;
@@ -1638,7 +1682,7 @@ safe-buffer/index.js:
         if (!PLATES.includes(a.size) || !(s.dirty[a.size] > 0)) throw new Error('No dirty plates of that size.');
         s.dirty[a.size]--;
         s.cupboard[a.size]++;
-        { const vw = visitOf(s, op); if (vw) (vw.washed = vw.washed || []).push(a.size); }
+        logVisit(s, op, { k: 'wash', size: a.size });
         feed(s, now, pid, 'wash', { o: 0, item: a.size });
         op.left--;
         if (op.left <= 0 || !PLATES.some(x => s.dirty[x] > 0)) s.open[pid] = null;
@@ -1687,7 +1731,7 @@ safe-buffer/index.js:
   // Turning a group away costs nothing. A missed moment: the guests leave without paying (their orders
   // go), −1 reputation once reputation exists. A met moment: a tip (+1 coin per guest, +2 for the
   // influencer) once money exists.
-  const SLOT_LEAD = 60000, SLOT_LEN = 30000, DELIVERY_N = 4;
+  const SLOT_LEAD = 60000, SLOT_LEN = 30000, DELIVERY_N = 4, QUEUE_MS = 45000;
   const MOMENT_INFO = {
     birthday:   { e: '🎂', n: 'Birthday party' },
     delivery:   { e: '🧊', n: 'Melting delivery' },
@@ -1787,6 +1831,14 @@ safe-buffer/index.js:
         return;
       }
       if (m.kind === 'delivery') { if (m.state === 'live' && now > m.until) { endMoment(s, m, false, now, 'it melted'); changed = true; } return; }
+      if (m.state === 'queued' && now > m.arrivedAt + QUEUE_MS) {
+        // nobody went to the front desk: they walk off, no harm done
+        m.state = 'declined'; m.endedAt = now; m.walked = true;
+        s.deck = s.deck.filter(x => x !== GROUP + m.id);
+        logMoment(s, m, { declined: true, walked: true });
+        feed(s, now, null, 'moment', { kind: m.kind, phase: 'walked' });
+        changed = true; return;
+      }
       if (m.state !== 'seated') return;
       const served = momentOrders(s, m).filter(o => o.servedAt != null), total = m.dishes.length;
       if (m.kind === 'birthday') {
@@ -1837,7 +1889,7 @@ safe-buffer/index.js:
     Object.keys(s.workers).forEach(k => s.workers[k].forEach(w => { if (w) w.start += d; }));
     Object.keys(s.spaces).forEach(k => s.spaces[k].forEach(x => { if (x && x.start != null) x.start += d; }));
     Object.keys(s.open).forEach(k => { const op = s.open[k]; if (op && op.worker) op.worker.start += d; });
-    (s.moments || []).forEach(m => ['at', 'until', 'slotStart', 'slotEnd'].forEach(f => { if (m[f] != null) m[f] += d; }));
+    (s.moments || []).forEach(m => ['at', 'until', 'slotStart', 'slotEnd', 'arrivedAt'].forEach(f => { if (m[f] != null) m[f] += d; }));
     s.orders.forEach(o => { if (o.servedAt != null && o.moment) o.servedAt += d; });
     s.pausedMs = (s.pausedMs || 0) + d;
     s.paused = null;
@@ -2019,7 +2071,7 @@ safe-buffer/index.js:
     MAX_ROW, SCEN, AREA_NAME, ROOM_OF, HOST_ONLY, SALARY_PER_TIMER, AWARDS, AWARD_AT, OFFICE, LATE_PAY,
     layout, goalOf, goalText, newGame, apply, tick, endShift, finish, checkOrder, plateOk, needsIng, needsSp, ingComplete,
     isMistake, tally, roomIngs, guests, goalChecks, onStrike, kindOf, has, supplyCount,
-    workerReady, workerLeft, timerReady, workerMs, cfgOf, LEVELS, levelOf, MOMENT_INFO, headGroup, isGroup, momentOf, SLOT_LEAD, SLOT_LEN, DELIVERY_N, stepMoments, momentOrders, graceDeadline, pause, resume, PAUSE_MS,
+    workerReady, workerLeft, timerReady, workerMs, cfgOf, NO_CANCEL, LEVELS, levelOf, MOMENT_INFO, headGroup, isGroup, momentOf, SLOT_LEAD, SLOT_LEN, DELIVERY_N, QUEUE_MS, stepMoments, momentOrders, graceDeadline, pause, resume, PAUSE_MS,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -3166,14 +3218,14 @@ safe-buffer/index.js:
     const drinks = E.cfgOf(g).money ? k * (E.has(g, 'drinks') ? 2 : 1) : 0;
     const why = !g.deck.length ? 'No guests are left outside.' : 'All tables are full.';
     const grp = E.headGroup(g), canAway = E.cfgOf(g).throwOut;
-    const grpCard = grp ? `<div class="mom queued grpchoice"><b>${E.MOMENT_INFO[grp.kind].e} ${grp.kind === 'birthday' ? `A birthday party of ${grp.dishes.length}` : 'An influencer'} is next in line</b><span>${esc(groupRule(g, grp))}</span></div>` : '';
+    const grpCard = grp ? `<div class="mom queued grpchoice"><b class="big">${E.MOMENT_INFO[grp.kind].e} ${grp.kind === 'birthday' ? 'Birthday party' : 'Influencer'}</b>${groupIcons(g, grp)}</div>` : '';
     return `<div class="sheet recsheet"><div class="card reception-card">
       <h2>🚪 Front desk</h2>
       ${grpCard}
       <p class="note">Your chef is at the door. Choose one:</p>
       <div class="rec-opts">
-        <button class="rec-opt seat" data-a="seatGuests" ${k ? '' : 'disabled'}><span class="ro-ic">🪑</span><span class="ro-t"><b>${grp ? (k ? `Seat them${k > 1 ? ` and ${k - 1} more guest${k > 2 ? 's' : ''}` : ''}` : 'Seat them') : k ? `Seat ${k} new guest${k > 1 ? 's' : ''}` : 'Seat new guests'}</b><small>${k ? `They sit at the empty tables${drinks ? ` and buy kombucha` : ''}.` : why}</small></span></button>
-        ${grp ? `<button class="rec-opt away" data-a="turnAway"><span class="ro-ic">🙅</span><span class="ro-t"><b>Turn them away</b><small>No penalty. The next ordinary guests sit down instead.</small></span></button>` : ''}
+        <button class="rec-opt seat" data-a="seatGuests" ${k ? '' : 'disabled'}><span class="ro-ic">🪑</span><span class="ro-t"><b>${grp ? `Seat them${k > 1 ? ` +${k - 1}` : ''}` : k ? `Seat ${k} new guest${k > 1 ? 's' : ''}` : 'Seat new guests'}</b><small>${k ? (grp ? '' : `They sit at the empty tables${drinks ? ` and buy kombucha` : ''}.`) : why}</small></span></button>
+        ${grp ? `<button class="rec-opt away" data-a="turnAway"><span class="ro-ic">🙅</span><span class="ro-t"><b>No, thanks</b><small>No penalty.</small></span></button>` : ''}
         ${canAway ? `<button class="rec-opt away" data-a="recAway" ${waiting ? '' : 'disabled'}><span class="ro-ic">👋</span><span class="ro-t"><b>Send guests away</b><small>${waiting ? 'Pick 1 or 2 waiting guests whose meals you don\'t want. New guests take their seats, but buy no kombucha.' : 'Nobody is waiting at the tables.'}</small></span></button>` : ''}
       </div>
       ${k || waiting ? '' : '<button class="btn ghost" data-a="done">Close</button>'}
@@ -3282,9 +3334,9 @@ safe-buffer/index.js:
   const PING_SHOW = 8000, PING_URGENT = 3000;
   let heardPings = 0;
   function pingWhat(p) {
-    if (p.ing) return `${E.ING_INFO[p.ing].n}!`;
-    if (p.spice) return `${E.SP_INFO[p.spice].n.split(/[ &]/)[0]}!`;
-    return p.area ? `Over here — ${E.AREA_NAME[p.area]}` : 'Over here!';
+    if (p.ing) return `${E.ING_INFO[p.ing].e} ${E.ING_INFO[p.ing].n}!`;
+    if (p.spice) return `${E.SP_INFO[p.spice].e} ${E.SP_INFO[p.spice].n}!`;
+    return p.area ? `👉 ${E.AREA_NAME[p.area]}` : '👉 Here!';
   }
   function livePings(g, now) { return (g.pings || []).filter(p => now - p.at < PING_SHOW); }
   function pingSounds(g, now) {
@@ -3313,63 +3365,63 @@ safe-buffer/index.js:
     const name = id => esc((whoOf(g, id) || { name: '?' }).name);
     return list.slice(-3).map(p => {
       const c = colorOf((whoOf(g, p.pid) || {}).color), mine = p.pid === me.pid;
-      const state = p.claimedBy ? `<em class="onit">✓ ${p.claimedBy === me.pid ? 'You are' : name(p.claimedBy) + ' is'} on it</em>`
-        : mine ? '<em>waiting for an answer…</em>' : `<button class="btn" data-a="claim" data-ping="${p.id}">On it!</button>`;
+      const state = p.claimedBy ? `<em class="onit">👍 ${p.claimedBy === me.pid ? 'You' : name(p.claimedBy)}</em>`
+        : mine ? '<em>⏳</em>' : `<button class="btn" data-a="claim" data-ping="${p.id}">👍 On it</button>`;
       return `<div class="mom pingrow ${p.panic ? 'panic' : ''} ${p.claimedBy ? 'claimed' : ''}" data-pat="${p.at}" data-pclaim="${p.claimedBy ? 1 : 0}" style="--c:${c}"><b>📡 ${mine ? 'You' : name(p.pid)}: ${esc(pingWhat(p))}</b>${state}</div>`;
     }).join('');
   }
 
   // ---------- Canggu: team moments bar ----------
   let seenMoments = '';
-  // What a group asks of the team, in one sentence (front desk and bar).
-  function groupRule(g, m) {
+  // What a group asks of the team, as icons: who, orders, time window, reward, risk.
+  function groupIcons(g, m) {
     const L = E.levelOf(g), win = Math.round(L.win / 1000), cfg = E.cfgOf(g);
-    const fail = `Missed: they leave without paying${cfg.rep ? ', −1 ⭐' : ''}.`;
-    if (m.kind === 'birthday') return `${m.dishes.length} orders at one table, one per chef. Every plate must arrive within ${win} s of the first.${cfg.money ? ` Made it: +${m.dishes.length} 🪙 tip.` : ''} ${fail}`;
-    return `2 orders for two chefs. She films for 30 s, starting 1 minute after sitting down: both items inside that slot, within ${win} s of each other.${cfg.money ? ' Made it: +2 🪙 tip.' : ''} ${fail}`;
+    const chips = m.kind === 'birthday'
+      ? [`🎂×${m.dishes.length}`, '🧑‍🍳 1 each', `⏱ ${win} s`]
+      : ['📸 ×2', '🧑‍🍳🧑‍🍳', '🎬 1:00 → 30 s', `⏱ ${win} s`];
+    if (cfg.money) chips.push(`✅ +${m.kind === 'birthday' ? m.dishes.length : 2} 🪙`);
+    chips.push(`❌ 0 🪙${cfg.rep ? ' −1 ⭐' : ''}`);
+    return `<span class="mchips">${chips.map(c => `<span class="mchip">${c}</span>`).join('')}</span>`;
   }
+  const mDish = (o, cls) => `<span class="mdish ${cls || ''}" title="${esc(E.DISHES[o.dish].name)}">${dishArt(E.DISHES[o.dish])}</span>`;
   function momentBar(g, now) {
     pingSounds(g, now);
-    const L = E.levelOf(g), win = Math.round(L.win / 1000);
+    const L = E.levelOf(g);
     const live = (g.moments || []).filter(m => m.state === 'live' || m.state === 'queued' || m.state === 'seated');
-    const recent = (g.moments || []).filter(m => (m.state === 'met' || m.state === 'missed' || m.state === 'declined') && m.endedAt && now - m.endedAt < 7000);
+    const recent = (g.moments || []).filter(m => (m.state === 'met' || m.state === 'missed' || m.state === 'declined') && m.endedAt && now - m.endedAt < 6000);
     const key = live.map(m => m.id + m.state).join(',');
     if (key && key !== seenMoments && key.split(',').some(id => !seenMoments.split(',').includes(id))) SFX.moment();
     seenMoments = key;
     const pings = pingBar(g, now);
     if (!live.length && !recent.length && !pings) return '';
-    const who = pid => esc((playerOf(g, pid) || { name: '?' }).name);
     const rows = live.map(m => {
       const I = E.MOMENT_INFO[m.kind];
-      if (m.kind === 'delivery') return `<div class="mom live"><b>${I.e} Acai delivery at the back door!</b><span>Send any chef to a fridge — <b class="mleft" data-mend="${m.until}"></b> before it melts.</span></div>`;
-      const what = m.kind === 'birthday' ? `A birthday party of ${m.dishes.length}` : 'An influencer';
+      if (m.kind === 'delivery') return `<div class="mom live icons" aria-label="Acai delivery: send a chef to a fridge"><span class="big">🧊</span><span class="arrow">➜</span><span class="big">📦</span><small>Fridge</small><b class="mleft" data-mend="${m.until}"></b></div>`;
       if (m.state === 'queued') {
-        const next = E.headGroup(g) === m;
-        return `<div class="mom queued"><b>${I.e} ${what} ${next ? 'is next in line' : 'is waiting outside'}</b><span>Send a chef to the front desk to seat them or turn them away. ${esc(groupRule(g, m))}</span></div>`;
+        return `<div class="mom queued icons" aria-label="${m.kind === 'birthday' ? 'Birthday party' : 'Influencer'} waiting outside: go to the front desk"><span class="big">${I.e}${m.kind === 'birthday' ? '×' + m.dishes.length : ''}</span><span class="arrow">➜</span><span class="big">🚪</span><small>Front desk</small><b class="mleft" data-mend="${m.arrivedAt + E.QUEUE_MS}"></b></div>`;
       }
-      // seated: orders to take, then to serve together
+      // seated: each order as a picture with its chef's colour; 📝? = still at the table
       const parts = E.momentOrders(g, m);
       const left = m.dishes.length - parts.length;
-      const list = parts.map(o => `<span class="mpart ${o.servedAt != null ? 'done' : ''}">${who(o.pid)} · ${esc(E.DISHES[o.dish].name)}${o.servedAt != null ? ' ✓' : ''}</span>`).join('')
-        + (left ? `<span class="mpart open">${left} order${left > 1 ? 's' : ''} still at the table</span>` : '');
+      const chips = parts.map(o => `<span class="mpart ${o.servedAt != null ? 'done' : ''}" style="--c:${colorOf((playerOf(g, o.pid) || {}).color)}">${mDish(o)}${o.servedAt != null ? '<i>✓</i>' : ''}</span>`).join('')
+        + Array.from({ length: left }, () => '<span class="mpart open" title="Order still at the table">📝?</span>').join('');
       const mine = parts.filter(o => o.pid === me.pid && o.servedAt == null);
       const canServe = m.kind !== 'influencer' || now >= m.slotStart;
-      const btns = mine.map(o => `<button class="btn" data-a="serveMoment" data-order="${o.id}" ${canServe ? '' : 'disabled'}>Serve my ${esc(E.DISHES[o.dish].name)}</button>`).join('');
+      const btns = mine.map(o => `<button class="btn serve-m" data-a="serveMoment" data-order="${o.id}" ${canServe ? '' : 'disabled'} aria-label="Serve ${esc(E.DISHES[o.dish].name)}">🛎️ ${mDish(o, 'sm')}</button>`).join('');
       const served = parts.filter(o => o.servedAt != null).map(o => o.servedAt);
-      const take = left ? `Take their orders in the dining room — one per chef. ` : '';
       if (m.kind === 'birthday') {
-        const clock = served.length ? `<b class="mleft" data-mend="${Math.min.apply(null, served) + L.win}"></b> for the rest!` : `Serve every plate within ${win} s of the first.`;
-        return `<div class="mom live"><b>${I.e} Birthday party at the table</b><span>${take}${clock}</span><div class="mparts">${list}</div>${btns}</div>`;
+        const clock = served.length ? `<b class="mleft hot" data-mend="${Math.min.apply(null, served) + L.win}"></b>` : `<span class="mchip">⏱ ${Math.round(L.win / 1000)} s</span>`;
+        return `<div class="mom live icons"><span class="big">🎂</span>${chips}${clock}${btns}</div>`;
       }
       const before = now < m.slotStart;
-      const clock = before ? `Filming starts in <b class="mleft" data-mend="${m.slotStart}"></b>` : `Filming now — <b class="mleft" data-mend="${m.slotEnd}"></b> left`;
-      return `<div class="mom live ${before ? '' : 'hot'}"><b>${I.e} Influencer photo shoot</b><span>${take}${clock}. Both items within ${win} s of each other.</span><div class="mparts">${list}</div>${btns}</div>`;
+      const clock = before ? `<span class="mchip">🎬</span><b class="mleft" data-mend="${m.slotStart}"></b>` : `<span class="mchip rec">🔴 REC</span><b class="mleft hot" data-mend="${m.slotEnd}"></b>`;
+      return `<div class="mom live icons ${before ? '' : 'hot'}"><span class="big">📸</span>${chips}${clock}${btns}</div>`;
     }).join('');
     const done = recent.map(m => {
       const I = E.MOMENT_INFO[m.kind];
-      if (m.state === 'declined') return `<div class="mom declined"><b>${I.e} ${I.n}: turned away</b><span>No harm done.</span></div>`;
-      const gain = m.kind === 'delivery' ? `+${m.gain} ${esc(E.ING_INFO[m.ing].n)} in Fridge A` : m.tip ? `+${m.tip} coin tip` : 'nicely done';
-      return `<div class="mom ${m.state}"><b>${I.e} ${I.n}: ${m.state === 'met' ? 'made it!' : 'missed'}</b><span>${m.state === 'met' ? gain : esc(m.why || '')}${m.repLoss ? ' · −1 reputation' : ''}</span></div>`;
+      const res = m.state === 'declined' ? (m.walked ? '🚶' : '🙅') : m.state === 'met' ? '✅' : '❌';
+      const gain = m.state !== 'met' ? (m.repLoss ? '−1 ⭐' : '') : m.kind === 'delivery' ? `+${m.gain} ${E.ING_INFO[m.ing].e}` : m.tip ? `+${m.tip} 🪙` : '';
+      return `<div class="mom ${m.state} icons" data-mgone="${m.endedAt}" aria-label="${esc(I.n)}: ${m.state}${m.why ? ' — ' + esc(m.why) : ''}"><span class="big">${I.e}</span><span class="big">${res}</span>${gain ? `<b>${gain}</b>` : ''}</div>`;
     }).join('');
     return `<div class="moments" role="status">${pings}${rows}${done}</div>`;
   }
@@ -3386,14 +3438,20 @@ safe-buffer/index.js:
   // Chefs this player could cancel right now: own timers and shared ones they sent out, sand still running.
   function runningChefs(g, now) {
     return [me.pid, 'temp', 'helper'].filter(o => g.workers[o]).flatMap(owner => g.workers[owner].map((w, t) => ({ owner, t, w })))
-      .filter(x => x.w && !g.off[x.owner][x.t] && !E.timerReady(g, x.w, now) && (x.owner === me.pid || x.w.by === me.pid));
+      .filter(x => x.w && !g.off[x.owner][x.t] && !E.timerReady(g, x.w, now) && (x.owner === me.pid || x.w.by === me.pid) && !E.NO_CANCEL.includes(x.w.area));
   }
   function lossText(w) {
-    const c = (w.cooked || []).length, k = (w.washed || []).length;
+    const L = w.log || [];
+    if (!L.length) return 'Nothing done on this visit yet, so nothing is lost.';
+    const n = k => L.filter(x => x.k === k).length;
     const parts = [];
-    if (c) parts.push(`the cooking step${c > 1 ? 's' : ''} on this visit`);
-    if (k) parts.push(`${k} washed plate${k > 1 ? 's' : ''} (back to dirty)`);
-    return parts.length ? `You lose ${parts.join(' and ')}.` : 'Nothing is lost: ingredients and spices stay on the plates.';
+    if (n('order')) parts.push(`${n('order')} order${n('order') > 1 ? 's' : ''} (the guest waits again)`);
+    if (n('ing')) parts.push(`${n('ing')} ingredient${n('ing') > 1 ? 's' : ''} (back in the fridge)`);
+    if (n('sp')) parts.push(`${n('sp')} superfood${n('sp') > 1 ? 's' : ''} (back in the bar)`);
+    if (n('cook')) parts.push(`${n('cook')} cooking step${n('cook') > 1 ? 's' : ''}`);
+    if (n('wash')) parts.push(`${n('wash')} washed plate${n('wash') > 1 ? 's' : ''} (dirty again)`);
+    if (n('serve')) parts.push('the early serve and its tip');
+    return `Undone: ${parts.join(', ')}.`;
   }
   function renderCancel(g, now) {
     const cs = ui.cancelSheet, only = cs.only;
@@ -3404,7 +3462,7 @@ safe-buffer/index.js:
       const p = whoOf(g, x.owner), left = Math.ceil((x.w.start + E.workerMs(g) - now) / 1000);
       return `<div class="worker-row">${chef(p.color)}<div><b>${esc(E.AREA_NAME[x.w.area])} · ${left} s left</b><small>${esc(lossText(x.w))}</small></div><button class="btn" data-a="cancelGo" data-owner="${x.owner}" data-t="${x.t}">${dest ? `Cancel · go to ${esc(dest)}` : 'Cancel this chef'}</button></div>`;
     }).join('');
-    return `<div class="sheet"><div class="card worker-card"><span class="eyebrow">Drop everything?</span><h2>${only ? 'This chef is still working' : 'All your chefs are busy'}</h2><p>Cancel a chef to free them at once. Cooking and washing from that visit are lost.</p>${rows}<button class="btn ghost" data-a="closeCancel">Keep working</button></div></div>`;
+    return `<div class="sheet"><div class="card worker-card"><span class="eyebrow">Drop everything?</span><h2>${only ? 'This chef is still working' : 'All your chefs are busy'}</h2><p>Cancel a chef to free them at once. Everything done on that visit is undone. Front desk, scooter run and office visits can't be cancelled.</p>${rows}<button class="btn ghost" data-a="closeCancel">Keep working</button></div></div>`;
   }
 
   // ---------- team panel: what the other chefs are doing right now ----------
@@ -3470,7 +3528,7 @@ safe-buffer/index.js:
   function feedLine(g, f) {
     if (f.k === 'moment') {
       const I = E.MOMENT_INFO[f.kind] || { e: '', n: '' };
-      const t = f.phase === 'start' ? 'started' : f.phase === 'queued' ? 'is waiting outside' : f.phase === 'declined' ? 'was turned away' : f.phase === 'met' ? 'made it!' : `missed${f.why ? ' — ' + esc(f.why) : ''}`;
+      const t = f.phase === 'start' ? 'started' : f.phase === 'queued' ? 'is waiting outside' : f.phase === 'declined' ? 'was turned away' : f.phase === 'walked' ? 'walked off (nobody seated them)' : f.phase === 'met' ? 'made it!' : `missed${f.why ? ' — ' + esc(f.why) : ''}`;
       return `<li class="momline"><b>${I.e} ${I.n}</b> ${t}</li>`;
     }
     const p = whoOf(g, f.pid);
@@ -3643,7 +3701,7 @@ safe-buffer/index.js:
       <h3>New in the Canggu edition</h3>
       <ul>
         <li><b>Difficulty</b> — Chill (40 s timers, practice hints, no team moments), Normal, Hectic and Full Canggu (20 s timers, challenge goals, more team moments).</li>
-        <li><b>Cancel a chef</b> — tap your own working chef, or a free circle while all your chefs are busy, to cancel one at once. Cooking and washing from that visit are lost; ingredients and superfoods stay on the plates.</li>
+        <li><b>Cancel a chef</b> — tap your own working chef, or a free circle while all your chefs are busy, to cancel one at once. Everything done on that visit is undone: orders go back to the guests, ingredients and superfoods back to the shelves, cooking and washing are lost. Front desk, scooter run and office visits can't be cancelled.</li>
         <li><b>📡 Pings</b> — press and hold anywhere on the plan to ping that spot on every iPad. Tap an empty shelf to call for that ingredient. Answer a call with <b>On it!</b> so nobody else runs. An unanswered call turns red after 3 s; three quick pings mean panic.</li>
         <li><b>🎂 Birthday party</b> and <b>📸 influencer</b> guests join the queue outside; the front desk shows who is next in line. Send a chef to the front desk to seat them or turn them away (no penalty).</li>
         <li><b>🎂 Birthday party</b> — seated at one table with one order per chef: every chef takes one in the dining room. Serve them with the buttons in the bar at the top; every plate must arrive within the window of the first.</li>
@@ -3766,6 +3824,7 @@ safe-buffer/index.js:
         el.classList.toggle('urgent', el.dataset.pclaim === '0' && age > PING_URGENT);
         el.classList.toggle('gone', age > PING_SHOW);
       });
+      document.querySelectorAll('[data-mgone]').forEach(el => { if (hostNow() - +el.dataset.mgone > 6000) el.style.display = 'none'; });
       document.querySelectorAll('[data-mend]').forEach(el => { el.textContent = `${Math.max(0, Math.ceil((+el.dataset.mend - now) / 1000))} s`; });
       document.querySelectorAll('[data-gend]').forEach(el => { el.textContent = `${Math.max(0, Math.ceil((+el.dataset.gend - now) / 1000))} s`; });
       const clock = document.getElementById('clock');
