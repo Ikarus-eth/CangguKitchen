@@ -20,111 +20,13 @@ function order(s, dish = 'mie', extra = {}) {
 }
 const slotOf = (s, area) => s.workers.p0.findIndex(w => w && w.area === area);
 
-test('Cancel: a running chef is refused without cancel, freed with it', () => {
+test('No cancelling: a working chef stays until the sand runs out', () => {
   const s = game();
   ok(s, 'place', { area: 'storA', idx: 0 }, 5000);
   const t = slotOf(s, 'storA');
-  assert.match(act(s, 'recall', { owner: 'p0', t }, 8000), /still working/);
-  ok(s, 'recall', { owner: 'p0', t, cancel: true }, 8000);
-  assert.equal(s.workers.p0[t], null);
-  assert.equal(s.spaces.storA[0], null);
-  assert.equal(s.open.p0, null);
+  assert.match(act(s, 'recall', { owner: 'p0', t, cancel: true }, 8000), /still working/);
+  ok(s, 'recall', { owner: 'p0', t }, 40000);
 });
-
-test('Cancel at the stove loses the cooking step of that visit', () => {
-  const s = game();
-  const o = order(s, 'mie', { row: 1 });
-  ok(s, 'place', { area: 'stove', idx: 0 }, 5000);
-  ok(s, 'cook', { order: o.id }, 5500);
-  assert.equal(o.row, 2);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'stove'), cancel: true }, 9000);
-  assert.equal(o.row, 1);
-  assert.match(s.errs.p0.msg, /cooking step on/);
-});
-
-test('Cancel at the sink sends the plates washed on that visit back to dirty', () => {
-  const s = game(3);
-  const size = E.PLATES.find(x => s.dirty[x] >= 2) || E.PLATES.find(x => s.dirty[x] > 0);
-  s.dirty[size] = 3; const clean = s.cupboard[size];
-  ok(s, 'place', { area: 'sink', idx: 0 }, 5000);
-  ok(s, 'wash', { size }, 5200); ok(s, 'wash', { size }, 5400);
-  assert.equal(s.cupboard[size], clean + 2);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'sink'), cancel: true }, 9000);
-  assert.equal(s.cupboard[size], clean);
-  assert.equal(s.dirty[size], 3);
-});
-
-test('Cancel in a fridge puts the ingredients taken on that visit back', () => {
-  const s = game();
-  const o = order(s, 'mie');
-  ok(s, 'place', { area: 'storA', idx: 0 }, 5000);
-  const ing = E.ING.find(i => s.storage.A[i] > 0), before = s.storage.A[ing];
-  ok(s, 'takeIng', { order: o.id, ing }, 5200); ok(s, 'takeIng', { order: o.id, ing }, 5300);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'storA'), cancel: true }, 9000);
-  assert.equal(o.ing[ing], 0); assert.equal(s.storage.A[ing], before); assert.equal(o.src.length, 0);
-});
-
-test('Cancel at the superfood bar puts the superfoods back', () => {
-  const s = game(3);
-  const o = order(s, 'mie');
-  ok(s, 'place', { area: 'green', idx: 0 }, 5000);
-  const sp = E.SPICES.find(i => s.bag[i] > 0), before = s.bag[sp];
-  ok(s, 'takeSpice', { order: o.id, spice: sp }, 5200);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'green'), cancel: true }, 9000);
-  assert.equal(o.sp[sp], 0); assert.equal(s.bag[sp], before);
-});
-
-test('Cancel in the dining room hands the order back to the guest, with its plate and food', () => {
-  const s = game(3);
-  const seat = s.seats.findIndex(x => x.dish), dish = s.seats[seat].dish;
-  ok(s, 'place', { area: 'dining', idx: 0 }, 5000);
-  ok(s, 'takeOrder', { seat }, 5100);
-  const o = s.orders.find(x => x.dish === dish);
-  const size = E.PLATES.find(x => s.cupboard[x] > 0), clean = s.cupboard[size];
-  ok(s, 'takePlate', { order: o.id, size }, 5200);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'dining'), cancel: true }, 9000);
-  assert.ok(!s.orders.some(x => x.id === o.id));
-  assert.equal(s.seats[seat].dish, dish);
-  assert.equal(s.cupboard[size], clean);
-});
-
-test('Front desk, scooter run and office visits cannot be cancelled', () => {
-  const s = game(8, 3); s.coins = 20;
-  ok(s, 'place', { area: 'reception', idx: 0 }, 5000);
-  assert.match(act(s, 'recall', { owner: 'p0', t: slotOf(s, 'reception'), cancel: true }, 6000), /can't be cancelled/);
-  const t = game(4, 3); t.coins = 5;
-  ok(t, 'place', { area: 'van', idx: 0 }, 5000);
-  assert.match(act(t, 'recall', { owner: 'p0', t: slotOf(t, 'van'), cancel: true }, 6000), /can't be cancelled/);
-});
-
-test('Cancel never saves time: desk-order-ingredients chain is fully undone', () => {
-  const s = game(3);
-  const seat = s.seats.findIndex(x => x.dish), dish = s.seats[seat].dish;
-  const stock = JSON.stringify(s.storage), bag = JSON.stringify(s.bag);
-  ok(s, 'place', { area: 'dining', idx: 0 }, 5000); ok(s, 'takeOrder', { seat }, 5000);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'dining'), cancel: true }, 5100);
-  assert.equal(s.orders.length, 0); assert.equal(s.seats[seat].dish, dish);
-  assert.equal(JSON.stringify(s.storage), stock); assert.equal(JSON.stringify(s.bag), bag);
-});
-
-test('Cancelling a finished timer is a normal recall, nothing is undone', () => {
-  const s = game();
-  const o = order(s, 'mie', { row: 1 });
-  ok(s, 'place', { area: 'stove', idx: 0 }, 5000);
-  ok(s, 'cook', { order: o.id }, 5500);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'stove'), cancel: true }, 40000);
-  assert.equal(o.row, 2);
-});
-
-test('After cancelling, the chef can go somewhere else at once', () => {
-  const s = game(1, 3);
-  ok(s, 'place', { area: 'storA', idx: 0 }, 5000);
-  assert.match(act(s, 'place', { area: 'stove', idx: 0 }, 6000), /still running/);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'storA'), cancel: true }, 6000);
-  ok(s, 'place', { area: 'stove', idx: 0 }, 6000);
-  assert.equal(s.open.p0.type, 'cook');
-});
-
 
 function withMoment(s, kind, at = 5000) { s.moments = [{ id: 99, kind, at, state: 'planned', shift: s.shift }]; E.tick(s, at); return s.moments[0]; }
 
@@ -252,11 +154,38 @@ test('Birthday party: plates too far apart, the guests leave and their orders go
   assert.equal(E.momentOrders(s, m).length, 0);
 });
 
-test('Solo: one chef may take every order of the party', () => {
+test('Solo: one visit takes every order of the party', () => {
   const s = game(2, 1, { level: 'normal' });
   const m = seatGroup(s, 'birthday');
-  const parts = takeAll(s, m);
+  const seat = s.seats.findIndex(x => x.group === m.id);
+  s.workers.p0 = s.workers.p0.map(() => null); s.spaces.reception = [null];
+  ok(s, 'place', { area: 'dining', idx: 0 }, 7000); ok(s, 'takeOrder', { seat }, 7000);
+  const parts = E.momentOrders(s, m);
   assert.equal(parts.length, 2); assert.ok(parts.every(o => o.pid === 'p0'));
+});
+
+test('After the first party order, the others take theirs with one tap within 10 s', () => {
+  const s = game(3, 3, { level: 'normal' });
+  const m = seatGroup(s, 'birthday');
+  const seat = s.seats.findIndex(x => x.group === m.id);
+  s.workers.p0 = s.workers.p0.map(() => null); s.spaces.reception = [null];
+  ok(s, 'place', { area: 'dining', idx: 0 }, 7000); ok(s, 'takeOrder', { seat }, 7000);
+  assert.equal(m.claimUntil, 7000 + E.CLAIM_MS);
+  assert.match(act(s, 'claimPart', { moment: m.id }, 7500), /already have one/);
+  assert.equal(E.apply(s, { pid: 'p1', type: 'claimPart', moment: m.id }, 8000), null);
+  assert.equal(E.momentOrders(s, m).filter(o => o.pid === 'p1').length, 1);
+});
+
+test('Party orders nobody claims in 10 s go round the chefs who have none', () => {
+  const s = game(3, 3, { level: 'normal' });
+  const m = seatGroup(s, 'birthday');
+  const seat = s.seats.findIndex(x => x.group === m.id);
+  s.workers.p0 = s.workers.p0.map(() => null); s.spaces.reception = [null];
+  ok(s, 'place', { area: 'dining', idx: 0 }, 7000); ok(s, 'takeOrder', { seat }, 7000);
+  E.tick(s, 7000 + E.CLAIM_MS + 1);
+  const parts = E.momentOrders(s, m);
+  assert.equal(parts.length, 3); assert.equal(new Set(parts.map(o => o.pid)).size, 3);
+  assert.equal(s.seats[seat].group, null);
 });
 
 test('Influencer: her slot starts a minute after sitting; both items together inside it', () => {
@@ -277,18 +206,6 @@ test('Influencer: missing the slot loses both orders and frees her table', () =>
   E.tick(s, m.slotEnd + 1);
   assert.equal(m.state, 'missed'); assert.equal(s.rep, 1);
   assert.ok(!s.seats.some(x => x.group === m.id));
-});
-
-test('Cancelling a party order puts it back on the table for any chef', () => {
-  const s = game(3, 3, { level: 'normal' });
-  const m = seatGroup(s, 'birthday');
-  const seat = s.seats.findIndex(x => x.group === m.id);
-  s.workers.p0 = s.workers.p0.map(() => null); s.spaces.reception = [null];
-  ok(s, 'place', { area: 'dining', idx: 1 }, 6500); ok(s, 'takeOrder', { seat }, 6500);
-  assert.equal(s.seats[seat].parts.length, 2);
-  ok(s, 'recall', { owner: 'p0', t: slotOf(s, 'dining'), cancel: true }, 7000);
-  assert.equal(s.seats[seat].parts.length, 3); assert.equal(m.takers.length, 0);
-  assert.equal(E.momentOrders(s, m).length, 0);
 });
 
 test('Shift end closes open moments, the report lists them', () => {

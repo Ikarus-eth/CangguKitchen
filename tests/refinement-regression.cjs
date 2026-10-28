@@ -32,8 +32,9 @@ await p.locator('[data-a="openStation"]').click();await settle();
 await p.locator('.station-tray [data-a="done"]').click();await settle();
 await p.evaluate(()=>{const o=__kc.wrap.game.orders[0];o.row=Engine.DISHES[o.dish].cook;__kc.render();});await settle();
 await p.locator('.stove [data-a="place"]').first().click();await settle();
-await p.locator('.order-summary').first().click();await settle();
-await p.locator('.work-card [data-a="cook"]').click();await settle();
+// The Canggu edition opens a cook menu at the stove; the original opens the meal from its ticket.
+if(await p.locator('.cooksheet .cook-row').count()){await p.locator('.cooksheet .cook-row').first().click();await settle();}
+else{await p.locator('.order-summary').first().click();await settle();await p.locator('.work-card [data-a="cook"]').click();await settle();}
 assert.equal(await p.evaluate(()=>{const o=__kc.wrap.game.orders[0];return o.row-Engine.DISHES[o.dish].cook}),1);
 assert.equal(await p.locator('.cook-ring.over,.next-need').count(),0);
 await p.evaluate(()=>{const g=__kc.wrap.game,o=g.orders[0],d=Engine.DISHES[o.dish];o.ing={...d.ing};o.sp={...d.sp};o.row=d.cook;Engine.endShift(g,Date.now());__kc.ui.results=true;__kc.render();});await settle();

@@ -69,16 +69,22 @@ const URL = (process.env.BASE_URL || 'http://localhost:8765/') + 'canggu/?dev';
     assert.equal(shout.ing, 'cheese');
     console.log('PASS empty shelf shout');
 
-    // Cancel: tapping my own working chef offers to cancel; cancelling frees the chef.
-    await page.evaluate(() => { __kc.act({ type: 'place', area: 'storB', idx: 0 }); });
-    await w(200);
-    await page.locator('.board .st2 .spot.taken.mine').first().click(); await w(200);
-    assert.match(await page.locator('.worker-card').innerText(), /still working/);
-    await page.screenshot({ path: out + '/cancel.png' });
-    await page.locator('[data-a="cancelGo"]').first().click(); await w(200);
-    const free = await page.evaluate(() => __kc.wrap.game.workers[__kc.me.pid].every(x => !x || x.area !== 'storB'));
-    assert.ok(free, 'chef left storage 2');
-    console.log('PASS cancel sheet frees a working chef');
+    // The stove opens a cook menu; set-aside meals live in a side drawer.
+    await page.evaluate(() => {
+      const g = __kc.wrap.game; g.ui = null;
+      g.workers[__kc.me.pid] = g.workers[__kc.me.pid].map(() => null); Object.keys(g.spaces).forEach(k => { if (k !== 'van') g.spaces[k] = g.spaces[k].map(() => null); }); g.open = {};
+      ['pizza', 'toast'].forEach((d, i) => g.orders.push({ id: g.nextOrder++, pid: __kc.me.pid, dish: d, plate: null, ing: {}, sp: {}, src: [], row: 0, parked: i === 1 }));
+      __kc.render(); __kc.act({ type: 'place', area: 'stove', idx: 0 });
+    });
+    await w(250);
+    assert.ok(await page.locator('.cooksheet .cook-row').count() >= 1, 'cook menu opens at the stove');
+    await page.screenshot({ path: out + '/cook-menu.png' });
+    await page.locator('.cooksheet .cook-row').first().click(); await w(200);
+    assert.equal(await page.locator('.cooksheet').count(), 0, 'cooking closes the menu');
+    assert.equal(await page.locator('.mytks .shelf').count(), 0, 'no set-aside row between the tickets');
+    await page.locator('[data-a="asideOpen"]').click(); await w(200);
+    assert.ok(await page.locator('.drawer .shchip').count() >= 1, 'set-aside meal in the drawer');
+    console.log('PASS cook menu at the stove, set-aside drawer');
 
     // Difficulty presets set the timer, goal and practice mode together.
     const L = await page.evaluate(() => Engine.LEVELS);

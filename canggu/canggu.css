@@ -86,3 +86,85 @@ button.ing[data-a="shout"] .empty-tag::after { content: ' · call'; }
 .mdish.sm { width: 30px; height: 30px; vertical-align: middle; }
 .btn.serve-m { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; padding: 4px 12px; }
 .grpchoice .big { font-size: 24px; }
+
+/* plates as pictures: the meal's plate ➜ the plate the recipe allows */
+.plate-pair { display: inline-flex; align-items: center; gap: 4px; }
+.plate-pair .pl { position: relative; display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; }
+.plate-pair .pl .asset { position: absolute; inset: 0; width: 100%; height: 100%; }
+.plate-pair .pl b { position: relative; font: 800 12px/1 system-ui, sans-serif; color: #2b2116; background: rgba(255,255,255,.85); border-radius: 6px; padding: 1px 3px; }
+.plate-pair .pl.have { outline: 3px solid #5fa354; border-radius: 50%; }
+.pl.pl-none { opacity: .55; outline: 2px dashed #b06a3c; border-radius: 50%; }
+.pl-arrow, .pl-or { font-style: normal; opacity: .55; font-size: 14px; }
+.summary-meta { display: flex; align-items: center; gap: 12px; }
+.cookmeta { font-size: 15px; }
+.btn.plate-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; }
+.btn.plate-btn .asset { width: 34px; height: 34px; display: inline-block; }
+.btn.plate-btn b { font-size: 18px; }
+.btn.close-x { min-width: 48px; font-size: 22px; }
+.pm-dish small .pl { width: 26px; height: 26px; }
+.hint .asset, .prompt .dish-art, .prompt .asset { display: inline-block; width: 26px; height: 26px; vertical-align: middle; }
+.prompt .dish-art { width: 28px; height: 28px; }
+#prompt { font-size: 18px; }
+.mini-pan { display: inline-block; width: 24px; height: 24px; vertical-align: middle; }
+.cookbtn .mini-pan { width: 28px; height: 28px; }
+.prompt .chef, #prompt .asset.chef { display: inline-block; width: 30px; height: 34px; vertical-align: middle; }
+.free-dot { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; border: 3px solid #2f5d50; align-items: center; justify-content: center; font-weight: 800; color: #2f5d50; vertical-align: middle; background: #fff; }
+.plate-toggle .asset { display: inline-block; width: 30px; height: 30px; }
+.worker-toggle .asset { width: 30px; height: 34px; }
+.parkbtn { font-size: 20px; min-width: 48px; }
+@media (max-width: 700px) {
+  .summary-meta { gap: 6px; flex-wrap: nowrap; line-height: 1; }
+  .summary-meta .plate-pair { gap: 2px; }
+  .plate-pair .pl { width: 19px !important; height: 19px !important; }
+  .cookmeta { font-size: 12px; }
+  .plate-pair .pl b { font-size: 10px; }
+  .pl-arrow, .pl-or { font-size: 11px; }
+  .mini-pan { width: 15px; height: 15px; }
+}
+/* the compact summary keeps its old row height */
+.summary-meta { line-height: 1; max-height: 22px; }
+.summary-meta .plate-pair .pl { width: 20px !important; height: 20px !important; }
+.summary-meta .plate-pair .pl b { font-size: 10px; padding: 0 2px; }
+.summary-meta .mini-pan { width: 16px; height: 16px; }
+@media (max-width: 700px) {
+  .summary-meta { max-height: 16px; }
+  .summary-meta .plate-pair .pl { width: 16px !important; height: 16px !important; }
+  .summary-meta .plate-pair .pl b { font-size: 9px; }
+  .summary-meta .mini-pan { width: 13px; height: 13px; }
+}
+/* keep the summary row at the original 14–15 px so the compact tickets never scroll */
+.summary-meta { max-height: 15px; overflow: visible; }
+.summary-meta .plate-pair .pl { width: 15px !important; height: 15px !important; }
+.summary-meta .plate-pair .pl b { font-size: 8px; padding: 0 1px; }
+.summary-meta .mini-pan { width: 14px; height: 14px; }
+.summary-meta .pl.have { outline-width: 2px; }
+.summary-meta { max-height: 14px; height: 14px; }
+.summary-meta .plate-pair .pl { width: 14px !important; height: 14px !important; }
+.summary-meta .plate-pair .pl b { font-size: 8px; line-height: 1; }
+.summary-meta .mini-pan { width: 13px; height: 13px; }
+
+/* set-aside meals: a drawer at the side */
+.sheet.drawer { justify-content: flex-end; align-items: stretch; }
+.sheet.drawer .aside-card { width: min(360px, 92vw); height: 100%; max-height: none; border-radius: 16px 0 0 16px; overflow: auto; margin: 0; }
+.aside-card .shelf { display: flex; flex-direction: column; gap: 8px; }
+.aside-card .shelf .shl { display: none; }
+.aside-card .shchip { width: 100%; justify-content: flex-start; }
+.btn.aside-toggle { font-size: 18px; }
+.btn.aside-toggle.glow { box-shadow: 0 0 0 3px #e8b84a; }
+
+/* the stove: what to cook, as big buttons */
+.cook-card { max-width: 560px; }
+.cook-row { display: flex; align-items: center; gap: 12px; width: 100%; margin: 6px 0; padding: 8px 12px; border-radius: 14px; border: 2px solid #c9b78f; background: #fffaf0; text-align: left; cursor: pointer; }
+.cook-row:active { transform: scale(.98); }
+.cook-row.done { opacity: .6; }
+.cr-art { width: 52px; height: 52px; flex: none; }
+.cr-art .dish-art, .cr-art .asset { display: block; width: 100%; height: 100%; }
+.cr-name { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.cr-name b { font-size: 18px; }
+.csteps { display: flex; gap: 4px; }
+.cstep { width: 22px; height: 12px; border-radius: 6px; background: #e7dcc4; }
+.cstep.on { background: #e0573c; }
+.cstep.over { outline: 2px solid #c4200a; }
+.cstep.raw { width: auto; background: none; font-size: 12px; opacity: .6; }
+.cr-go { display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; border-radius: 12px; background: #2f5d50; color: #fff; font: 800 20px/1 system-ui, sans-serif; }
+.cr-go .mini-pan { width: 30px; height: 30px; }
