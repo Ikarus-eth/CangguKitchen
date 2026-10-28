@@ -112,20 +112,88 @@ test('Melting delivery: too late, it melts and costs reputation where it exists'
   assert.equal(s.momentLog.length, 1);
 });
 
-test('Birthday table: one order per chef, served within the window pays a tip', () => {
+// A group joins the queue, a chef seats it at the front desk, then each chef takes one order.
+function seatGroup(s, kind, now = 6000) {
+  const m = withMoment(s, kind);
+  assert.equal(m.state, 'queued'); assert.equal(E.headGroup(s), m);
+  s.seats.forEach(x => { x.dish = null; });
+  ok(s, 'place', { area: 'reception', idx: 0 }, now);
+  assert.equal(s.open.p0.type, 'reception');
+  ok(s, 'seat', {}, now);
+  assert.equal(m.state, 'seated');
+  return m;
+}
+function takeAll(s, m, now = 7000) {
+  const seat = s.seats.findIndex(x => x.group === m.id);
+  const ids = s.players.map(p => p.id);
+  m.dishes.forEach((_, i) => {
+    const pid = ids[i % ids.length];
+    s.workers[pid] = s.workers[pid].map(() => null); Object.keys(s.spaces).forEach(k => { if (k !== 'van') s.spaces[k] = s.spaces[k].map(() => null); });
+    assert.equal(E.apply(s, { pid, type: 'place', area: 'dining', idx: 0 }, now + i * 100), null);
+    assert.equal(E.apply(s, { pid, type: 'takeOrder', seat }, now + i * 100), null);
+  });
+  return E.momentOrders(s, m);
+}
+
+test('Groups arrive in the queue, not on the boards', () => {
   const s = game(3, 3, { level: 'normal' });
   const m = withMoment(s, 'birthday');
+  assert.equal(m.state, 'queued'); assert.equal(E.momentOrders(s, m).length, 0);
+  assert.ok(E.isGroup(s.deck[s.deck.length - 1]));
+});
+
+test('Front desk: a group next in line opens the choice even before restaurant 6', () => {
+  const s = game(2, 3, { level: 'normal' });
+  withMoment(s, 'birthday');
+  ok(s, 'place', { area: 'reception', idx: 0 }, 6000);
+  assert.equal(s.open.p0.type, 'reception');
+});
+
+test('Turning a group away costs nothing and seats ordinary guests', () => {
+  const s = game(6, 3, { level: 'normal' }); s.rep = 2;
+  const m = withMoment(s, 'influencer');
+  s.seats.forEach(x => { x.dish = null; });
+  ok(s, 'place', { area: 'reception', idx: 0 }, 6000);
+  ok(s, 'turnAway', {}, 6000);
+  assert.equal(m.state, 'declined'); assert.equal(s.rep, 2);
+  assert.ok(!s.deck.some(E.isGroup));
+  assert.ok(s.seats.some(x => x.dish && !x.group));
+  assert.equal(s.momentLog[0].declined, true);
+});
+
+test('Leaving the front desk without choosing seats the group', () => {
+  const s = game(3, 3, { level: 'normal' });
+  const m = withMoment(s, 'birthday');
+  s.seats.forEach(x => { x.dish = null; });
+  ok(s, 'place', { area: 'reception', idx: 0 }, 6000);
+  ok(s, 'done', {}, 6500);
+  assert.equal(m.state, 'seated');
+});
+
+test('Birthday party: one table, one order per chef, served together pays a tip', () => {
+  const s = game(3, 3, { level: 'normal' });
+  const m = seatGroup(s, 'birthday');
+  const seat = s.seats.findIndex(x => x.group === m.id);
+  assert.equal(s.seats[seat].parts.length, 3);
+  // the same chef can't take a second order from the party
+  s.workers.p0 = s.workers.p0.map(() => null); s.spaces.reception = [null];
+  ok(s, 'place', { area: 'dining', idx: 1 }, 6500); ok(s, 'takeOrder', { seat }, 6500);
+  s.workers.p0 = s.workers.p0.map(() => null); s.spaces.dining = s.spaces.dining.map(() => null);
+  ok(s, 'place', { area: 'dining', idx: 1 }, 6600);
+  assert.match(act(s, 'takeOrder', { seat }, 6600), /one per chef/);
+  ['p1', 'p2'].forEach((pid, i) => { assert.equal(E.apply(s, { pid, type: 'place', area: 'dining', idx: 2 + i }, 6700), null); assert.equal(E.apply(s, { pid, type: 'takeOrder', seat }, 6700), null); });
+  assert.equal(s.seats[seat].group, null);
   const parts = E.momentOrders(s, m);
-  assert.equal(parts.length, 3); assert.deepEqual(new Set(parts.map(o => o.pid)).size, 3);
+  assert.equal(new Set(parts.map(o => o.pid)).size, 3);
   const coins = s.coins;
-  parts.forEach((o, i) => ok(s, 'serveMoment', { pid: o.pid, order: o.id }, 8000 + i * 5000));
+  parts.forEach((o, i) => ok(s, 'serveMoment', { pid: o.pid, order: o.id }, 9000 + i * 5000));
   assert.equal(m.state, 'met'); assert.equal(s.coins, coins + 3);
 });
 
-test('Birthday table: plates too far apart, the guests leave and their orders go', () => {
+test('Birthday party: plates too far apart, the guests leave and their orders go', () => {
   const s = game(3, 2, { level: 'hectic' });
-  const m = withMoment(s, 'birthday');
-  const parts = E.momentOrders(s, m);
+  const m = seatGroup(s, 'birthday');
+  const parts = takeAll(s, m);
   assert.equal(parts.length, 2);
   ok(s, 'serveMoment', { pid: parts[0].pid, order: parts[0].id }, 8000);
   E.tick(s, 8000 + 10001);
@@ -133,34 +201,36 @@ test('Birthday table: plates too far apart, the guests leave and their orders go
   assert.equal(E.momentOrders(s, m).length, 0);
 });
 
-test('Solo: the birthday table puts both orders on the one chef', () => {
+test('Solo: one chef may take every order of the party', () => {
   const s = game(2, 1, { level: 'normal' });
-  const m = withMoment(s, 'birthday');
-  assert.equal(E.momentOrders(s, m).length, 2);
-  assert.ok(E.momentOrders(s, m).every(o => o.pid === 'p0'));
+  const m = seatGroup(s, 'birthday');
+  const parts = takeAll(s, m);
+  assert.equal(parts.length, 2); assert.ok(parts.every(o => o.pid === 'p0'));
 });
 
-test('Influencer: not before her slot, then both items together inside it', () => {
+test('Influencer: her slot starts a minute after sitting; both items together inside it', () => {
   const s = game(3, 3, { level: 'normal' });
-  const m = withMoment(s, 'influencer');
-  const [a, b] = E.momentOrders(s, m);
+  const m = seatGroup(s, 'influencer', 6000);
+  assert.equal(m.slotStart, 6000 + E.SLOT_LEAD);
+  const [a, b] = takeAll(s, m);
   assert.notEqual(a.pid, b.pid);
-  assert.match(E.apply(s, { pid: a.pid, type: 'serveMoment', order: a.id }, 6000), /isn't filming yet/);
+  assert.match(E.apply(s, { pid: a.pid, type: 'serveMoment', order: a.id }, 8000), /isn't filming yet/);
   ok(s, 'serveMoment', { pid: a.pid, order: a.id }, m.slotStart + 1000);
   ok(s, 'serveMoment', { pid: b.pid, order: b.id }, m.slotStart + 9000);
   assert.equal(m.state, 'met'); assert.equal(m.tip, 2);
 });
 
-test('Influencer: missing the slot loses both orders', () => {
+test('Influencer: missing the slot loses both orders and frees her table', () => {
   const s = game(6, 3, { level: 'normal' }); s.rep = 2;
-  const m = withMoment(s, 'influencer');
+  const m = seatGroup(s, 'influencer');
   E.tick(s, m.slotEnd + 1);
-  assert.equal(m.state, 'missed'); assert.equal(s.rep, 1); assert.equal(E.momentOrders(s, m).length, 0);
+  assert.equal(m.state, 'missed'); assert.equal(s.rep, 1);
+  assert.ok(!s.seats.some(x => x.group === m.id));
 });
 
 test('Shift end closes open moments, the report lists them', () => {
   const s = game(3, 3, { level: 'normal' });
-  const m = withMoment(s, 'birthday');
+  const m = seatGroup(s, 'birthday');
   E.apply(s, { type: 'endNow' }, 9000);
   for (let t = 9000; t < 60000 && s.phase !== 'results'; t += 1000) E.tick(s, t);
   assert.equal(m.state, 'missed');

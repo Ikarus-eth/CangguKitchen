@@ -8,7 +8,7 @@ function run(scenario, n, seed, load) {
   const ctx = vm.createContext({Math: math}); vm.runInContext(engine, ctx);
   const E = ctx.Engine;
   const players = Array.from({length:n}, (_,i)=>({id:'p'+i,name:'Player '+i,color:['blue','yellow','red','green'][i]}));
-  const s = E.newGame({scenario,workerSec:30,shiftSec:240,strict:true}, players);
+  const s = E.newGame({scenario,workerSec:30,shiftSec:240,strict:true,...(process.env.KC_LEVEL?{level:process.env.KC_LEVEL}:{})}, players);
   let now=1000, decisions=0;
   const m={scenario,players:n,seed,load,actions:0,errors:[],maxStock:0,maxSpices:0,maxDishesPerPlayer:0,maxDishesTotal:0,missingPlateDecisions:0,missingIngredientDecisions:0,missingSpiceDecisions:0,blockedStationDecisions:0,maxOccupancy:{},visits:{},trace:[]};
   function act(a) { const err=E.apply(s,a,now); if(err){if(m.errors.length<15)m.errors.push({action:a.type,error:err});return false;} m.actions++; if(m.trace.length<100)m.trace.push({t:now,shift:s.shift,...a}); return true; }

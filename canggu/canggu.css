@@ -53,3 +53,16 @@ button.ing.out, button.ing[data-a="shout"] { cursor: pointer; }
 button.ing[data-a="shout"] .empty-tag::after { content: ' · call'; }
 
 .edition-tag { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 999px; background: #2f5d50; color: #fff; font: 600 13px/1.4 system-ui, sans-serif; letter-spacing: .04em; }
+
+/* groups arrive through the front desk */
+.mom.queued { background: #eef4ff; border-color: #5b7fc4; }
+.mom.declined { background: #f1f0ec; border-color: #9a968c; }
+.mpart.open { background: #fff1c9; font-style: italic; }
+.reception-card .grpchoice { margin: 6px 0 10px; }
+.nextline { display: flex; gap: 6px; justify-content: center; margin-top: 4px; }
+.nl { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 30px; padding: 0 6px; border-radius: 15px; background: #fff; border: 2px solid #c9b78f; font-size: 18px; }
+.nl.grp { background: #fff1c9; border-color: #e0573c; font-weight: 700; animation: mom-in .4s ease-out; }
+.nextline .nl:first-child { border-width: 3px; }
+.seat.grpseat { outline: 4px solid #e0573c; outline-offset: 2px; border-radius: 10px; }
+.grptag { position: absolute; left: 50%; top: 2px; transform: translateX(-50%); white-space: nowrap; padding: 3px 10px; border-radius: 999px; background: #e0573c; color: #fff; font: 700 15px/1.2 system-ui, sans-serif; z-index: 5; }
+.seat.guest { position: relative; }

@@ -12,20 +12,40 @@ const URL = (process.env.BASE_URL || 'http://localhost:8765/') + 'canggu/?dev';
   const w = ms => page.waitForTimeout(ms);
   try {
     await page.goto(URL);
-    // A running restaurant 3 with three chefs; the shift started 5 s ago.
+    // A running restaurant 3 with three chefs; the shift started 5 s ago. A birthday party arrives.
     await page.evaluate(() => {
       const g = __kc.loadScenario(3, 3); g.settings.strict = false; g.settings.level = 'normal';
       Engine.apply(g, { type: 'start' }, Date.now() - 5000);
       g.moments = [{ id: 7, kind: 'birthday', at: Date.now() - 100, state: 'planned', shift: 1 }];
+      g.seats.forEach(x => { x.dish = null; });
       Engine.tick(g, Date.now()); __kc.render();
     });
     await w(300);
-    assert.equal(await page.locator('.moments .mom.live').count(), 1, 'birthday bar shows');
-    assert.ok(await page.locator('[data-a="serveMoment"]').count() >= 1, 'my serve button');
-    await page.screenshot({ path: out + '/birthday.png' });
+    assert.equal(await page.locator('.moments .mom.queued').count(), 1, 'queued party in the bar');
+    assert.equal(await page.locator('.nextline .nl.grp').count(), 1, 'party shown next in line');
+    assert.equal(await page.locator('[data-a="serveMoment"]').count(), 0, 'no orders before seating');
+    await page.screenshot({ path: out + '/party-queued.png' });
+    // The front desk offers seat or turn away.
+    await page.locator('.board .reception [data-a="place"]').first().click(); await w(250);
+    assert.equal(await page.locator('.reception-card [data-a="turnAway"]').count(), 1, 'turn away offered');
+    await page.screenshot({ path: out + '/front-desk.png' });
+    await page.locator('.reception-card [data-a="seatGuests"]').click(); await w(250);
+    assert.equal(await page.locator('.seat.grpseat').count(), 1, 'party at one table');
+    await page.screenshot({ path: out + '/party-seated.png' });
+    // My chef takes one order from the party; the others take theirs.
+    await page.evaluate(() => {
+      const g = __kc.wrap.game, seat = g.seats.findIndex(x => x.group);
+      g.workers[__kc.me.pid] = g.workers[__kc.me.pid].map(() => null); g.spaces.reception = [null];
+      __kc.act({ type: 'place', area: 'dining', idx: 0 }); __kc.act({ type: 'takeOrder', seat });
+      ['qa1', 'qa2'].forEach((pid, i) => { Engine.apply(g, { pid, type: 'place', area: 'dining', idx: 1 + i }, Date.now()); Engine.apply(g, { pid, type: 'takeOrder', seat }, Date.now()); });
+      __kc.render();
+    });
+    await w(250);
+    assert.equal(await page.locator('[data-a="serveMoment"]').count(), 1, 'my serve button');
     await page.locator('[data-a="serveMoment"]').first().click(); await w(200);
     assert.ok((await page.locator('.mpart.done').count()) >= 1, 'served part ticked');
-    console.log('PASS birthday bar and serving from it');
+    await page.screenshot({ path: out + '/birthday.png' });
+    console.log('PASS party queues, front desk choice, one table, orders per chef, serving from the bar');
 
     // Long-press on the plan sends a ping with a ripple and a row in the bar.
     const box = await page.locator('.board .stove').boundingBox();
