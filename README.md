@@ -106,3 +106,6 @@ The visual pass unifies typography, icons, stock labels, status controls, panels
 The full floor plan gets the main screen. Orders appear as compact summaries with plate, cooking and ingredient have/recipe counts. Tap an order to open its full recipe and actions. Storage and spice visits open a work menu with large choices and the selected recipe; Back to plan closes the menu without ending the visit. Reopen it from the Storage/Spices button. Plate, wash, shop and dining controls remain in their dedicated menus.
 
 Landscape iPads reserve 236 pixels for up to four order summaries. Portrait layouts use two columns. Larger order collections use more rows; exceptionally large collections can scroll. Nothing in the overview grades a standard-mode meal. Rejoining games, disconnect pauses and the public version's shop and reception behavior are retained.
+
+## Beta interface update
+The root address opens the Canggu beta. The original is preserved at `archive/original/`. Gameplay requires landscape; orders occupy three fixed horizontal cells, and parked orders reopen from the arrow sidebar. The shop displays café shelf counts separately from supplier inventory. Delivery and birthday moments include written action instructions.

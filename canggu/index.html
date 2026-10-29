@@ -622,7 +622,7 @@ h2 small, h2 .extra { font-size: 14px; font-weight: 500; color: var(--ink-2); ma
 <link rel="stylesheet" href="reference.css?v=20261028-ui6">
 <link rel="stylesheet" href="refinement.css?v=20261028-compact">
 <link rel="stylesheet" href="overview.css?v=20261028-overview1">
-<link rel="stylesheet" href="canggu.css?v=20261028-c12">
+<link rel="stylesheet" href="canggu.css?v=20261029-c13">
 </head>
 <body>
 <div id="app"></div>
@@ -2694,7 +2694,7 @@ safe-buffer/index.js:
   }
   // Canggu: set-aside meals live in a drawer at the side instead of a row that pushes the tickets down.
   function asideDrawer(g, aside) {
-    return `<div class="sheet drawer" data-a="asideClose"><div class="card aside-card" data-stop="1"><header class="work-head"><h2>⏸ ${aside.length}</h2><button class="btn ghost close-x" data-a="asideClose" aria-label="Close">✕</button></header>${shelf(g, aside)}</div></div>`;
+    return `<div class="sheet drawer" data-a="asideClose"><div class="card aside-card" data-stop="1"><header class="work-head"><h2>Parked orders · ${aside.length}</h2><button class="btn ghost close-x" data-a="asideClose" aria-label="Close">✕</button></header>${shelf(g, aside)}</div></div>`;
   }
   // Canggu: a chef at the stove gets the meals to cook straight away, as big buttons.
   function cookMenu(g, live, op) {
@@ -3084,7 +3084,7 @@ safe-buffer/index.js:
     const strikes = id => (g.off[id] || []).filter(Boolean).length;
 
     return `<div class="game phase-${g.phase} ${g.settings.strict ? 'strict' : ''}">
-      <header class="bar ${cfg.shop ? 'crowded' : ''}">
+      <div class="rotate-notice"><b>Turn your device sideways</b><p>Canggu Kitchen is played in landscape.</p></div><header class="bar ${cfg.shop ? 'crowded' : ''}">
         <div class="brand">Canggu Kitchen<small>${esc(wrap.room)}</small></div>${role !== 'solo' ? `<span class="roomchip" title="Room code for joining">Code <b>${esc(wrap.room)}</b></span>` : ''}
         <div class="clock" id="clock">${clock}</div>
         ${goalChip(g)}${g.phase==='results'?'<button class="btn" data-a="showResults">Shift results</button>':''}
@@ -3111,8 +3111,8 @@ safe-buffer/index.js:
           ${cfg.office?`<section class="area office"><h3>Office</h3>${office}<small>Repairs · unlock · hire</small></section>`:dormant('office','Office',7)}
         </div></div></div>
         <aside class="kitchen">
-          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> 📝 <small>${liveOrders.length}</small></h2><span class="play-mode">${g.settings.strict?'💡':''}</span>${op&&['storage','spice'].includes(op.type)?`<button class="btn ghost" data-a="openStation">${op.type==='storage'?'📦 '+op.room:'🍵'}</button>`:''}${aside.length ? `<button class="btn ghost aside-toggle ${op && op.type === 'order' && cfg.service && aside.some(o => !o.served) ? 'glow' : ''}" data-a="asideOpen" aria-label="Set-aside meals">⏸ <b>${aside.length}</b></button>` : ''}<button class="btn ghost plate-toggle" data-a="plateMenu" aria-label="Plates">${asset('plate')}</button><button class="link worker-toggle" data-a="workers" aria-label="My chefs">${meP?chef(meP.color):''}</button></div>${status}${ui.pick&&Date.now()-ui.pick.at<2800?`<div class="pick-receipt" role="status">${esc(ui.pick.message)}</div>`:''}
-          <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${orderOverview(g, partnerSel)}</div>` : ''}${liveOrders.length ? liveOrders.map(o => orderOverview(g, o)).join('') : aside.length ? '<p class="empty-k">⏸ ➜ 📝</p>' : (meP ? '<p class="empty-k">🚪 ➜ 📝</p>' : '')}</div>
+          <div class="order-heading"><h2>${esc(meP?.name||'Spectator')} <i>|</i> 📝 <small>${liveOrders.length}</small></h2><span class="play-mode">${g.settings.strict?'💡':''}</span>${op&&['storage','spice'].includes(op.type)?`<button class="btn ghost" data-a="openStation">${op.type==='storage'?'📦 '+op.room:'🍵'}</button>`:''}${aside.length ? `<button class="btn ghost aside-toggle ${op && op.type === 'order' && cfg.service && aside.some(o => !o.served) ? 'glow' : ''}" data-a="asideOpen" aria-label="Set-aside meals">◀ <b>${aside.length}</b><small>Parked</small></button>` : ''}<button class="btn ghost plate-toggle" data-a="plateMenu" aria-label="Plates">${asset('plate')}</button><button class="link worker-toggle" data-a="workers" aria-label="My chefs">${meP?chef(meP.color):''}</button></div>${status}${ui.pick&&Date.now()-ui.pick.at<2800?`<div class="pick-receipt" role="status">${esc(ui.pick.message)}</div>`:''}
+          <div class="mytks">${partnerSel ? `<div class="forpartner"><div class="fpband">Helping ${esc((playerOf(g, partnerSel.pid) || {}).name)} <button class="link" data-a="selMine">back to mine</button></div>${orderOverview(g, partnerSel)}</div>` : ''}${liveOrders.map(o => orderOverview(g, o)).join('')}${Array.from({length:Math.max(0,3-liveOrders.length)},()=>'<div class="empty-order">Empty order slot<small>Take an order in the dining room</small></div>').join('')}</div>
           
         </aside>
       </div>
@@ -3206,7 +3206,7 @@ safe-buffer/index.js:
     const drinks = E.cfgOf(g).money ? k * (E.has(g, 'drinks') ? 2 : 1) : 0;
     const why = !g.deck.length ? 'No guests are left outside.' : 'All tables are full.';
     const grp = E.headGroup(g), canAway = E.cfgOf(g).throwOut;
-    const grpCard = grp ? `<div class="mom queued grpchoice"><b class="big">${E.MOMENT_INFO[grp.kind].e} ${grp.kind === 'birthday' ? 'Birthday party' : 'Influencer'}</b>${groupIcons(g, grp)}</div>` : '';
+    const grpCard = grp ? `<div class="mom queued grpchoice"><b class="big">${E.MOMENT_INFO[grp.kind].e} ${grp.kind === 'birthday' ? 'Birthday party' : 'Influencer'}</b>${groupIcons(g, grp)}<p>Seat the party, then take their orders in the dining room. Each chef takes one dish. Prepare them together before serving.</p></div>` : '';
     return `<div class="sheet recsheet"><div class="card reception-card">
       <h2>🚪 Front desk</h2>
       ${grpCard}
@@ -3238,9 +3238,13 @@ safe-buffer/index.js:
     const n = E.has(g, 'bulk') ? 7 : 5;
     const left = myOpen(g) ? myOpen(g).left : 1;
     // Everything on one screen: the six ingredients and all five spices are visible at once.
-    const ingBtn = i => `<button class="sbtn ${sh.ing === i ? 'on' : ''}" data-a="shopIng" data-ing="${i}" ${E.supplyCount(g, i) < n ? 'disabled' : ''} aria-label="Buy ${n} ${E.ING_INFO[i].n}, ${E.supplyCount(g, i)} in supply">${asset(i)}<small>${E.ING_INFO[i].n}</small><small class="left">${E.supplyCount(g, i)} left</small></button>`;
+    const stockLabel = i => {
+      const rooms = (pantry && E.PANTRY_INGS.includes(i) ? ['C'] : ['A','B']).filter(r=>!g.locked[r]);
+      return rooms.map(r=>`${ROOM_LABEL[r]}: ${g.storage[r][i]||0}${!g.storage[r][i]?' · EMPTY':''}`).join(' / ');
+    };
+    const ingBtn = i => `<button class="sbtn ${sh.ing === i ? 'on' : ''}" data-a="shopIng" data-ing="${i}" ${E.supplyCount(g, i) < n ? 'disabled' : ''} aria-label="Buy ${n} ${E.ING_INFO[i].n}, ${E.supplyCount(g, i)} in supply">${asset(i)}<small>${E.ING_INFO[i].n}</small><small class="cafe-stock">${stockLabel(i)}</small><small class="left">Supplier: ${E.supplyCount(g, i)}</small></button>`;
     const spBtn = (kind, i) => { const k = kind === 'cheap' ? 3 : 2, picks = sh[kind], cnt = picks.filter(x => x === i).length;
-      return `<button class="sbtn ${cnt ? 'on' : ''}" data-a="shopSp" data-kind="${kind}" data-spice="${i}" ${picks.length >= k || cnt >= E.supplyCount(g, i) ? 'disabled' : ''} aria-label="${E.SP_INFO[i].n}, ${E.supplyCount(g, i)} in supply">${cnt ? `<span class="pickn">×${cnt}</span>` : ''}${asset(i)}<small>${E.SP_INFO[i].n}</small><small class="left">${E.supplyCount(g, i)} left</small></button>`; };
+      return `<button class="sbtn ${cnt ? 'on' : ''}" data-a="shopSp" data-kind="${kind}" data-spice="${i}" ${picks.length >= k || cnt >= E.supplyCount(g, i) ? 'disabled' : ''} aria-label="${E.SP_INFO[i].n}, ${E.supplyCount(g, i)} in supply">${cnt ? `<span class="pickn">×${cnt}</span>` : ''}${asset(i)}<small>${E.SP_INFO[i].n}</small><small class="cafe-stock">Café: ${g.bag[i]||0}${!g.bag[i]?" · EMPTY":""}</small><small class="left">Supplier: ${E.supplyCount(g, i)}</small></button>`; };
     const grp = (kind, title, sub, btns) => `<div class="sgroup sg-${kind} ${tab === kind ? 'on' : tab ? 'off' : ''}"><div class="sg-h"><b>${title}</b><small>${sub}</small></div><div class="shoprow">${btns}</div></div>`;
     let body = '';
     if (tab === 'ing' && sh.ing) {
@@ -3258,7 +3262,7 @@ safe-buffer/index.js:
     } else body = '<p class="note shop-start">Tap what you want to buy.</p>';
     return `<div class="sheet shopsheet"><div class="card shop">
       <h2>🛵 Scooter run <small class="badge">${left > 1 ? '2 purchases this trip' : '1 purchase'} · office has ${g.coins} 🪙</small></h2>
-      <p class="note">One purchase costs 1 coin. Choose one of the three:</p>
+      <p class="note">Restock your café · EMPTY means your shelf has run out. Each purchase costs 1 coin.</p>
       <div class="shopgrid">
         ${grp('ing', `${n} of one ingredient`, 'into Fridge A and B', E.ING.map(ingBtn).join(''))}
         <div class="sg-pair">
@@ -3384,7 +3388,7 @@ safe-buffer/index.js:
     if (!live.length && !recent.length && !pings) return '';
     const rows = live.map(m => {
       const I = E.MOMENT_INFO[m.kind];
-      if (m.kind === 'delivery') return `<div class="mom live icons" aria-label="Acai delivery: send a chef to a fridge"><span class="big">🧊</span><span class="arrow">➜</span><span class="big">📦</span><small>Fridge</small><b class="mleft" data-mend="${m.until}"></b></div>`;
+      if (m.kind === 'delivery') return `<div class="mom live icons" aria-label="Acai delivery: send a chef to a fridge"><span class="big">🧊</span><span class="arrow">➜</span><span class="big">📦</span><small><b>Açaí &amp; ice delivery</b><br>Send a free chef to Fridge A or B before time runs out. Collected automatically.</small><b class="mleft" data-mend="${m.until}"></b></div>`;
       if (m.state === 'queued') {
         return `<div class="mom queued icons" aria-label="${m.kind === 'birthday' ? 'Birthday party' : 'Influencer'} waiting outside: go to the front desk"><span class="big">${I.e}${m.kind === 'birthday' ? '×' + m.dishes.length : ''}</span><span class="arrow">➜</span><span class="big">🚪</span><small>Front desk</small><b class="mleft" data-mend="${m.arrivedAt + E.QUEUE_MS}"></b></div>`;
       }
@@ -3397,13 +3401,13 @@ safe-buffer/index.js:
       const canServe = m.kind !== 'influencer' || now >= m.slotStart;
       const seatG = g.seats.find(x => x.group === m.id);
       const claim = m.claimUntil && seatG && seatG.parts && seatG.parts.length
-        ? (!m.takers.includes(me.pid) && g.players.some(p => p.id === me.pid) ? `<button class="btn claim-m" data-a="claimPart" data-moment="${m.id}" aria-label="Take the next order">👍 ${mDish({ dish: seatG.parts[0] }, 'sm')}</button>` : '') + `<b class="mleft hot" data-mend="${m.claimUntil}"></b>`
+        ? (!m.takers.includes(me.pid) && g.players.some(p => p.id === me.pid) ? `<button class="btn claim-m" data-a="claimPart" data-moment="${m.id}" aria-label="Take the next order">Take my dish  ${mDish({ dish: seatG.parts[0] }, 'sm')}</button>` : '') + `<b class="mleft hot" data-mend="${m.claimUntil}"></b>`
         : '';
-      const btns = mine.map(o => `<button class="btn serve-m" data-a="serveMoment" data-order="${o.id}" ${canServe ? '' : 'disabled'} aria-label="Serve ${esc(E.DISHES[o.dish].name)}">🛎️ ${mDish(o, 'sm')}</button>`).join('');
+      const btns = mine.map(o => `<button class="btn serve-m" data-a="serveMoment" data-order="${o.id}" ${canServe ? '' : 'disabled'} aria-label="Serve ${esc(E.DISHES[o.dish].name)}">Serve  ${mDish(o, 'sm')}</button>`).join('');
       const served = parts.filter(o => o.servedAt != null).map(o => o.servedAt);
       if (m.kind === 'birthday') {
         const clock = served.length ? `<b class="mleft hot" data-mend="${Math.min.apply(null, served) + L.win}"></b>` : `<span class="mchip">⏱ ${Math.round(L.win / 1000)} s</span>`;
-        return `<div class="mom live icons"><span class="big">🎂</span>${chips}${claim || clock}${claim ? '' : btns}</div>`;
+        return `<div class="mom live icons"><span class="big">🎂</span><small><b>Birthday party</b><br>${claim ? "Each chef: take one dish below." : `Prepare every dish, then serve all within ${Math.round(L.win / 1000)} seconds of the first. The first Serve starts the clock.`}</small>${chips}${claim || clock}${claim ? '' : btns}</div>`;
       }
       const before = now < m.slotStart;
       const clock = before ? `<span class="mchip">🎬</span><b class="mleft" data-mend="${m.slotStart}"></b>` : `<span class="mchip rec">🔴 REC</span><b class="mleft hot" data-mend="${m.slotEnd}"></b>`;

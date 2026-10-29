@@ -168,3 +168,19 @@ button.ing[data-a="shout"] .empty-tag::after { content: ' · call'; }
 .cstep.raw { width: auto; background: none; font-size: 12px; opacity: .6; }
 .cr-go { display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; border-radius: 12px; background: #2f5d50; color: #fff; font: 800 20px/1 system-ui, sans-serif; }
 .cr-go .mini-pan { width: 30px; height: 30px; }
+
+/* Fixed three-place order rail, with parked meals in the existing drawer. */
+.game .main.overview,.game .main.overview.many-orders{grid-template-rows:minmax(0,1fr) 230px!important}
+.game .overview .mytks{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:calc((100% - 16px)/3);grid-template-rows:minmax(0,1fr);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;grid-auto-rows:auto!important}
+.order-summary,.empty-order{min-width:0;scroll-snap-align:start;overflow:auto}
+.empty-order{border:1px dashed #b9ad93;border-radius:8px;color:#776d58;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font:16px Georgia}
+.empty-order small{font:11px var(--ui);text-align:center}
+.game .kitchen{position:relative;padding-right:58px!important}
+.game .aside-toggle{position:absolute;right:4px;top:50px;bottom:8px;width:46px;padding:5px;display:flex;flex-direction:column;justify-content:center;gap:8px;background:#e8dfcc}
+.aside-toggle small{font-size:10px}
+.cafe-stock{font-weight:700;color:#85552d;white-space:normal}
+.shop .sbtn{height:auto!important;min-height:110px}
+.mom small{max-width:310px;line-height:1.4}
+.rotate-notice{display:none}
+@media(orientation:portrait){.rotate-notice{display:flex;position:fixed;inset:0;z-index:99999;background:#faf5e9;color:#384a36;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px}.game>:not(.rotate-notice){visibility:hidden}}
+@media(orientation:landscape) and (max-height:650px){.game .main.overview,.game .main.overview.many-orders{grid-template-rows:minmax(0,1fr) 190px!important}}

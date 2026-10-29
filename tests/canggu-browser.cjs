@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const out = process.env.QA_OUTPUT || '/tmp/canggu-edition'; fs.mkdirSync(out, { recursive: true });
 const URL = (process.env.BASE_URL || 'http://localhost:8765/') + 'canggu/?dev';
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch({channel:'chrome'});
   const page = await b.newPage({ viewport: { width: 1194, height: 834 } }), errors = [];
   page.on('pageerror', e => errors.push(e.message));
   const w = ms => page.waitForTimeout(ms);
